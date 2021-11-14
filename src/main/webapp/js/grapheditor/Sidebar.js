@@ -105,7 +105,9 @@ Sidebar.prototype.init = function()
 	this.setCurrentSearchEntryLibrary();
 	
 	this.addUmlPalette(false);
-	this.addBpmnPalette(dir, false);
+	if(this.addBpmnPalette != undefined){
+		this.addBpmnPalette(dir, false);
+	}
 	
 	this.setCurrentSearchEntryLibrary('flowchart');
 	this.addStencilPalette('flowchart', 'Flowchart', dir + '/flowchart.xml',
