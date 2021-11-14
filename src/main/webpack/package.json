@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jgraph/drawio.git"
+    "url": "git+https://github.com/ArfanMirza/drawio.git"
   },
   "keywords": [
     "draw.io",
@@ -23,7 +23,7 @@
   "bugs": {
     "url": "https://github.com/jgraph/drawio-desktop/issues"
   },
-  "homepage": "https://github.com/jgraph/drawio",
+  "homepage": "https://github.com/jArfanMirza/drawio",
   "dependencies": {
     "copy-webpack-plugin": "^9.0.1",
     "html-webpack-plugin": "^5.5.0",
