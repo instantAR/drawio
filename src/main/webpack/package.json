@@ -1,0 +1,35 @@
+{
+  "name": "draw.io",
+  "version": "15.7.2",
+  "description": "diagrams.net desktop",
+  "main": "./dist/grapheditor.js",
+  "scripts": {
+    "start": "rmdir dist /S /Q & npx webpack --mode=development --config webpack.config.js --watch",
+    "build:pack": "rmdir dist /S /Q & del draw.io.15.7.2.tgz & npx webpack --mode=development --config webpack.config.js & npm pack",
+    "build": "rmdir dist /S /Q & npx webpack --mode=production --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgraph/drawio.git"
+  },
+  "keywords": [
+    "draw.io",
+    "diagram",
+    "flowchart",
+    "UML"
+  ],
+  "author": "JGraph",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/jgraph/drawio-desktop/issues"
+  },
+  "homepage": "https://github.com/jgraph/drawio",
+  "dependencies": {
+    "copy-webpack-plugin": "^9.0.1",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.61.0",
+    "webpack-cli": "^4.9.1",
+    "pdf-lib": "^1.16.0"
+  },
+  "devDependencies": {}
+}

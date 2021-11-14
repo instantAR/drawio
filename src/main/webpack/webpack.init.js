@@ -1,0 +1,434 @@
+/**
+ * Copyright (c) 2006-2021, JGraph Ltd
+ * Copyright (c) 2006-2021, draw.io AG
+ */
+
+ // urlParams is null when used for embedding
+ window.urlParams = window.urlParams || {};
+
+ // Public global variables
+ window.MAX_REQUEST_SIZE = window.MAX_REQUEST_SIZE  || 10485760;
+ window.MAX_AREA = window.MAX_AREA || 15000 * 15000;
+ 
+ // URLs for save and export
+ window.EXPORT_URL = window.EXPORT_URL || '/export';
+ window.SAVE_URL = window.SAVE_URL || '/save';
+ window.OPEN_URL = window.OPEN_URL || '/open';
+ window.RESOURCES_PATH = window.RESOURCES_PATH || 'assets/mxgraph/resources';
+//  window.RESOURCE_BASE = window.RESOURCE_BASE || window.RESOURCES_PATH + '/grapheditor';
+ window.STENCIL_PATH = window.STENCIL_PATH || 'assets/mxgraph/stencils';
+ window.IMAGE_PATH = window.IMAGE_PATH || 'assets/mxgraph/images';
+ window.STYLE_PATH = window.STYLE_PATH || 'assets/mxgraph/styles';
+ window.CSS_PATH = window.CSS_PATH || 'assets/mxgraph/styles';
+ window.OPEN_FORM = window.OPEN_FORM || 'open.html';
+ 
+ // Sets the base path, the UI language via URL param and configures the
+ // supported languages to avoid 404s. The loading of all core language
+ // resources is disabled as all required resources are in grapheditor.
+ // properties. Note that in this example the loading of two resource
+ // files (the special bundle and the default bundle) is disabled to
+ // save a GET request. This requires that all resources be present in
+ // each properties file since only one file is loaded.
+ window.mxBasePath = window.mxBasePath || 'assets/mxgraph/';
+ window.mxImageBasePath = window.mxImageBasePath || 'assets/mxgraph/images';
+ window.mxLanguage = window.mxLanguage || urlParams['lang'];
+//  window.mxLanguages = window.mxLanguages || ['de', 'se'];
+
+ 
+ /**
+ * Copyright (c) 2006-2021, JGraph Ltd
+ * Copyright (c) 2006-2021, draw.io AG
+ */
+
+// // urlParams is null when used for embedding
+// window.urlParams = window.urlParams || {};
+
+// isLocalStorage controls access to local storage
+window.isLocalStorage = window.isLocalStorage || false;
+
+// Disables loading settings in configured mode
+window.mxLoadSettings = window.mxLoadSettings || urlParams['configure'] != '1';
+
+// Checks for SVG support
+window.isSvgBrowser = true;
+
+// CUSTOM_PARAMETERS - URLs for save and export
+// window.DRAWIO_BASE_URL = window.DRAWIO_BASE_URL || ((/.*\.draw\.io$/.test(window.location.hostname)) || (/.*\.diagrams\.net$/.test(window.location.hostname)) ?
+// 	window.location.protocol + '//' + window.location.hostname : 'https://app.diagrams.net');
+// window.DRAWIO_LIGHTBOX_URL = window.DRAWIO_LIGHTBOX_URL || 'https://viewer.diagrams.net';
+// window.EXPORT_URL = window.EXPORT_URL || 'https://convert.diagrams.net/node/export';
+// window.PLANT_URL = window.PLANT_URL || 'https://plant-aws.diagrams.net';
+// window.DRAW_MATH_URL = window.DRAW_MATH_URL || window.DRAWIO_BASE_URL + '/math';
+// window.VSD_CONVERT_URL = window.VSD_CONVERT_URL || 'https://convert.diagrams.net/VsdConverter/api/converter';
+// window.EMF_CONVERT_URL = window.EMF_CONVERT_URL || 'https://convert.diagrams.net/emf2png/convertEMF';
+// window.REALTIME_URL = window.REALTIME_URL || 'cache';
+// window.DRAWIO_GITLAB_URL = window.DRAWIO_GITLAB_URL || 'https://gitlab.com';
+// window.DRAWIO_GITLAB_ID = window.DRAWIO_GITLAB_ID || 'c9b9d3fcdce2dec7abe3ab21ad8123d89ac272abb7d0883f08923043e80f3e36';
+// window.DRAWIO_GITHUB_URL = window.DRAWIO_GITHUB_URL || 'https://github.com';
+// window.DRAWIO_GITHUB_API_URL = window.DRAWIO_GITHUB_API_URL || 'https://api.github.com';
+// window.DRAWIO_GITHUB_ID = window.DRAWIO_GITHUB_ID || '4f88e2ec436d76c2ee6e';
+// window.DRAWIO_DROPBOX_ID = window.DRAWIO_DROPBOX_ID || 'libwls2fa9szdji';
+// window.SAVE_URL = window.SAVE_URL || 'save';
+// window.OPEN_URL = window.OPEN_URL || 'import';
+// window.PROXY_URL = window.PROXY_URL || 'proxy';
+// window.DRAWIO_VIEWER_URL = window.DRAWIO_VIEWER_URL || null;
+// window.NOTIFICATIONS_URL = window.NOTIFICATIONS_URL || 'https://www.draw.io/notifications';
+
+// Paths and files
+window.SHAPES_PATH = window.SHAPES_PATH || 'assets/mxgraph/shapes';
+// Path for images inside the diagram
+window.GRAPH_IMAGE_PATH = window.GRAPH_IMAGE_PATH || 'assets/mxgraph/img';
+window.ICONSEARCH_PATH = window.ICONSEARCH_PATH || (((navigator.userAgent != null && navigator.userAgent.indexOf('MSIE') >= 0) ||
+	urlParams['dev']) && window.location.protocol != 'file:' ? 'iconSearch' : window.DRAWIO_BASE_URL + '/iconSearch');
+window.TEMPLATE_PATH = window.TEMPLATE_PATH || 'assets/mxgraph/templates';
+window.NEW_DIAGRAM_CATS_PATH = window.NEW_DIAGRAM_CATS_PATH || 'assets/mxgraph/newDiagramCats';
+window.PLUGINS_BASE_PATH = window.PLUGINS_BASE_PATH || '';
+
+// Directory for i18 files and basename for main i18n file
+window.RESOURCES_PATH = window.RESOURCES_PATH || 'assets/mxgraph/resources';
+window.RESOURCE_BASE = window.RESOURCE_BASE || RESOURCES_PATH + '/dia';
+
+// Specifies global configuration via variable
+window.DRAWIO_CONFIG = window.DRAWIO_CONFIG || null;
+
+// Sets the base path, the UI language via URL param and configures the
+// supported languages to avoid 404s. The loading of all core language
+// resources is disabled as all required resources are in grapheditor.
+// properties. Note that in this example the loading of two resource
+// files (the special bundle and the default bundle) is disabled to
+// save a GET request. This requires that all resources be present in
+// the special bundle.
+window.mxLoadResources = window.mxLoadResources || false;
+
+// Add new languages here. First entry is translated to [Automatic]
+// in the menu defintion in Diagramly.js.
+window.mxLanguageMap = window.mxLanguageMap ||
+{
+	'i18n': '',
+	'id' : 'Bahasa Indonesia',
+	'ms' : 'Bahasa Melayu',
+	'bs' : 'Bosanski',
+	'bg' : 'Bulgarian',
+	'ca' : 'Català',
+	'cs' : 'Čeština',
+	'da' : 'Dansk',
+	'de' : 'Deutsch',
+	'et' : 'Eesti',
+	'en' : 'English',
+	'es' : 'Español',
+	'eu' : 'Euskara',
+	'fil' : 'Filipino',
+	'fr' : 'Français',
+	'gl' : 'Galego',
+	'it' : 'Italiano',
+	'hu' : 'Magyar',
+	'nl' : 'Nederlands',
+	'no' : 'Norsk',
+	'pl' : 'Polski',
+	'pt-br' : 'Português (Brasil)',
+	'pt' : 'Português (Portugal)',
+	'ro' : 'Română',
+	'fi' : 'Suomi',
+	'sv' : 'Svenska',
+	'vi' : 'Tiếng Việt',
+	'tr' : 'Türkçe',
+	'el' : 'Ελληνικά',
+	'ru' : 'Русский',
+	'sr' : 'Српски',
+	'uk' : 'Українська',
+	'he' : 'עברית',
+	'ar' : 'العربية',
+	'fa' : 'فارسی',
+	'th' : 'ไทย',
+	'ko' : '한국어',
+	'ja' : '日本語',
+	'zh' : '简体中文',
+	'zh-tw' : '繁體中文'
+};
+
+if (typeof window.mxBasePath === 'undefined')
+{
+	window.mxBasePath = 'assets/mxgraphmxgraph';
+	window.mxImageBasePath = 'assets/mxgraphmxgraph/images';
+}
+
+if (window.mxLanguages == null)
+{
+	window.mxLanguages = [];
+	
+	// Populates the list of supported special language bundles
+	for (var lang in mxLanguageMap)
+	{
+		// Empty means default (ie. browser language), "en" means English (default for unsupported languages)
+		// Since "en" uses no extension this must not be added to the array of supported language bundles.
+		if (lang != 'en')
+		{
+			window.mxLanguages.push(lang);
+		}
+	}
+}
+
+//Disable Google Drive when running in a WebView (e.g, MS Teams App) Since auth doesn't work with disallowd_useragent
+//[For MS Teams only] TODO Check if other apps are affected also (android and iOS)
+if (urlParams['extAuth'] == '1' && /((iPhone|iPod|iPad).*AppleWebKit(?!.*Version)|; wv)/i.test(navigator.userAgent))
+{
+	urlParams['gapi'] = '0';
+	urlParams['noDevice'] = '1';
+	//Force viewer only
+	//TODO This should always be for MS Teams only
+	if (urlParams['lightbox'] != '1')
+	{
+		urlParams['lightbox'] = '1';
+		urlParams['layers'] = '1';
+		urlParams['viewerOnlyMsg'] = '1';
+	}
+}
+
+// Uses lightbox mode on viewer domain
+// if (window.location.hostname == DRAWIO_LIGHTBOX_URL.substring(DRAWIO_LIGHTBOX_URL.indexOf('//') + 2))
+// {
+// 	urlParams['lightbox'] = '1';
+// }	
+
+// Lightbox enables chromeless mode
+if (urlParams['lightbox'] == '1')
+{
+	urlParams['chrome'] = '0';
+}
+
+// Embed inline is embed mode and sketch UI
+if (urlParams['embedInline'] == '1')
+{
+	urlParams['embed'] = '1';
+	urlParams['ui'] = 'sketch';
+	urlParams['plugins'] = '0';
+	urlParams['proto'] = 'json';
+	urlParams['prefetchFonts'] = '1';
+}
+
+/**
+ * Returns the global UI setting before running static draw.io code
+ */
+window.uiTheme = window.uiTheme || (function() 
+{
+	var ui = urlParams['ui'];
+
+	//Use Sketch theme for MS Teams (and any future extAuth) by default
+	if (urlParams['extAuth'] == '1')
+	{
+		ui = 'sketch';
+	}
+
+	// Known issue: No JSON object at this point in quirks in IE8
+	if (ui == null && isLocalStorage && typeof JSON !== 'undefined' && urlParams['lightbox'] != '1')
+	{
+		try
+		{
+			var value = localStorage.getItem('.drawio-config');
+			
+			if (value != null)
+			{
+				ui = JSON.parse(value).ui || null;
+			}
+		}
+		catch (e)
+		{
+			// cookies are disabled, attempts to use local storage will cause
+			// a DOM error at a minimum on Chrome
+			isLocalStorage = false;
+		}
+	}
+	
+	// Uses minimal theme on small screens
+	try
+	{
+		if (ui == null)
+		{
+	        var iw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+	        if (iw <= 768)
+	        {
+				if (urlParams['pages'] == null)
+				{
+					urlParams['pages'] = '1';
+				}
+
+				ui = 'sketch';
+	        }
+		}
+	}
+	catch (e)
+	{
+		// ignore
+	}
+
+	// Redirects sketch UI to min UI with sketch URL parameter
+	if (ui == 'sketch')
+	{
+		urlParams['sketch'] = '1';
+		ui = 'min';
+	}
+		
+	return ui;
+})();
+
+/**
+ * Global function for loading local files via servlet
+ */
+function setCurrentXml(data, filename)
+{
+	if (window.parent != null && window.parent.openFile != null)
+	{
+		window.parent.openFile.setData(data, filename);
+	}
+};
+
+/**
+ * Overrides splash URL parameter via local storage
+ */
+(function() 
+{
+	// Known issue: No JSON object at this point in quirks in IE8
+	if (typeof JSON !== 'undefined')
+	{
+		// Cannot use mxSettings here
+		if (isLocalStorage) 
+		{
+			try
+			{
+				var value = localStorage.getItem('.drawio-config');
+				var showSplash = true;
+				
+				if (value != null)
+				{
+					showSplash = JSON.parse(value).showStartScreen;
+				}
+				
+				// Undefined means true
+				if (showSplash == false)
+				{
+					urlParams['splash'] = '0';
+				}
+			}
+			catch (e)
+			{
+				// ignore
+			}
+		}
+	}
+	
+	// Customizes export URL
+	var ex = urlParams['export'];
+
+	if (ex != null)
+	{
+		ex = decodeURIComponent(ex);
+		
+		if (ex.substring(0, 7) != 'http://' &&  ex.substring(0, 8) != 'https://')
+		{
+			ex = 'http://' + ex;
+		}
+		
+		EXPORT_URL = ex;
+	}
+
+	// Customizes gitlab URL
+	var glUrl = urlParams['gitlab'];
+
+	if (glUrl != null)
+	{
+		glUrl = decodeURIComponent(glUrl);
+		
+		if (glUrl.substring(0, 7) != 'http://' &&  glUrl.substring(0, 8) != 'https://')
+		{
+			glUrl = 'http://' + glUrl;
+		}
+		
+		DRAWIO_GITLAB_URL = glUrl;
+	}
+	
+	var glId = urlParams['gitlab-id'];
+
+	if (glId != null)
+	{
+		DRAWIO_GITLAB_ID = glId;
+	}
+
+	// URL for logging
+	window.DRAWIO_LOG_URL = window.DRAWIO_LOG_URL || '';
+
+	//Adds hard-coded logging domain for draw.io domains
+	var host = window.location.host;
+	
+	if (host != 'test.draw.io')
+	{
+		var searchString = 'diagrams.net';
+		var position = host.length - searchString.length;
+		var lastIndex = host.lastIndexOf(searchString, position);
+		
+		if (lastIndex !== -1 && lastIndex === position)
+		{
+			window.DRAWIO_LOG_URL = 'https://log.diagrams.net';
+		}
+		else
+		{
+			// For atlas integrations
+			var searchString = 'draw.io';
+			var position = host.length - searchString.length;
+			var lastIndex = host.lastIndexOf(searchString, position);
+			
+			if (lastIndex !== -1 && lastIndex === position)
+			{
+				window.DRAWIO_LOG_URL = 'https://log.draw.io';
+			}
+		}
+	}
+})();
+
+// Enables offline mode
+if (urlParams['offline'] == '1' || urlParams['demo'] == '1' || 
+		urlParams['stealth'] == '1' || urlParams['local'] == '1' || urlParams['lockdown'] == '1')
+{
+	urlParams['picker'] = '0';
+	urlParams['gapi'] = '0';
+	urlParams['db'] = '0';
+	urlParams['od'] = '0';
+	urlParams['gh'] = '0';
+	urlParams['gl'] = '0';
+	urlParams['tr'] = '0';
+}
+// Do not insert code between above and below blocks
+// se mode. Ensure this comes after the block above. 
+if (window.location.hostname == 'se.diagrams.net')
+{
+	urlParams['db'] = '0';
+	urlParams['od'] = '0';
+	urlParams['gh'] = '0';
+	urlParams['gl'] = '0';
+	urlParams['tr'] = '0';
+	urlParams['plugins'] = '0';
+	urlParams['mode'] = 'google';
+	urlParams['lockdown'] = '1'; // Do not want to apply lockdown true to above block
+
+	window.DRAWIO_GOOGLE_APP_ID = window.DRAWIO_GOOGLE_APP_ID || '184079235871';
+	window.DRAWIO_GOOGLE_CLIENT_ID = window.DRAWIO_GOOGLE_CLIENT_ID || '184079235871-pjf5nn0lff27lk8qf0770gmffiv9gt61.apps.googleusercontent.com';
+}
+
+// Disables Trello client by default
+if (urlParams['mode'] == 'trello')
+{
+	urlParams['tr'] = '1';
+}
+
+// Uses embed mode on embed domain
+if (window.location.hostname == 'embed.diagrams.net')
+{
+	urlParams['embed'] = '1';
+}
+
+// Fallback for cases where the hash property is not available
+if ((window.location.hash == null || window.location.hash.length <= 1) &&
+	urlParams['open'] != null)
+{
+	window.location.hash = urlParams['open'];
+}
