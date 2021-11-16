@@ -19,6 +19,24 @@ Copy the tgz & Go to Angular Project, create lib directory along src directory a
 ```shell
 npm install --save ./lib/draw.io-*.tgz
 ```
+### Update Angular.json
+```shell
+"assets": [
+  .
+  .
+  {
+    "glob": "**/*",
+    "input": "./node_modules/draw.io/dist/mxgraph",
+    "output": "./mxgraph"
+  }
+]
+
+"styles": [
+  .
+  .
+  "./node_modules/draw.io/dist/mxgraph/styles/grapheditor.css"
+],
+```
 
 ### TS - Integration
 ```shell
