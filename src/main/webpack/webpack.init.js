@@ -14,12 +14,12 @@
  window.EXPORT_URL = window.EXPORT_URL || '/export';
  window.SAVE_URL = window.SAVE_URL || '/save';
  window.OPEN_URL = window.OPEN_URL || '/open';
- window.RESOURCES_PATH = window.RESOURCES_PATH || 'assets/mxgraph/resources';
+ window.RESOURCES_PATH = window.RESOURCES_PATH || 'mxgraph/resources';
 //  window.RESOURCE_BASE = window.RESOURCE_BASE || window.RESOURCES_PATH + '/grapheditor';
- window.STENCIL_PATH = window.STENCIL_PATH || 'assets/mxgraph/stencils';
- window.IMAGE_PATH = window.IMAGE_PATH || 'assets/mxgraph/images';
- window.STYLE_PATH = window.STYLE_PATH || 'assets/mxgraph/styles';
- window.CSS_PATH = window.CSS_PATH || 'assets/mxgraph/styles';
+ window.STENCIL_PATH = window.STENCIL_PATH || 'mxgraph/stencils';
+ window.IMAGE_PATH = window.IMAGE_PATH || 'mxgraph/images';
+ window.STYLE_PATH = window.STYLE_PATH || 'mxgraph/styles';
+ window.CSS_PATH = window.CSS_PATH || 'mxgraph/styles';
  window.OPEN_FORM = window.OPEN_FORM || 'open.html';
  
  // Sets the base path, the UI language via URL param and configures the
@@ -29,12 +29,12 @@
  // files (the special bundle and the default bundle) is disabled to
  // save a GET request. This requires that all resources be present in
  // each properties file since only one file is loaded.
- window.mxBasePath = window.mxBasePath || 'assets/mxgraph/';
- window.mxImageBasePath = window.mxImageBasePath || 'assets/mxgraph/images';
+ window.mxBasePath = window.mxBasePath || 'mxgraph/';
+ window.mxImageBasePath = window.mxImageBasePath || 'mxgraph/images';
  window.mxLanguage = window.mxLanguage || urlParams['lang'];
 //  window.mxLanguages = window.mxLanguages || ['de', 'se'];
 
- 
+// window.mxLoadStylesheets=window.mxLoadStylesheets|| true;
  /**
  * Copyright (c) 2006-2021, JGraph Ltd
  * Copyright (c) 2006-2021, draw.io AG
@@ -75,17 +75,17 @@ window.isSvgBrowser = true;
 // window.NOTIFICATIONS_URL = window.NOTIFICATIONS_URL || 'https://www.draw.io/notifications';
 
 // Paths and files
-window.SHAPES_PATH = window.SHAPES_PATH || 'assets/mxgraph/shapes';
+window.SHAPES_PATH = window.SHAPES_PATH || 'mxgraph/shapes';
 // Path for images inside the diagram
-window.GRAPH_IMAGE_PATH = window.GRAPH_IMAGE_PATH || 'assets/mxgraph/img';
+window.GRAPH_IMAGE_PATH = window.GRAPH_IMAGE_PATH || 'mxgraph/img';
 window.ICONSEARCH_PATH = window.ICONSEARCH_PATH || (((navigator.userAgent != null && navigator.userAgent.indexOf('MSIE') >= 0) ||
 	urlParams['dev']) && window.location.protocol != 'file:' ? 'iconSearch' : window.DRAWIO_BASE_URL + '/iconSearch');
-window.TEMPLATE_PATH = window.TEMPLATE_PATH || 'assets/mxgraph/templates';
-window.NEW_DIAGRAM_CATS_PATH = window.NEW_DIAGRAM_CATS_PATH || 'assets/mxgraph/newDiagramCats';
+window.TEMPLATE_PATH = window.TEMPLATE_PATH || 'mxgraph/templates';
+window.NEW_DIAGRAM_CATS_PATH = window.NEW_DIAGRAM_CATS_PATH || 'mxgraph/newDiagramCats';
 window.PLUGINS_BASE_PATH = window.PLUGINS_BASE_PATH || '';
 
 // Directory for i18 files and basename for main i18n file
-window.RESOURCES_PATH = window.RESOURCES_PATH || 'assets/mxgraph/resources';
+window.RESOURCES_PATH = window.RESOURCES_PATH || 'mxgraph/resources';
 window.RESOURCE_BASE = window.RESOURCE_BASE || RESOURCES_PATH + '/dia';
 
 // Specifies global configuration via variable
@@ -148,8 +148,8 @@ window.mxLanguageMap = window.mxLanguageMap ||
 
 if (typeof window.mxBasePath === 'undefined')
 {
-	window.mxBasePath = 'assets/mxgraphmxgraph';
-	window.mxImageBasePath = 'assets/mxgraphmxgraph/images';
+	window.mxBasePath = 'mxgraph';
+	window.mxImageBasePath = 'mxgraphmxgraph/images';
 }
 
 if (window.mxLanguages == null)

@@ -12,6 +12,10 @@ module.exports = {
     umdNamedDefine: true,
     globalObject: 'this',
   },
+  module: {
+    rules: [
+    ]
+  },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Graph Editor - Draw.io',
@@ -63,7 +67,8 @@ function getCopyConfig(copyItems) {
   copyItems.forEach(element => {
     patterns.push({
       from: element.from,
-      to: "assets/" + element.to,
+      to: element.to,
+      // _to: "assets/" + element.to,
       context: "../webapp",
       globOptions: {
         dot: true,

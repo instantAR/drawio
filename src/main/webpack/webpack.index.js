@@ -1,6 +1,5 @@
 import './webpack.init';
 
-
 //TODO: load script based on Window observer
 
 window.webpackScripts = [];
@@ -19,10 +18,10 @@ function loadScript(scriptIndex, scriptContainer) {
             let script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = webpackScripts[scriptIndex].src;
-            script.defer = true;
             script.id = webpackScripts[scriptIndex].name;
             if (script.readyState) { //IE
-                script.onreadystatechange = () => {
+                script.onreadystatechange = ($event) => {
+                    // console.log("onreadystatechange", $event, window);
                     if (script.readyState === "loaded" || script.readyState === "complete") {
                         script.onreadystatechange = null;
                         webpackScripts[scriptIndex].loaded = true;
@@ -34,13 +33,15 @@ function loadScript(scriptIndex, scriptContainer) {
                     }
                 };
             } else { //Others
-                script.onload = () => {
+                script.onload = ($event) => {
+                    // console.log(".onload", $event, window);
                     webpackScripts[scriptIndex].loaded = true;
                     resolve({
                         script: webpackScripts[scriptIndex],
                         loaded: true,
                         status: 'Loaded'
                     });
+
                 };
             }
             script.onerror = (error) => resolve({
@@ -48,9 +49,25 @@ function loadScript(scriptIndex, scriptContainer) {
                 loaded: false,
                 status: 'Loaded'
             });
+            if (scriptIndex == 0) {
+                backupWindowObject();
+            }
             scriptContainer.appendChild(script);
         }
     });
+}
+
+function backupWindowObject() {
+    window.windowKeysBackup = Object.keys(window);
+    window.grapheditorKeysDefault = ["webpackScripts", "graphEditorRefCount", "windowKeysBackup", "grapheditorKeysDefault", "grapheditorKeys", "grapheditor", "onDestroy"];
+    window.grapheditorKeys = [];
+}
+
+function pouplateScriptVars() {
+    let windowUpdatedKeys = Object.keys(window);
+    grapheditorKeys = windowUpdatedKeys.filter(x => !windowKeysBackup.includes(x));
+    grapheditorKeys = grapheditorKeys.filter(x => !grapheditorKeysDefault.includes(x));
+    // console.log('pouplateScriptVars', windowKeysBackup, windowUpdatedKeys, grapheditorKeys);
 }
 
 function addWebScript(name, src) {
@@ -74,6 +91,7 @@ function appendScriptAtIndex(scriptIndex, scriptContainer) {
                 })
             })
         } else {
+            postScript();
             resolve({
                 scriptLoaded: true,
                 scriptIndex: [scriptIndex]
@@ -82,34 +100,43 @@ function appendScriptAtIndex(scriptIndex, scriptContainer) {
     })
 }
 
+
+
 function init(scriptContainer) {
 
     window.graphEditorRefCount = window.graphEditorRefCount++ || 1;
 
-    addWebScript('mxClient', './assets/mxgraph/mxClient.js')
-    addWebScript('pako', './assets/mxgraph/grapheditor/deflate/pako.min.js')
-    addWebScript('base64', './assets/mxgraph/grapheditor/deflate/base64.js')
-    addWebScript('jscolor', './assets/mxgraph/grapheditor/jscolor/jscolor.js')
-    addWebScript('html_sanitize', './assets/mxgraph/grapheditor/sanitizer/sanitizer.min.js')
-    addWebScript('EditorUi', './assets/mxgraph/grapheditor/EditorUi.js')
-    addWebScript('Editor', './assets/mxgraph/grapheditor/Editor.js')
-    addWebScript('Sidebar', './assets/mxgraph/grapheditor/Sidebar.js')
-    addWebScript('Graph', './assets/mxgraph/grapheditor/Graph.js')
-    addWebScript('Format', './assets/mxgraph/grapheditor/Format.js')
-    addWebScript('Shapes', './assets/mxgraph/grapheditor/Shapes.js')
-    addWebScript('Actions', './assets/mxgraph/grapheditor/Actions.js')
-    addWebScript('Menus', './assets/mxgraph/grapheditor/Menus.js')
-    addWebScript('Toolbar', './assets/mxgraph/grapheditor/Toolbar.js')
-    addWebScript('Dialogs', './assets/mxgraph/grapheditor/Dialogs.js')
+    addWebScript('mxClient', './mxgraph/mxClient.js')
+    addWebScript('pako', './mxgraph/grapheditor/deflate/pako.min.js')
+    addWebScript('base64', './mxgraph/grapheditor/deflate/base64.js')
+    addWebScript('jscolor', './mxgraph/grapheditor/jscolor/jscolor.js')
+    addWebScript('html_sanitize', './mxgraph/grapheditor/sanitizer/sanitizer.min.js')
+    addWebScript('EditorUi', './mxgraph/grapheditor/EditorUi.js')
+    addWebScript('Editor', './mxgraph/grapheditor/Editor.js')
+    addWebScript('Sidebar', './mxgraph/grapheditor/Sidebar.js')
+    addWebScript('Graph', './mxgraph/grapheditor/Graph.js')
+    addWebScript('Format', './mxgraph/grapheditor/Format.js')
+    addWebScript('Shapes', './mxgraph/grapheditor/Shapes.js')
+    addWebScript('Actions', './mxgraph/grapheditor/Actions.js')
+    addWebScript('Menus', './mxgraph/grapheditor/Menus.js')
+    addWebScript('Toolbar', './mxgraph/grapheditor/Toolbar.js')
+    addWebScript('Dialogs', './mxgraph/grapheditor/Dialogs.js')
 
 
     return appendScriptAtIndex(0, scriptContainer);
 
 }
 
+function postScript() {
+    // Menus.prototype.defaultMenuItems = [];
+}
+
+
 function grapheditor(container, scriptContainer) {
     init(scriptContainer).then(resolve => {
-        console.log('script init', resolve);
+        pouplateScriptVars();
+        console.log('script init', resolve, grapheditorKeys);
+
         // Adds required resources (disables loading of fallback properties, this can only
         // be used if we know that all keys are defined in the language specific file)
         mxResources.loadDefaultBundle = false;
@@ -142,8 +169,45 @@ function grapheditor(container, scriptContainer) {
     });
 }
 
+//Test: html button click
+window.onDestroy = function () {
+    destroyGrapheditor().then(res => {
+        console.log('onDestroy', res);
+    })
+}
+
+//TODO: Not usable right now
+function destroyGrapheditor() {
+    new Promise((resolve, reject) => {
+        graphEditorRefCount--;
+        if (graphEditorRefCount > 0) {
+            resolve({
+                graphEditorRefCount: graphEditorRefCount,
+                status: `Running graph-editor instances ${graphEditorRefCount}`
+            })
+        } else {
+            try {
+                grapheditorKeys.forEach(item => {
+                    if (window[item] !== undefined) {
+                        delete window[item]
+                    }
+                })
+            } catch (e) {
+                console.log(e);
+            }
+            resolve({
+                graphEditorRefCount: graphEditorRefCount,
+                status: `Running graph-editor instances ${graphEditorRefCount}`
+            })
+        }
+    })
+}
+
 if (typeof isWebpack !== 'undefined') {
     grapheditor(document.getElementById('mxgraph-diagram-container'), document.getElementById('mxgraph-scripts-container'));
 }
 
-export default grapheditor;
+export default {
+    grapheditor,
+    destroyGrapheditor
+};
