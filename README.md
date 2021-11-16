@@ -7,6 +7,19 @@ Draw.IO - Graph Editor Node library for Angular projects.
 draw.io, this project, is a configurable diagramming/whiteboarding visualization application. draw.io is owned and developed by JGraph Ltd, a UK based software company.
 
 As well as running this project, we run a production-grade deployment of the diagramming interface at https://app.diagrams.net.
+### Library Build
+```shell
+git clone https://github.com/ArfanMirza/drawio.git
+cd "drawio\src\main\webpack"
+npm run build 
+```
+TGZ file created along with dist directory. TGZ file name start from **draw.io-**
+Copy the tgz & Go to Angular Project, create lib directory along src directory and past TGZ file inside
+### NPM Install
+```shell
+npm install --save ./lib/draw.io-*.tgz
+```
+
 ### TS - Integration
 ```shell
 import { GraphEditor } from 'draw.io';
@@ -29,9 +42,7 @@ this.graphEditor.saveGrapheditor = (xml) => {
   })
 }
 }
-
 ```
-
 License
 -------
 The source code in this repo is licensed under the Apache v2.
