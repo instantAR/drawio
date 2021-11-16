@@ -128,9 +128,48 @@ function init(scriptContainer) {
 }
 
 function postScript() {
-    // Menus.prototype.defaultMenuItems = [];
+    // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
+    let superSaveFile = EditorUi.prototype.saveFile;
+    /**
+     * Extends: EditorUi.prototype.saveFile and save xml content in TS-Func.
+     */
+    EditorUi.prototype.saveFile = function (forceDialog) {
+
+        // superSaveFile.apply(this, arguments);
+
+        if (this.editor.graph.isEditing()) {
+            this.editor.graph.stopEditing();
+        }
+
+        var xml = mxUtils.getXml(this.editor.getGraphXml());
+        // console.log("saveFile", forceDialog, xml);
+        try {
+            saveGrapheditor(xml).then(resolve => {
+                console.log("saveGraphEditor", resolve);
+                this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('saved')) + ' ' + new Date());
+                this.editor.setModified(false);
+                this.editor.setFilename('ts.xml');
+                this.updateDocumentTitle();
+            }, reject =>{
+                console.log("saveGraphEditor:reject", reject);
+            }).catch(e => {
+                console.log(e);
+            });
+        } catch (e) {
+            this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('errorSavingFile')));
+        }
+
+    };
 }
 
+function saveGrapheditor(xml) {
+    return new Promise((resolve, reject) => {
+        resolve({
+            status: "Implementation required",
+            xml: xml
+        })
+    })
+}
 
 function grapheditor(container, scriptContainer) {
     init(scriptContainer).then(resolve => {
