@@ -13,7 +13,7 @@ window.grapheditorKeys = [];
  * @typedef {{ status: string, graphData: xml}} GraphEditorSave
  * @typedef {{ status: string, graphData?: xml}} GraphEditorOpen
  * @typedef {{ status: string, graphData: xml, document?: DOMParser|XMLDocument , reason?: any }} GraphEditorData
- * @typedef {{ status: string, graphEditorObj?: EditorUi, message?: string , reason?: any }} GraphEditorLoaded
+ * @typedef {{ status: string, graphEditorObj?: any, message?: string , reason?: any }} GraphEditorLoaded
  */
 
 export class GraphEditor {
