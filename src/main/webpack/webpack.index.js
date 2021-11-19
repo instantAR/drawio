@@ -10,6 +10,9 @@ window.grapheditorKeys = [];
 export class GraphEditor {
 
     /** @private */
+    static editorUiObj;
+
+    /** @private */
     loadScript(scriptIndex, scriptContainer) {
         return new Promise((resolve, reject) => {
             //resolve if already loaded
@@ -47,7 +50,7 @@ export class GraphEditor {
                             loaded: true,
                             status: 'Loaded'
                         });
-    
+
                     };
                 }
                 script.onerror = (error) => resolve({
@@ -62,7 +65,7 @@ export class GraphEditor {
             }
         });
     }
-    
+
     /** @private */
     backupWindowObject() {
         windowKeysBackup = Object.keys(window);
@@ -75,7 +78,7 @@ export class GraphEditor {
         grapheditorKeys = grapheditorKeys.filter(x => !grapheditorKeysDefault.includes(x));
         // console.log('pouplateScriptVars', windowKeysBackup, windowUpdatedKeys, grapheditorKeys);
     }
-    
+
     /** @private */
     addWebScript(name, src) {
         webpackScripts.push({
@@ -107,13 +110,13 @@ export class GraphEditor {
             }
         })
     }
-    
-    
+
+
     /** @private */
     init(scriptContainer) {
-    
+
         graphEditorRefCount++;
-    
+
         this.addWebScript('mxClient', './mxgraph/mxClient.js')
         this.addWebScript('pako', './mxgraph/grapheditor/deflate/pako.min.js')
         this.addWebScript('base64', './mxgraph/grapheditor/deflate/base64.js')
@@ -129,12 +132,12 @@ export class GraphEditor {
         this.addWebScript('Menus', './mxgraph/grapheditor/Menus.js')
         this.addWebScript('Toolbar', './mxgraph/grapheditor/Toolbar.js')
         this.addWebScript('Dialogs', './mxgraph/grapheditor/Dialogs.js')
-    
-    
+
+
         return this.appendScriptAtIndex(0, scriptContainer);
-    
+
     }
-    
+
     /** @private */
     postScript() {
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
@@ -144,13 +147,13 @@ export class GraphEditor {
          * Extends: EditorUi.prototype.saveFile and save xml content in TS-Func.
          */
         EditorUi.prototype.saveFile = function (forceDialog) {
-    
+
             // superSaveFile.apply(this, arguments);
-    
+
             if (this.editor.graph.isEditing()) {
                 this.editor.graph.stopEditing();
             }
-    
+
             var xml = mxUtils.getXml(this.editor.getGraphXml());
             // console.log("saveFile", forceDialog, xml);
             try {
@@ -168,7 +171,7 @@ export class GraphEditor {
             } catch (e) {
                 this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('errorSavingFile')));
             }
-    
+
         };
     }
 
@@ -181,41 +184,90 @@ export class GraphEditor {
         })
     }
 
+    setGrapheditorData(xml) {
+        return new Promise((resolve, reject) => {
+            try {
+                let doc = mxUtils.parseXml(xml);
+                console.log("setGraphData", xml, doc);
+                this.editorUiObj.editor.setGraphXml(doc.documentElement);
+                this.editorUiObj.editor.setModified(false);
+                this.editorUiObj.editor.undoManager.clear();
+                resolve({
+                    status: "Loaded",
+                    xml: xml,
+                    document: doc
+                })
+            } catch (e) {
+                reject({
+                    status: "Failed",
+                    reason: e,
+                    xml: xml
+                })
+            }
+        })
+    }
+
     grapheditor(container, scriptContainer) {
-        this.init(scriptContainer).then(resolve => {
-            this.pouplateScriptVars();
-            console.log('script init', resolve, grapheditorKeys);
+        return new Promise((resolve, reject) => {
 
-            // Adds required resources (disables loading of fallback properties, this can only
-            // be used if we know that all keys are defined in the language specific file)
-            mxResources.loadDefaultBundle = false;
-            var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
-                mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
 
-            // Fixes possible asynchronous requests
-            mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function (xhr) {
-                // Adds bundle text to resources
-                mxResources.parse(xhr[0].getText());
+            this.init(scriptContainer).then(res => {
+                this.pouplateScriptVars();
+                console.log('script init', res, grapheditorKeys);
+                let self = this;
 
-                // Configures the default graph theme
-                var themes = new Object();
-                themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
+                // Adds required resources (disables loading of fallback properties, this can only
+                // be used if we know that all keys are defined in the language specific file)
+                mxResources.loadDefaultBundle = false;
+                var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
+                    mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
 
-                // Main
-                // new EditorUi(new Editor(urlParams['chrome'] == '0', themes), container);
-                new EditorUi(new Editor(
-                    urlParams['chrome'] == '0' || uiTheme == 'min',
-                    null, null, null, urlParams['chrome'] != '0'), container);
-            }, function () {
+                // Fixes possible asynchronous requests
+                mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function (xhr) {
+                    // Adds bundle text to resources
+                    mxResources.parse(xhr[0].getText());
 
-                const element = document.createElement('div');
+                    // Configures the default graph theme
+                    var themes = new Object();
+                    themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
 
-                element.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';
+                    // Main
+                    // new EditorUi(new Editor(urlParams['chrome'] == '0', themes), container);
+                    self.editorUiObj = new EditorUi(new Editor(
+                        urlParams['chrome'] == '0' || uiTheme == 'min',
+                        null, null, null, urlParams['chrome'] != '0'), container);
+                    resolve({
+                        status: 'Initialized',
+                        graphEditorObj: self.editorUiObj
+                    })
+                }, function () {
 
-                container.appendChild(element);
+                    const element = document.createElement('div');
+
+                    element.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';
+
+                    container.appendChild(element);
+                    reject({
+                        status: 'Failed',
+                        message: 'Error loading resource files. Please check browser console.'
+                    });
+                });
+
+            }, rej => {
+                console.log("grapheditor-init:reject", rej);
+                reject({
+                    status: 'Failed',
+                    reason: rej,
+                });
+                reject(rej);
+            }).catch(e => {
+                console.log(e);
+                reject({
+                    status: 'Failed',
+                    reason: e,
+                });
             });
-
-        });
+        })
     }
 
     //TODO: Not usable right now
@@ -257,7 +309,27 @@ export class GraphEditor {
 
 if (typeof isWebpack !== 'undefined') {
     // grapheditor(document.getElementById('mxgraph-diagram-container'), document.getElementById('mxgraph-scripts-container'));
-    new GraphEditor().grapheditor(document.getElementById('mxgraph-diagram-container'), document.getElementById('mxgraph-scripts-container'));
+    let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"850\" pageHeight=\"1100\"><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"4\" value=\"\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"3\"><mxGeometry relative=\"1\" as=\"geometry\"/></mxCell><mxCell id=\"6\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"5\"><mxGeometry relative=\"1\" as=\"geometry\"><Array as=\"points\"><mxPoint x=\"440\" y=\"210\"/><mxPoint x=\"590\" y=\"210\"/></Array></mxGeometry></mxCell><mxCell id=\"2\" value=\"Actor\" style=\"shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"410\" y=\"170\" width=\"30\" height=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"3\" value=\"\" style=\"swimlane;startSize=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"120\" y=\"80\" width=\"200\" height=\"200\" as=\"geometry\"/></mxCell><mxCell id=\"5\" value=\"\" style=\"shape=tape;whiteSpace=wrap;html=1;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"530\" y=\"60\" width=\"120\" height=\"100\" as=\"geometry\"/></mxCell></root></mxGraphModel>";
+    let graphEditor = new GraphEditor();
+    graphEditor.grapheditor(
+            document.getElementById('mxgraph-diagram-container'),
+            document.getElementById('mxgraph-scripts-container'))
+        .then(resolve => {
+            console.log("init", resolve)
+        }, reject => {
+            console.log("init", reject)
+        }).catch(e => {
+            console.log("init", e)
+        });
+    setTimeout(() => {
+        graphEditor.setGrapheditorData(xml).then(resolve => {
+            console.log("setGraphEditor", resolve)
+        }, reject => {
+            console.log("setGraphEditor", reject)
+        }).catch(e => {
+            console.log("setGraphEditor", e)
+        });
+    }, 1000);
 }
 
 
