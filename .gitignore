@@ -5,4 +5,4 @@ node_modules
 .vscode/settings.json
 dist
 src/main/webpack/package-lock.json
-src/main/webpack/draw.io-15.7.2.tgz
+src/main/webpack/draw.io-*.tgz
