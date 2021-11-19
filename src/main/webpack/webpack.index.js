@@ -8,6 +8,7 @@ window.grapheditorKeysDefault = ["webpackScripts", "graphEditorRefCount", "windo
 window.grapheditorKeys = [];
 
 /**
+ * @typedef {{ hide: {menu?:{help?:boolean} subMenu? : {new?: boolean, open?: boolean, import?: boolean, export?:boolean,editDiagram?:boolean}} }} GraphInitConfig
  * @typedef {{ xml: string }} xml
  * @typedef {{ status: string, graphData: xml}} GraphEditorSave
  * @typedef {{ status: string, graphData?: xml}} GraphEditorOpen
@@ -96,21 +97,24 @@ export class GraphEditor {
         })
     }
 
-    /** @private */
-    appendScriptAtIndex(scriptIndex, scriptContainer) {
+    /**
+     * @private
+     * @param {GraphInitConfig} config - Grapheditor Configuration.
+     */
+    appendScriptAtIndex(scriptIndex, scriptContainer, config) {
         return new Promise((resolve, reject) => {
             // console.info('appendScriptAtIndex', scriptIndex);
             if (webpackScripts[scriptIndex] != undefined) {
                 this.loadScript(scriptIndex, scriptContainer).then((scriptLoaded) => {
                     // console.log("script loaded", scriptLoaded);
-                    this.appendScriptAtIndex(++scriptIndex, scriptContainer).then(solved => {
+                    this.appendScriptAtIndex(++scriptIndex, scriptContainer, config).then(solved => {
                         // console.log(`nested:appendScriptAtIndex ${scriptIndex}`, solved);
                         solved.scriptIndex.push(scriptIndex);
                         resolve(solved)
                     })
                 })
             } else {
-                this.postScript();
+                this.postScript(config);
                 resolve({
                     scriptLoaded: true,
                     scriptIndex: [scriptIndex]
@@ -119,9 +123,11 @@ export class GraphEditor {
         })
     }
 
-
-    /** @private */
-    init(scriptContainer) {
+    /**
+     * @private
+     * @param {GraphInitConfig} config - Grapheditor Configuration.
+     */
+    init(scriptContainer, config) {
 
         graphEditorRefCount++;
 
@@ -142,12 +148,15 @@ export class GraphEditor {
         this.addWebScript('Dialogs', './mxgraph/grapheditor/Dialogs.js')
 
 
-        return this.appendScriptAtIndex(0, scriptContainer);
+        return this.appendScriptAtIndex(0, scriptContainer, config);
 
     }
 
-    /** @private */
-    postScript() {
+    /**
+     * @private
+     * @param {GraphInitConfig} config - Grapheditor Configuration.
+     */
+    postScript(config) {
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
 
 
@@ -159,7 +168,12 @@ export class GraphEditor {
          */
         let menusCreateMenubar = Menus.prototype.createMenubar;
         Menus.prototype.createMenubar = function (container) {
-            this.defaultMenuItems = this.defaultMenuItems.filter((menu) => menu.toLowerCase() != 'help')
+            if (config.hide.menu != undefined) {
+                if (config.hide.menu.help) {
+                    this.defaultMenuItems = this.defaultMenuItems.filter((menu) => menu.toLowerCase() != 'help')
+                }
+            }
+
             return menusCreateMenubar.apply(this, arguments);
         }
 
@@ -177,9 +191,23 @@ export class GraphEditor {
          */
         let editorUiInit = EditorUi.prototype.init;
         EditorUi.prototype.init = function () {
-            this.actions.removeAction('new');
-            this.actions.removeAction('import');
-            this.actions.removeAction('export');
+            if (config.hide.subMenu != undefined) {
+                if (config.hide.subMenu.open) {
+                    this.actions.removeAction('open');
+                }
+                if (config.hide.subMenu.new) {
+                    this.actions.removeAction('new'); //TODO: func expose 
+                }
+                if (config.hide.subMenu.import) {
+                    this.actions.removeAction('import'); //TODO: func expose 
+                }
+                if (config.hide.subMenu.export) {
+                    this.actions.removeAction('export'); //TODO: func expose 
+                }
+                if (config.hide.subMenu.editDiagram) {
+                    this.actions.removeAction('editDiagram'); //TODO: func expose 
+                }
+            }
             editorUiInit.apply(this, arguments);
         }
         /**
@@ -296,13 +324,14 @@ export class GraphEditor {
     /**
      * @param {HTMLDivElement | HTMLElement} container - Grapheditor container.
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
+     * @param {GraphInitConfig} config - Grapheditor Configuration.
      * @returns {Promise<GraphEditorLoaded>} Promise<GraphEditorLoaded>
      */
-    initialized(container, scriptContainer) {
+    initialized(container, scriptContainer, config) {
         return new Promise((resolve, reject) => {
 
 
-            this.init(scriptContainer).then(res => {
+            this.init(scriptContainer, config).then(res => {
                 this.pouplateScriptVars();
                 // console.log('script init', res, grapheditorKeys);
                 let self = this;
@@ -404,7 +433,19 @@ if (typeof isWebpack !== 'undefined') {
     let graphEditor = new GraphEditor();
     graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
-            document.getElementById('mxgraph-scripts-container'))
+            document.getElementById('mxgraph-scripts-container'), {
+                hide: {
+                    menu: {
+                        help: true
+                    },
+                    subMenu: {
+                        import: true,
+                        export: true,
+                        new: true,
+                        editDiagram: true
+                    }
+                }
+            })
         .then(resolve => {
             // console.log("init", resolve)
         }, reject => {
