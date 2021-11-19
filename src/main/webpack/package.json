@@ -30,7 +30,6 @@
     "pdf-lib": "^1.16.0"
   },
   "devDependencies": {
-    "@types/node": "^16.11.9",
     "copy-webpack-plugin": "^9.0.1",
     "html-webpack-plugin": "^5.5.0",
     "typescript": "^4.4.4",
