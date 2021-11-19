@@ -39,6 +39,18 @@ npm install --save ./lib/draw.io-*.tgz
 ```
 
 ### TS - Integration
+**component.html**
+```shell
+<div>
+    .
+    .
+    <div>
+      <div #mxgraphScriptsContainer id="mxgraph-scripts-container"></div>
+      <div #container id="mxgraph-diagram-container"></div>
+    </div>
+</div>
+```
+**component.ts**
 ```shell
 import { GraphEditor } from 'draw.io';
 ...
