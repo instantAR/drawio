@@ -1,3 +1,4 @@
+// src/main/webapp/js/grapheditor
 import './webpack.init';
 
 window.graphEditorRefCount = 0;
@@ -6,6 +7,13 @@ window.windowKeysBackup = [];
 window.grapheditorKeysDefault = ["webpackScripts", "graphEditorRefCount", "windowKeysBackup", "grapheditorKeysDefault", "grapheditorKeys", "grapheditor", "onDestroy"];
 window.grapheditorKeys = [];
 
+/**
+ * @typedef {{ xml: string }} xml
+ * @typedef {{ status: string, graphData: xml}} GraphEditorSave
+ * @typedef {{ status: string, graphData?: xml}} GraphEditorOpen
+ * @typedef {{ status: string, graphData: xml, document?: DOMParser|XMLDocument , reason?: any }} GraphEditorData
+ * @typedef {{ status: string, graphEditorObj?: EditorUi, message?: string , reason?: any }} GraphEditorLoaded
+ */
 
 export class GraphEditor {
 
@@ -141,11 +149,61 @@ export class GraphEditor {
     /** @private */
     postScript() {
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
-        // let superSaveFile = EditorUi.prototype.saveFile;
+
+
         let self = this;
+
+
+        /**
+         * Creates the keyboard event handler for the current graph and history.
+         */
+        let menusCreateMenubar = Menus.prototype.createMenubar;
+        Menus.prototype.createMenubar = function (container) {
+            this.defaultMenuItems = this.defaultMenuItems.filter((menu) => menu.toLowerCase() != 'help')
+            return menusCreateMenubar.apply(this, arguments);
+        }
+
+        /**
+         * Remove the action under the given name.
+         */
+        Actions.prototype.removeAction = function (key) {
+            if (this.actions[key] != undefined) {
+                delete this.actions[key];
+            }
+        };
+
+        /**
+         * Remove actions.
+         */
+        let editorUiInit = EditorUi.prototype.init;
+        EditorUi.prototype.init = function () {
+            this.actions.removeAction('new');
+            this.actions.removeAction('import');
+            this.actions.removeAction('export');
+            editorUiInit.apply(this, arguments);
+        }
+        /**
+         * Extends: EditorUi.prototype.openFile and open xml content in TS-Func.
+         */
+        // let superOpenFile = EditorUi.prototype.openFile;
+        EditorUi.prototype.openFile = function () {
+            try {
+                self.openGraphEditorList().then(resolve => {
+                    console.log("openFile:resolve", resolve);
+                }, reject => {
+                    console.log("openFile:reject", reject);
+                    if (reject != undefined && reject.status != undefined) {
+                        mxUtils.alert(reject.status);
+                    }
+                }).catch(e => {
+                    console.log(e);
+                });
+            } catch (e) {}
+        };
         /**
          * Extends: EditorUi.prototype.saveFile and save xml content in TS-Func.
          */
+        // let superSaveFile = EditorUi.prototype.saveFile;
         EditorUi.prototype.saveFile = function (forceDialog) {
 
             // superSaveFile.apply(this, arguments);
@@ -157,7 +215,9 @@ export class GraphEditor {
             var xml = mxUtils.getXml(this.editor.getGraphXml());
             // console.log("saveFile", forceDialog, xml);
             try {
-                self.saveGrapheditor(xml).then(resolve => {
+                self.saveGrapheditor({
+                    xml: xml
+                }).then(resolve => {
                     console.log("saveGraphEditor", resolve);
                     this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('saved')) + ' ' + new Date());
                     this.editor.setModified(false);
@@ -165,6 +225,9 @@ export class GraphEditor {
                     this.updateDocumentTitle();
                 }, reject => {
                     console.log("saveGraphEditor:reject", reject);
+                    if (reject != undefined && reject.status != undefined) {
+                        mxUtils.alert(reject.status);
+                    }
                 }).catch(e => {
                     console.log(e);
                 });
@@ -175,45 +238,73 @@ export class GraphEditor {
         };
     }
 
-    saveGrapheditor(xml) {
+
+    /**
+     * @param {xml} graphData - Grapheditor xml.
+     * @returns {Promise<GraphEditorSave>} Promise<GraphEditorSave>
+     */
+    saveGrapheditor(graphData) {
         return new Promise((resolve, reject) => {
-            resolve({
+            reject({
                 status: "Implementation required",
-                xml: xml
+                graphData: graphData
             })
         })
     }
 
-    setGrapheditorData(xml) {
+
+    /**
+     * @returns {Promise<GraphEditorOpen>} Promise<GraphEditorOpen>
+     */
+    openGraphEditorList() {
+        return new Promise((resolve, reject) => {
+            reject({
+                status: "Implementation required",
+            })
+        })
+    }
+
+
+    /**
+     * @param {xml} graphData - Grapheditor xml.
+     * @returns {Promise<GraphEditorData>} Promise<GraphEditorData>
+     */
+    setGrapheditorData(graphData) {
         return new Promise((resolve, reject) => {
             try {
-                let doc = mxUtils.parseXml(xml);
-                console.log("setGraphData", xml, doc);
+
+                let doc = mxUtils.parseXml(graphData.xml);
+                // console.log("setGraphData", graphData, doc);
                 this.editorUiObj.editor.setGraphXml(doc.documentElement);
                 this.editorUiObj.editor.setModified(false);
                 this.editorUiObj.editor.undoManager.clear();
                 resolve({
                     status: "Loaded",
-                    xml: xml,
+                    graphData: graphData,
                     document: doc
                 })
             } catch (e) {
                 reject({
                     status: "Failed",
                     reason: e,
-                    xml: xml
+                    graphData: graphData
                 })
             }
         })
     }
 
-    grapheditor(container, scriptContainer) {
+    /**
+     * @param {HTMLDivElement | HTMLElement} container - Grapheditor container.
+     * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
+     * @returns {Promise<GraphEditorLoaded>} Promise<GraphEditorLoaded>
+     */
+    initialized(container, scriptContainer) {
         return new Promise((resolve, reject) => {
 
 
             this.init(scriptContainer).then(res => {
                 this.pouplateScriptVars();
-                console.log('script init', res, grapheditorKeys);
+                // console.log('script init', res, grapheditorKeys);
                 let self = this;
 
                 // Adds required resources (disables loading of fallback properties, this can only
@@ -311,19 +402,21 @@ if (typeof isWebpack !== 'undefined') {
     // grapheditor(document.getElementById('mxgraph-diagram-container'), document.getElementById('mxgraph-scripts-container'));
     let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"850\" pageHeight=\"1100\"><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"4\" value=\"\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"3\"><mxGeometry relative=\"1\" as=\"geometry\"/></mxCell><mxCell id=\"6\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"5\"><mxGeometry relative=\"1\" as=\"geometry\"><Array as=\"points\"><mxPoint x=\"440\" y=\"210\"/><mxPoint x=\"590\" y=\"210\"/></Array></mxGeometry></mxCell><mxCell id=\"2\" value=\"Actor\" style=\"shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"410\" y=\"170\" width=\"30\" height=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"3\" value=\"\" style=\"swimlane;startSize=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"120\" y=\"80\" width=\"200\" height=\"200\" as=\"geometry\"/></mxCell><mxCell id=\"5\" value=\"\" style=\"shape=tape;whiteSpace=wrap;html=1;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"530\" y=\"60\" width=\"120\" height=\"100\" as=\"geometry\"/></mxCell></root></mxGraphModel>";
     let graphEditor = new GraphEditor();
-    graphEditor.grapheditor(
+    graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
             document.getElementById('mxgraph-scripts-container'))
         .then(resolve => {
-            console.log("init", resolve)
+            // console.log("init", resolve)
         }, reject => {
             console.log("init", reject)
         }).catch(e => {
             console.log("init", e)
         });
     setTimeout(() => {
-        graphEditor.setGrapheditorData(xml).then(resolve => {
-            console.log("setGraphEditor", resolve)
+        graphEditor.setGrapheditorData({
+            xml: xml
+        }).then(resolve => {
+            // console.log("setGraphEditor", resolve)
         }, reject => {
             console.log("setGraphEditor", reject)
         }).catch(e => {
