@@ -9,7 +9,8 @@ window.grapheditorKeys = [];
 
 export class GraphEditor {
 
-    #loadScript(scriptIndex, scriptContainer) {
+    /** @private */
+    loadScript(scriptIndex, scriptContainer) {
         return new Promise((resolve, reject) => {
             //resolve if already loaded
             if (webpackScripts[scriptIndex].loaded) {
@@ -55,46 +56,50 @@ export class GraphEditor {
                     status: 'Loaded'
                 });
                 if (scriptIndex == 0) {
-                    this.#backupWindowObject();
+                    this.backupWindowObject();
                 }
                 scriptContainer.appendChild(script);
             }
         });
     }
     
-    #backupWindowObject() {
+    /** @private */
+    backupWindowObject() {
         windowKeysBackup = Object.keys(window);
     }
-    
-    #pouplateScriptVars() {
+
+    /** @private */
+    pouplateScriptVars() {
         let windowUpdatedKeys = Object.keys(window);
         grapheditorKeys = windowUpdatedKeys.filter(x => !windowKeysBackup.includes(x));
         grapheditorKeys = grapheditorKeys.filter(x => !grapheditorKeysDefault.includes(x));
         // console.log('pouplateScriptVars', windowKeysBackup, windowUpdatedKeys, grapheditorKeys);
     }
     
-    #addWebScript(name, src) {
+    /** @private */
+    addWebScript(name, src) {
         webpackScripts.push({
             name: name,
             loaded: false,
             src: src
         })
     }
-    
-    #appendScriptAtIndex(scriptIndex, scriptContainer) {
+
+    /** @private */
+    appendScriptAtIndex(scriptIndex, scriptContainer) {
         return new Promise((resolve, reject) => {
             // console.info('appendScriptAtIndex', scriptIndex);
             if (webpackScripts[scriptIndex] != undefined) {
-                this.#loadScript(scriptIndex, scriptContainer).then((scriptLoaded) => {
+                this.loadScript(scriptIndex, scriptContainer).then((scriptLoaded) => {
                     // console.log("script loaded", scriptLoaded);
-                    this.#appendScriptAtIndex(++scriptIndex, scriptContainer).then(solved => {
+                    this.appendScriptAtIndex(++scriptIndex, scriptContainer).then(solved => {
                         // console.log(`nested:appendScriptAtIndex ${scriptIndex}`, solved);
                         solved.scriptIndex.push(scriptIndex);
                         resolve(solved)
                     })
                 })
             } else {
-                this.#postScript();
+                this.postScript();
                 resolve({
                     scriptLoaded: true,
                     scriptIndex: [scriptIndex]
@@ -104,35 +109,36 @@ export class GraphEditor {
     }
     
     
-    
-    #init(scriptContainer) {
+    /** @private */
+    init(scriptContainer) {
     
         graphEditorRefCount++;
     
-        this.#addWebScript('mxClient', './mxgraph/mxClient.js')
-        this.#addWebScript('pako', './mxgraph/grapheditor/deflate/pako.min.js')
-        this.#addWebScript('base64', './mxgraph/grapheditor/deflate/base64.js')
-        this.#addWebScript('jscolor', './mxgraph/grapheditor/jscolor/jscolor.js')
-        this.#addWebScript('html_sanitize', './mxgraph/grapheditor/sanitizer/sanitizer.min.js')
-        this.#addWebScript('EditorUi', './mxgraph/grapheditor/EditorUi.js')
-        this.#addWebScript('Editor', './mxgraph/grapheditor/Editor.js')
-        this.#addWebScript('Sidebar', './mxgraph/grapheditor/Sidebar.js')
-        this.#addWebScript('Graph', './mxgraph/grapheditor/Graph.js')
-        this.#addWebScript('Format', './mxgraph/grapheditor/Format.js')
-        this.#addWebScript('Shapes', './mxgraph/grapheditor/Shapes.js')
-        this.#addWebScript('Actions', './mxgraph/grapheditor/Actions.js')
-        this.#addWebScript('Menus', './mxgraph/grapheditor/Menus.js')
-        this.#addWebScript('Toolbar', './mxgraph/grapheditor/Toolbar.js')
-        this.#addWebScript('Dialogs', './mxgraph/grapheditor/Dialogs.js')
+        this.addWebScript('mxClient', './mxgraph/mxClient.js')
+        this.addWebScript('pako', './mxgraph/grapheditor/deflate/pako.min.js')
+        this.addWebScript('base64', './mxgraph/grapheditor/deflate/base64.js')
+        this.addWebScript('jscolor', './mxgraph/grapheditor/jscolor/jscolor.js')
+        this.addWebScript('html_sanitize', './mxgraph/grapheditor/sanitizer/sanitizer.min.js')
+        this.addWebScript('EditorUi', './mxgraph/grapheditor/EditorUi.js')
+        this.addWebScript('Editor', './mxgraph/grapheditor/Editor.js')
+        this.addWebScript('Sidebar', './mxgraph/grapheditor/Sidebar.js')
+        this.addWebScript('Graph', './mxgraph/grapheditor/Graph.js')
+        this.addWebScript('Format', './mxgraph/grapheditor/Format.js')
+        this.addWebScript('Shapes', './mxgraph/grapheditor/Shapes.js')
+        this.addWebScript('Actions', './mxgraph/grapheditor/Actions.js')
+        this.addWebScript('Menus', './mxgraph/grapheditor/Menus.js')
+        this.addWebScript('Toolbar', './mxgraph/grapheditor/Toolbar.js')
+        this.addWebScript('Dialogs', './mxgraph/grapheditor/Dialogs.js')
     
     
-        return this.#appendScriptAtIndex(0, scriptContainer);
+        return this.appendScriptAtIndex(0, scriptContainer);
     
     }
     
-    #postScript() {
+    /** @private */
+    postScript() {
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
-        let superSaveFile = EditorUi.prototype.saveFile;
+        // let superSaveFile = EditorUi.prototype.saveFile;
         let self = this;
         /**
          * Extends: EditorUi.prototype.saveFile and save xml content in TS-Func.
@@ -176,8 +182,8 @@ export class GraphEditor {
     }
 
     grapheditor(container, scriptContainer) {
-        this.#init(scriptContainer).then(resolve => {
-            this.#pouplateScriptVars();
+        this.init(scriptContainer).then(resolve => {
+            this.pouplateScriptVars();
             console.log('script init', resolve, grapheditorKeys);
 
             // Adds required resources (disables loading of fallback properties, this can only

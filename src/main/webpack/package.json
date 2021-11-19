@@ -6,8 +6,9 @@
   "types": "./dist/types/webpack.index.d.ts",
   "scripts": {
     "start": "rmdir dist /S /Q & npx webpack --mode=development --config webpack.config.js --watch",
-    "build:types": "npx -p typescript tsc ./webpack.index.js --declaration --allowJs --emitDeclarationOnly --outDir dist/types",
-    "build": "rmdir dist /S /Q & del draw.io.15.7.2.tgz & npm run build:types & npx webpack --mode=production --config webpack.config.js & npm pack"
+    "build:types": "rmdir dist\\types /S /Q & tsc -p tsconfig.json",
+    "build": "rmdir dist /S /Q & del draw.io.15.7.2.tgz & npm run build:types & npx webpack --mode=production --config webpack.config.js & npm pack",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "pdf-lib": "^1.16.0"
   },
   "devDependencies": {
+    "@types/node": "^16.11.9",
     "copy-webpack-plugin": "^9.0.1",
     "html-webpack-plugin": "^5.5.0",
     "typescript": "^4.4.4",
