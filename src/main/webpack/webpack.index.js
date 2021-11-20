@@ -7,13 +7,25 @@ window.windowKeysBackup = [];
 window.grapheditorKeysDefault = ["webpackScripts", "graphEditorRefCount", "windowKeysBackup", "grapheditorKeysDefault", "grapheditorKeys", "grapheditor", "onDestroy"];
 window.grapheditorKeys = [];
 
+/**
+ * @typedef {{ hide: {menu?:{help?:boolean} subMenu? : {new?: boolean, open?: boolean, import?: boolean, export?:boolean,editDiagram?:boolean}} }} GraphInitConfig
+ * @typedef {{ xml: string }} xml
+ * @typedef {{ status: string, graphData: xml}} GraphEditorSave
+ * @typedef {{ status: string, graphData?: xml}} GraphEditorOpen
+ * @typedef {{ status: string, graphData: xml, document?: DOMParser|XMLDocument , reason?: any }} GraphEditorData
+ * @typedef {{ status: string, graphEditorObj?: any, message?: string , reason?: any }} GraphEditorLoaded
+ */
 
 export class GraphEditor {
 
     /** @private */
     static editorUiObj;
 
-    /** @private */
+    /** 
+     * @private 
+     * @param {number} scriptIndex
+     * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
+    */
     loadScript(scriptIndex, scriptContainer) {
         return new Promise((resolve, reject) => {
             //resolve if already loaded
@@ -89,10 +101,10 @@ export class GraphEditor {
         })
     }
 
-
     /**
      * @private
-     * @typedef {{ hide: {menu?:{help?:boolean} subMenu? : {new?: boolean, open?: boolean, import?: boolean, export?:boolean,editDiagram?:boolean}} }} GraphInitConfig
+     * @param {number} scriptIndex
+     * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      * @param {GraphInitConfig} config - Grapheditor Configuration.
      */
     appendScriptAtIndex(scriptIndex, scriptContainer, config) {
@@ -119,6 +131,7 @@ export class GraphEditor {
 
     /**
      * @private
+     * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      * @param {GraphInitConfig} config - Grapheditor Configuration.
      */
     init(scriptContainer, config) {
@@ -262,8 +275,6 @@ export class GraphEditor {
 
 
     /**
-     * @typedef {{ xml: string }} xml
-     * @typedef {{ status?: string, graphData: xml}} GraphEditorSave
      * @param {xml} graphData - Grapheditor xml.
      * @returns {Promise<GraphEditorSave>} Promise<GraphEditorSave>
      */
@@ -276,8 +287,8 @@ export class GraphEditor {
         })
     }
 
+
     /**
-     * @typedef {{ status: string, graphData?: xml}} GraphEditorOpen
      * @returns {Promise<GraphEditorOpen>} Promise<GraphEditorOpen>
      */
     openGraphEditorList() {
@@ -290,7 +301,6 @@ export class GraphEditor {
 
 
     /**
-     * @typedef {{ status: string, graphData: xml, document?: DOMParser|XMLDocument , reason?: any }} GraphEditorData
      * @param {xml} graphData - Grapheditor xml.
      * @returns {Promise<GraphEditorData>} Promise<GraphEditorData>
      */
@@ -319,7 +329,6 @@ export class GraphEditor {
     }
 
     /**
-     * @typedef {{ status: string, graphEditorObj?: any, message?: string , reason?: any }} GraphEditorLoaded
      * @param {HTMLDivElement | HTMLElement} container - Grapheditor container.
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      * @param {GraphInitConfig} config - Grapheditor Configuration.
