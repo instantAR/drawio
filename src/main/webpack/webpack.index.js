@@ -433,13 +433,6 @@ export class GraphEditor {
 }
 
 
-//Test: html button click
-// window.onDestroy = function () {
-//     destroyGrapheditor().then(res => {
-//         console.log('onDestroy', res);
-//     })
-// }
-
 if (typeof isWebpack !== 'undefined') {
     // grapheditor(document.getElementById('mxgraph-diagram-container'), document.getElementById('mxgraph-scripts-container'));
     let xmlData = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"850\" pageHeight=\"1100\"><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"4\" value=\"\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"3\"><mxGeometry relative=\"1\" as=\"geometry\"/></mxCell><mxCell id=\"6\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"5\"><mxGeometry relative=\"1\" as=\"geometry\"><Array as=\"points\"><mxPoint x=\"440\" y=\"210\"/><mxPoint x=\"590\" y=\"210\"/></Array></mxGeometry></mxCell><mxCell id=\"2\" value=\"Actor\" style=\"shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"410\" y=\"170\" width=\"30\" height=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"3\" value=\"\" style=\"swimlane;startSize=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"120\" y=\"80\" width=\"200\" height=\"200\" as=\"geometry\"/></mxCell><mxCell id=\"5\" value=\"\" style=\"shape=tape;whiteSpace=wrap;html=1;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"530\" y=\"60\" width=\"120\" height=\"100\" as=\"geometry\"/></mxCell></root></mxGraphModel>";
@@ -454,39 +447,31 @@ if (typeof isWebpack !== 'undefined') {
                 }
             })
         .then(resolve => {
-            // console.log("init", resolve)
+            console.log("init", resolve)
+            graphEditor.setGrapheditorData({
+                xml: xmlData
+            }).then(resolve => {
+                console.log("setGraphEditor", resolve)
+            }, reject => {
+                console.log("setGraphEditor", reject)
+            }).catch(e => {
+                console.log("setGraphEditor", e)
+            });
         }, reject => {
             console.log("init", reject)
         }).catch(e => {
             console.log("init", e)
         });
-    // setTimeout(() => {
-    //     graphEditor.setGrapheditorData({
-    //         xml: xmlData
-    //     }).then(resolve => {
-    //         // console.log("setGraphEditor", resolve)
-    //     }, reject => {
-    //         console.log("setGraphEditor", reject)
-    //     }).catch(e => {
-    //         console.log("setGraphEditor", e)
-    //     });
-    // }, 1000);
 
     //Override - openGraphEditorList function - Deal save as per task requirements
     graphEditor.openGraphEditorList = () => {
         return new Promise((resolve, reject) => {
-          resolve({
-            status: "Open From TS",
-            graphData: { xml: xmlData }
-          })
+            resolve({
+                status: "Open From TS",
+                graphData: {
+                    xml: "<mxGraphModel dx=\"1038\" dy=\"411\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"850\" pageHeight=\"1100\"><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"4\" value=\"\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;\" parent=\"1\" source=\"2\" target=\"7\" edge=\"1\"><mxGeometry relative=\"1\" as=\"geometry\"><mxPoint x=\"320\" y=\"180\" as=\"targetPoint\"/></mxGeometry></mxCell><mxCell id=\"6\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;\" parent=\"1\" source=\"2\" target=\"5\" edge=\"1\"><mxGeometry relative=\"1\" as=\"geometry\"><Array as=\"points\"><mxPoint x=\"440\" y=\"210\"/><mxPoint x=\"590\" y=\"210\"/></Array></mxGeometry></mxCell><mxCell id=\"2\" value=\"Actor\" style=\"shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;\" parent=\"1\" vertex=\"1\"><mxGeometry x=\"410\" y=\"170\" width=\"30\" height=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"5\" value=\"\" style=\"shape=tape;whiteSpace=wrap;html=1;\" parent=\"1\" vertex=\"1\"><mxGeometry x=\"530\" y=\"60\" width=\"120\" height=\"100\" as=\"geometry\"/></mxCell><mxCell id=\"7\" value=\"Cross-Functional Flowchart\" style=\"shape=table;childLayout=tableLayout;rowLines=0;columnLines=0;startSize=40;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;fontStyle=1;align=center;\" parent=\"1\" vertex=\"1\"><mxGeometry x=\"260\" y=\"320\" width=\"400\" height=\"400\" as=\"geometry\"/></mxCell><mxCell id=\"8\" value=\"Actor 1\" style=\"swimlane;horizontal=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;startSize=40;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;fontStyle=1\" parent=\"7\" vertex=\"1\"><mxGeometry y=\"40\" width=\"400\" height=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"9\" value=\"Phase 1\" style=\"swimlane;connectable=0;startSize=40;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"8\" vertex=\"1\"><mxGeometry width=\"133\" height=\"120\" as=\"geometry\"><mxRectangle width=\"133\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"10\" value=\"Phase 2\" style=\"swimlane;connectable=0;startSize=40;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"8\" vertex=\"1\"><mxGeometry x=\"133\" width=\"134\" height=\"120\" as=\"geometry\"><mxRectangle width=\"134\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"11\" value=\"Phase 3\" style=\"swimlane;connectable=0;startSize=40;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"8\" vertex=\"1\"><mxGeometry x=\"267\" width=\"133\" height=\"120\" as=\"geometry\"><mxRectangle width=\"133\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"12\" value=\"Actor 2\" style=\"swimlane;horizontal=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;startSize=40;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"7\" vertex=\"1\"><mxGeometry y=\"160\" width=\"400\" height=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"13\" value=\"\" style=\"swimlane;connectable=0;startSize=0;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"12\" vertex=\"1\"><mxGeometry width=\"133\" height=\"120\" as=\"geometry\"><mxRectangle width=\"133\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"14\" value=\"\" style=\"swimlane;connectable=0;startSize=0;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"12\" vertex=\"1\"><mxGeometry x=\"133\" width=\"134\" height=\"120\" as=\"geometry\"><mxRectangle width=\"134\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"15\" value=\"\" style=\"swimlane;connectable=0;startSize=0;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"12\" vertex=\"1\"><mxGeometry x=\"267\" width=\"133\" height=\"120\" as=\"geometry\"><mxRectangle width=\"133\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"16\" value=\"Actor 3\" style=\"swimlane;horizontal=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;startSize=40;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"7\" vertex=\"1\"><mxGeometry y=\"280\" width=\"400\" height=\"120\" as=\"geometry\"/></mxCell><mxCell id=\"17\" value=\"\" style=\"swimlane;connectable=0;startSize=0;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"16\" vertex=\"1\"><mxGeometry width=\"133\" height=\"120\" as=\"geometry\"><mxRectangle width=\"133\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"18\" value=\"\" style=\"swimlane;connectable=0;startSize=0;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"16\" vertex=\"1\"><mxGeometry x=\"133\" width=\"134\" height=\"120\" as=\"geometry\"><mxRectangle width=\"134\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell><mxCell id=\"19\" value=\"\" style=\"swimlane;connectable=0;startSize=0;collapsible=0;recursiveResize=0;expand=0;pointerEvents=0;\" parent=\"16\" vertex=\"1\"><mxGeometry x=\"267\" width=\"133\" height=\"120\" as=\"geometry\"><mxRectangle width=\"133\" height=\"120\" as=\"alternateBounds\"/></mxGeometry></mxCell></root></mxGraphModel>"
+                }
+            })
         })
-      }
+    }
 }
-
-
-
-// export {
-//     grapheditor,
-//     saveGrapheditor,
-//     destroyGrapheditor
-// };
