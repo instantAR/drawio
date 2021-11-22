@@ -8,7 +8,7 @@ window.grapheditorKeysDefault = ["webpackScripts", "graphEditorRefCount", "windo
 window.grapheditorKeys = [];
 
 /**
- * @typedef {{ visible: {menu?:{help?:boolean} subMenu? : {new?: boolean, open?: boolean, import?: boolean, export?:boolean,editDiagram?:boolean}} }} GraphInitConfig
+ * @typedef {{ printSetting?: {isPrint:boolean},visible: {menu?:{help?:boolean} subMenu? : {new?: boolean, open?: boolean, import?: boolean, export?:boolean,editDiagram?:boolean}} }} GraphInitConfig
  * @typedef {{ xml: string }} GraphXmlData
  * @typedef {{ status: string, graphData: GraphXmlData}} GraphEditorSave
  * @typedef {{ status: string, graphData?: GraphXmlData}} GraphEditorOpen
@@ -17,6 +17,12 @@ window.grapheditorKeys = [];
  */
 
 export class GraphEditor {
+    /** @private */
+    printSetupActions = {
+        fitWindow: 'fitWindow',
+        fitPage: 'fitPage',
+        grid: 'grid'
+    }
 
     /** @private */
     hideMenus = {
@@ -313,16 +319,21 @@ export class GraphEditor {
     setGrapheditorData(graphData) {
         return new Promise((resolve, reject) => {
             try {
-
-                let doc = mxUtils.parseXml(graphData.xml);
-                // console.log("setGraphData", graphData, doc);
-                this.editorUiObj.editor.setGraphXml(doc.documentElement);
-                this.editorUiObj.editor.setModified(false);
-                this.editorUiObj.editor.undoManager.clear();
+                // console.log('typeof', typeof this.editorUiObj);
+                let xmlDoc = mxUtils.parseXml(graphData.xml);
+                if (typeof this.editorUiObj == EditorUi) {
+                    // console.log("setGraphData", graphData, doc);
+                    this.editorUiObj.editor.setGraphXml(xmlDoc.documentElement);
+                    this.editorUiObj.editor.setModified(false);
+                    this.editorUiObj.editor.undoManager.clear();
+                } else {
+                    var codec = new mxCodec(xmlDoc);
+                    codec.decode(xmlDoc.documentElement, this.editorUiObj.getModel());
+                }
                 resolve({
                     status: "Loaded",
                     graphData: graphData,
-                    document: doc
+                    document: xmlDoc
                 })
             } catch (e) {
                 reject({
@@ -359,19 +370,26 @@ export class GraphEditor {
                 mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function (xhr) {
                     // Adds bundle text to resources
                     mxResources.parse(xhr[0].getText());
+                    if (config === undefined || config.printSetting === undefined || config.printSetting.isPrint === false) {
+                        // Configures the default graph theme
+                        var themes = new Object();
+                        themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
 
-                    // Configures the default graph theme
-                    var themes = new Object();
-                    themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
+                        // Main
+                        let isChromeless = urlParams['chrome'] == '0' || uiTheme == 'min'; // true; // 
+                        let isEditable = urlParams['chrome'] != '0'; // false; // 
+                        self.editorUiObj = new EditorUi(new Editor(isChromeless, null, null, null, isEditable), container);
 
-                    // Main
-                    // new EditorUi(new Editor(urlParams['chrome'] == '0', themes), container);
-                    self.editorUiObj = new EditorUi(new Editor(
-                        urlParams['chrome'] == '0' || uiTheme == 'min',
-                        null, null, null, urlParams['chrome'] != '0'), container);
+                    } else {
+                        //Print Mod
+                        self.editorUiObj = new Graph(container);
+                        // graph.resizeContainer = true;
+                        self.editorUiObj.setEnabled(false);
+                        self.editorUiObj.setGridEnabled(true)
+                    }
                     resolve({
                         status: 'Initialized',
-                        graphEditorObj: self.editorUiObj
+                        graphEditorObj: self.editorUiObj || graph
                     })
                 }, function () {
 
@@ -440,6 +458,9 @@ if (typeof isWebpack !== 'undefined') {
     graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
             document.getElementById('mxgraph-scripts-container'), {
+                printSetting: {
+                    isPrint: true
+                },
                 visible: {
                     subMenu: {
                         open: true
