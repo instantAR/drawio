@@ -4,17 +4,27 @@ const path = require('path');
 
 module.exports = {
   entry: ['./webpack.index.js'],
+  stats: 'summary',
   output: {
     path: path.resolve(__dirname, 'dist'),
     library: 'grapheditor',
     libraryTarget: 'umd',
     filename: 'grapheditor.js',
     umdNamedDefine: true,
-    globalObject: 'this',
+    globalObject: 'this'
   },
   module: {
-    rules: [
-    ]
+    rules: [{
+      test: /\.(js)$/,
+      exclude: /(node_modules|bower_components)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+          plugins: ['@babel/plugin-proposal-object-rest-spread']
+        }
+      }
+    }]
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -102,3 +112,12 @@ function getCopyConfig(copyItems) {
 //     ignore: ["**/*.html", "**/ignored-directory/**"]
 //   }
 // }
+
+// 'errors-only'	none	Only output when errors happen
+// 'errors-warnings'	none	Only output errors and warnings happen
+// 'minimal'	none	Only output when errors or new compilation happen
+// 'none'	false	Output nothing
+// 'normal'	true	Standard output
+// 'verbose'	none	Output everything
+// 'detailed'	none	Output everything except chunkModules and chunkRootModules
+// 'summary'	none	Output webpack version, warnings count and errors coun

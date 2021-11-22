@@ -110,7 +110,7 @@ export class GraphEditor {
      * @private
      * @param {number} scriptIndex
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
-     * @param {GraphInitConfig} config - Grapheditor Configuration.
+     * @param {GraphInitConfig} [config] - Grapheditor Configuration.
      */
     appendScriptAtIndex(scriptIndex, scriptContainer, config) {
         return new Promise((resolve, reject) => {
@@ -137,7 +137,7 @@ export class GraphEditor {
     /**
      * @private
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
-     * @param {GraphInitConfig} config - Grapheditor Configuration.
+     * @param {GraphInitConfig} [config] - Grapheditor Configuration.
      */
     init(scriptContainer, config) {
 
@@ -166,7 +166,7 @@ export class GraphEditor {
 
     /**
      * @private
-     * @param {GraphInitConfig} config - Grapheditor Configuration.
+     * @param {GraphInitConfig} [config] - Grapheditor Configuration.
      */
     postScript(config) {
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
