@@ -21,7 +21,7 @@ export class GraphEditor {
     /** @private */
     hideMenus = {
         menu: ['help'],
-        subMenu: ['new', 'open', 'import', 'export', 'editDiagram']
+        subMenu: ['new', 'open', 'import', 'export', 'editDiagram', 'saveAs']
     }
     /** @private */
     editorUiObj;
@@ -264,9 +264,9 @@ export class GraphEditor {
                     this.updateDocumentTitle();
                 }, reject => {
                     console.log("saveGraphEditor:reject", reject);
-                    if (reject != undefined && reject.status != undefined) {
-                        mxUtils.alert(reject.status);
-                    }
+                    // if (reject != undefined && reject.status != undefined) {
+                    //     mxUtils.alert(reject.status);
+                    // }
                 }).catch(e => {
                     console.log(e);
                 });
