@@ -182,7 +182,7 @@ export class GraphEditor {
         Menus.prototype.createMenubar = function (container) {
 
             self.hideMenus.menu.forEach(item => {
-                if ((config.visible == undefined || config.visible.menu == undefined) ||
+                if (config === undefined || (config.visible == undefined || config.visible.menu == undefined) ||
                     (config.visible.menu[item] === undefined || config.visible.menu[item] === false)) {
                     this.defaultMenuItems = this.defaultMenuItems.filter((menu) => menu.toLowerCase() != item)
                 }
@@ -212,8 +212,8 @@ export class GraphEditor {
 
             self.hideMenus.subMenu.forEach(item => {
                 // console.log("subMenu", item, config.visible.subMenu[item]);
-                if (config.visible === undefined || config.visible.subMenu === undefined ||
-                    config.visible.subMenu[item] === undefined || config.visible.subMenu[item] === false) {
+                if (config === undefined || (config.visible === undefined || config.visible.subMenu === undefined) ||
+                    (config.visible.subMenu[item] === undefined || config.visible.subMenu[item] === false)) {
                     this.actions.removeAction(item);
                 }
             })
@@ -334,7 +334,7 @@ export class GraphEditor {
     /**
      * @param {HTMLDivElement | HTMLElement} container - Grapheditor container.
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
-     * @param {GraphInitConfig} config - Grapheditor Configuration.
+     * @param {GraphInitConfig} [config] - Grapheditor Configuration.
      * @returns {Promise<GraphEditorLoaded>} Promise<GraphEditorLoaded>
      */
     initialized(container, scriptContainer, config) {
@@ -443,13 +443,7 @@ if (typeof isWebpack !== 'undefined') {
     let graphEditor = new GraphEditor();
     graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
-            document.getElementById('mxgraph-scripts-container'), {
-                visible: {
-                    subMenu: {
-                        open: true
-                    }
-                }
-            })
+            document.getElementById('mxgraph-scripts-container'))
         .then(resolve => {
             // console.log("init", resolve)
         }, reject => {
