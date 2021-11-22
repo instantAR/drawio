@@ -14,7 +14,6 @@ window.grapheditorKeys = [];
  * @typedef {{ status: string, graphData?: GraphXmlData}} GraphEditorOpen
  * @typedef {{ status: string, graphData: GraphXmlData, document?: DOMParser|XMLDocument , reason?: any }} GraphEditorData
  * @typedef {{ status: string, graphEditorObj?: any, message?: string , reason?: any }} GraphEditorLoaded
- * @typedef {{ [key:string]: string}} GraphMenu
  */
 
 export class GraphEditor {
@@ -182,17 +181,12 @@ export class GraphEditor {
         let menusCreateMenubar = Menus.prototype.createMenubar;
         Menus.prototype.createMenubar = function (container) {
 
-            if (config.visible !== undefined && config.visible.menu !== undefined) {
-                self.hideMenus.menu.forEach(item => {
-                    if (config.visible.menu[item]) {
-                        this.defaultMenuItems = this.defaultMenuItems.filter((menu) => menu.toLowerCase() != item)
-                    }
-                })
-            } else {
-                self.hideMenus.menu.forEach(item => {
+            self.hideMenus.menu.forEach(item => {
+                if ((config.visible == undefined || config.visible.menu == undefined) ||
+                    (config.visible.menu[item] === undefined || config.visible.menu[item] === false)) {
                     this.defaultMenuItems = this.defaultMenuItems.filter((menu) => menu.toLowerCase() != item)
-                })
-            }
+                }
+            })
 
             return menusCreateMenubar.apply(this, arguments);
         }
@@ -201,6 +195,7 @@ export class GraphEditor {
          * Remove the action under the given name.
          */
         Actions.prototype.removeAction = function (key) {
+            // console.log("Actions:removeAction", key, this.actions[key]);
             if (this.actions[key] != undefined) {
                 delete this.actions[key];
             }
@@ -214,17 +209,15 @@ export class GraphEditor {
 
         EditorUi.prototype.init = function () {
 
-            if (config.visible !== undefined && config.visible.subMenu !== undefined) {
-                self.hideMenus.subMenu.forEach(item => {
-                    if (config.visible.subMenu[item]) {
-                        this.actions.removeAction(item);
-                    }
-                })
-            } else {
-                self.hideMenus.subMenu.forEach(item => {
+
+            self.hideMenus.subMenu.forEach(item => {
+                // console.log("subMenu", item, config.visible.subMenu[item]);
+                if (config.visible === undefined || config.visible.subMenu === undefined ||
+                    config.visible.subMenu[item] === undefined || config.visible.subMenu[item] === false) {
                     this.actions.removeAction(item);
-                })
-            }
+                }
+            })
+
             editorUiInit.apply(this, arguments);
         }
         /**
@@ -450,7 +443,13 @@ if (typeof isWebpack !== 'undefined') {
     let graphEditor = new GraphEditor();
     graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
-            document.getElementById('mxgraph-scripts-container'), {})
+            document.getElementById('mxgraph-scripts-container'), {
+                visible: {
+                    subMenu: {
+                        open: true
+                    }
+                }
+            })
         .then(resolve => {
             // console.log("init", resolve)
         }, reject => {
