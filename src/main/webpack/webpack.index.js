@@ -228,11 +228,12 @@ export class GraphEditor {
             try {
                 self.openGraphEditorList().then(resolve => {
                     console.log("openFile:resolve", resolve);
+                    self.setGrapheditorData(resolve.graphData);
                 }, reject => {
                     console.log("openFile:reject", reject);
-                    if (reject != undefined && reject.status != undefined) {
-                        mxUtils.alert(reject.status);
-                    }
+                    // if (reject != undefined && reject.status != undefined) {
+                    //     mxUtils.alert(reject.status);
+                    // }
                 }).catch(e => {
                     console.log(e);
                 });
@@ -282,6 +283,7 @@ export class GraphEditor {
      * @returns {Promise<GraphEditorSave>} Promise<GraphEditorSave>
      */
     saveGrapheditor(graphData) {
+        //TODO: bind this with GraphInitConfig
         return new Promise((resolve, reject) => {
             reject({
                 status: "Implementation required",
@@ -295,6 +297,7 @@ export class GraphEditor {
      * @returns {Promise<GraphEditorOpen>} Promise<GraphEditorOpen>
      */
     openGraphEditorList() {
+        //TODO: bind this with GraphInitConfig
         return new Promise((resolve, reject) => {
             reject({
                 status: "Implementation required",
@@ -443,7 +446,13 @@ if (typeof isWebpack !== 'undefined') {
     let graphEditor = new GraphEditor();
     graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
-            document.getElementById('mxgraph-scripts-container'))
+            document.getElementById('mxgraph-scripts-container'), {
+                visible: {
+                    subMenu: {
+                        open: true
+                    }
+                }
+            })
         .then(resolve => {
             // console.log("init", resolve)
         }, reject => {
@@ -451,17 +460,27 @@ if (typeof isWebpack !== 'undefined') {
         }).catch(e => {
             console.log("init", e)
         });
-    setTimeout(() => {
-        graphEditor.setGrapheditorData({
-            xml: xmlData
-        }).then(resolve => {
-            // console.log("setGraphEditor", resolve)
-        }, reject => {
-            console.log("setGraphEditor", reject)
-        }).catch(e => {
-            console.log("setGraphEditor", e)
-        });
-    }, 1000);
+    // setTimeout(() => {
+    //     graphEditor.setGrapheditorData({
+    //         xml: xmlData
+    //     }).then(resolve => {
+    //         // console.log("setGraphEditor", resolve)
+    //     }, reject => {
+    //         console.log("setGraphEditor", reject)
+    //     }).catch(e => {
+    //         console.log("setGraphEditor", e)
+    //     });
+    // }, 1000);
+
+    //Override - openGraphEditorList function - Deal save as per task requirements
+    graphEditor.openGraphEditorList = () => {
+        return new Promise((resolve, reject) => {
+          resolve({
+            status: "Open From TS",
+            graphData: { xml: xmlData }
+          })
+        })
+      }
 }
 
 
