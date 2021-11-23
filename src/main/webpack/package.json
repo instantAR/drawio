@@ -1,5 +1,5 @@
 {
-  "name": "@draw.io/grapheditor",
+  "name": "@zklogic/draw.io",
   "version": "15.7.1",
   "description": "diagrams.net desktop",
   "main": "./dist/grapheditor.js",
@@ -7,7 +7,7 @@
   "scripts": {
     "start": "rmdir dist /S /Q & npx webpack --mode=development --config webpack.config.js --watch",
     "build:types": "rmdir dist\\types /S /Q & tsc -p tsconfig.json",
-    "clean": "rmdir dist /S /Q & del draw.io-*.tgz",
+    "clean": "rmdir dist /S /Q & del *-draw.io-*.tgz",
     "build": "npm run clean & npm run build:types & npx webpack --mode=production --config webpack.config.js --progress --profile & npm pack",
     "tsc": "tsc"
   },
