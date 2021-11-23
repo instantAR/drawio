@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.com/jgraph/drawio.svg?branch=master)](https://travis-ci.com/jgraph/drawio)
+[![Build Status](https://travis-ci.com/jgraph/drawio.svg?branch=master)](https://app.diagrams.net)
+[Grapheditor](https://app.diagrams.net/) for Angular.
 
 About
 -----
@@ -13,11 +14,15 @@ git clone https://github.com/ArfanMirza/drawio.git
 cd "drawio\src\main\webpack"
 npm run build 
 ```
-TGZ file created along with dist directory. TGZ file name start from **draw.io-**
+TGZ file created along with dist directory. TGZ file name start from **zklogic-draw.io-**
 Copy the tgz & Go to Angular Project, create lib directory along src directory and past TGZ file inside
+### NPM Build & Install
+```shell
+npm install --save ./lib/zklogic-draw.io-*.tgz
+```
 ### NPM Install
 ```shell
-npm install --save ./lib/draw.io-*.tgz
+npm install --save @zklogic/draw.io
 ```
 ### Update Angular.json
 ```shell
@@ -26,7 +31,7 @@ npm install --save ./lib/draw.io-*.tgz
   .
   {
     "glob": "**/*",
-    "input": "./node_modules/draw.io/dist/mxgraph",
+    "input": "./node_modules/@zklogic/draw.io/dist/mxgraph",
     "output": "./mxgraph"
   }
 ]
@@ -34,7 +39,7 @@ npm install --save ./lib/draw.io-*.tgz
 "styles": [
   .
   .
-  "./node_modules/draw.io/dist/mxgraph/styles/grapheditor.css"
+  "./node_modules/@zklogic/draw.io/dist/mxgraph/styles/grapheditor.css"
 ],
 ```
 
@@ -52,7 +57,7 @@ npm install --save ./lib/draw.io-*.tgz
 ```
 **component.ts**
 ```shell
-import { GraphEditor, GraphInitConfig, GraphXmlData } from 'draw.io';
+import { GraphEditor, GraphInitConfig, GraphXmlData } from '@zklogic/draw.io';
 ...
 @ViewChild('container', { static: true }) container: ElementRef<HTMLElement>;
 @ViewChild('mxgraphScriptsContainer', { static: true }) mxgraphScriptsContainer: ElementRef<HTMLElement>;
