@@ -60,17 +60,50 @@ graphEditor: GraphEditor = new GraphEditor();
 ...
 
 ngOnInit(): void {
-//Div container to load Graph Editor
-this.graphEditor.grapheditor(this.container.nativeElement,this.mxgraphScriptsContainer.nativeElement)
-//Override - SaveGraphEditor function - Deal save as per task requirements
-this.graphEditor.saveGrapheditor = (xml) => {
-  return new Promise((resolve, reject) => {
-    resolve({
-      status: "From TS",
-      xml: xml
-    })
+let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"850\" pageHeight=\"1100\"><root></root></mxGraphModel>";
+
+    //Div container to load Graph Editor
+    this.graphEditor.initialized(this.container.nativeElement, this.mxgraphScriptsContainer.nativeElement, {
+      visible: {
+        subMenu: {
+          open: true
+        }
+      }
+    } as GraphInitConfig)
+  .then(resolve => {
+        console.log(resolve)
+        //Fetch last saved graph data and set after initialization
+        this.graphEditor.setGrapheditorData({ xml: xml } as GraphXmlData).then(resolve => {
+          console.log("setGraphEditor", resolve)
+        }, reject => {
+          console.log("setGraphEditor", reject)
+        }).catch(e => {
+          console.log("setGraphEditor", e)
+        });
+  }, reject => {
+    console.log(reject);
   })
-}
+
+    //Override - SaveGraphEditor function - Deal save as per task requirements
+    this.graphEditor.saveGrapheditor = (xml: GraphXmlData) => {
+      return new Promise((resolve, reject) => {
+        resolve({
+          status: "From TS",
+          graphData: xml
+        })
+      })
+    }
+
+    //Override - openGraphEditorList function - Deal save as per task requirements
+    this.graphEditor.openGraphEditorList = () => {
+      return new Promise((resolve, reject) => {
+        resolve({
+          status: "Open From TS",
+          graphData: { xml: xml } as GraphXmlData
+        })
+      })
+    }
+
 }
 ```
 License
