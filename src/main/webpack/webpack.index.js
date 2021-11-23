@@ -319,9 +319,9 @@ export class GraphEditor {
     setGrapheditorData(graphData) {
         return new Promise((resolve, reject) => {
             try {
-                // console.log('typeof', typeof this.editorUiObj);
+                // console.log('typeof', this.editorUiObj);
                 let xmlDoc = mxUtils.parseXml(graphData.xml);
-                if (typeof this.editorUiObj == EditorUi) {
+                if (this.editorUiObj instanceof EditorUi) {
                     // console.log("setGraphData", graphData, doc);
                     this.editorUiObj.editor.setGraphXml(xmlDoc.documentElement);
                     this.editorUiObj.editor.setModified(false);
@@ -459,7 +459,7 @@ if (typeof isWebpack !== 'undefined') {
             document.getElementById('mxgraph-diagram-container'),
             document.getElementById('mxgraph-scripts-container'), {
                 printSetting: {
-                    isPrint: true
+                    isPrint: false
                 },
                 visible: {
                     subMenu: {
