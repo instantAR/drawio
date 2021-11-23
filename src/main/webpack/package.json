@@ -18,8 +18,9 @@
   "keywords": [
     "draw.io",
     "diagram",
-    "flowchart",
-    "UML"
+    "flowchart-angular",
+    "UML",
+    "grapheditor-angular"
   ],
   "author": "JGraph",
   "license": "Apache-2.0",
