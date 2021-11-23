@@ -52,7 +52,7 @@ npm install --save ./lib/draw.io-*.tgz
 ```
 **component.ts**
 ```shell
-import { GraphEditor } from 'draw.io';
+import { GraphEditor, GraphInitConfig, GraphXmlData } from 'draw.io';
 ...
 @ViewChild('container', { static: true }) container: ElementRef<HTMLElement>;
 @ViewChild('mxgraphScriptsContainer', { static: true }) mxgraphScriptsContainer: ElementRef<HTMLElement>;
