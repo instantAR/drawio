@@ -1,7 +1,7 @@
 {
   "name": "@zklogic/draw.io",
   "version": "15.7.2",
-  "description": "diagrams.net desktop",
+  "description": "Draw.IO - Graph Editor integration in Angular-cli",
   "main": "./dist/grapheditor.js",
   "types": "./dist/types/webpack.index.d.ts",
   "scripts": {
