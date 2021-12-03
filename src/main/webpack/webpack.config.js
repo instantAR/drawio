@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = {
   entry: ['./webpack.index.js'],
-  stats: 'summary',
+  stats: 'verbose',
   output: {
     path: path.resolve(__dirname, 'dist'),
     library: 'grapheditor',
@@ -32,24 +32,21 @@ module.exports = {
       template: './index.html'
     }),
     getCopyConfig([{
+      from: './webpackExtensions',
+      to: './webpackExtensions',
+      isJsInclude: true,
+      context: 'root'
+    }, {
+      from: 'math',
+      to: 'mxgraph/grapheditor/math',
+      isJsInclude: true
+    }, {
       from: 'mxgraph',
       to: 'mxgraph',
       isJsInclude: true
     }, {
-      from: 'js/grapheditor',
+      from: 'js',
       to: 'mxgraph/grapheditor',
-      isJsInclude: true
-    }, {
-      from: 'js/deflate',
-      to: 'mxgraph/grapheditor/deflate',
-      isJsInclude: true
-    }, {
-      from: 'js/sanitizer',
-      to: 'mxgraph/grapheditor/sanitizer',
-      isJsInclude: true
-    }, {
-      from: 'js/jscolor',
-      to: 'mxgraph/grapheditor/jscolor',
       isJsInclude: true
     }, {
       from: 'resources',
@@ -79,11 +76,11 @@ function getCopyConfig(copyItems) {
       from: element.from,
       to: element.to,
       // _to: "assets/" + element.to,
-      context: "../webapp",
+      context: (element.context === 'root' ? "" : "../webapp"),
       globOptions: {
         dot: true,
         gitignore: true,
-        ignore: [(element.isJsInclude ? "**/*.jss" : ''), "**/*.html", "**/ignored-directory/**"]
+        ignore: [(element.isJsInclude ? '**/*.jss' : "**/*.js"), "**/*.html", "**/ignored-directory/**"]
       }
     })
   });
@@ -91,6 +88,52 @@ function getCopyConfig(copyItems) {
     patterns: patterns
   })
 }
+
+// {
+//   from: 'js/grapheditor',
+//   to: 'mxgraph/grapheditor',
+//   isJsInclude: true
+// }, {
+//   from: 'js/deflate',
+//   to: 'mxgraph/grapheditor/deflate',
+//   isJsInclude: true
+// }, {
+//   from: 'js/sanitizer',
+//   to: 'mxgraph/grapheditor/sanitizer',
+//   isJsInclude: true
+// }, {
+//   from: 'js/jscolor',
+//   to: 'mxgraph/grapheditor/jscolor',
+//   isJsInclude: true
+// }, {
+//   from: 'js/cryptojs',
+//   to: 'mxgraph/grapheditor/cryptojs',
+//   isJsInclude: true
+// }, {
+//   from: 'js/croppie',
+//   to: 'mxgraph/grapheditor/croppie',
+//   isJsInclude: true
+// }, {
+//   from: 'js/rough',
+//   to: 'mxgraph/grapheditor/rough',
+//   isJsInclude: true
+// }, {
+//   from: 'js/spin',
+//   to: 'mxgraph/grapheditor/spin',
+//   isJsInclude: true
+// }, {
+//   from: 'js/jszip',
+//   to: 'mxgraph/grapheditor/jszip',
+//   isJsInclude: true
+// }, {
+//   from: 'js/orgchart',
+//   to: 'mxgraph/grapheditor/orgchart',
+//   isJsInclude: true
+// }, {
+//   from: 'js/diagramly',
+//   to: 'mxgraph/grapheditor/diagramly',
+//   isJsInclude: true
+// }
 
 // {
 //   from: "mxgraph",
