@@ -594,7 +594,7 @@
   * 
   * Optional callback is called with the app instance.
   */
- App.main = function(callback, createUi)
+ App.main = function(callback, createUi, graphContainer)
  {
      // Logs uncaught errors
      window.onerror = function(message, url, linenumber, colno, err)
@@ -790,18 +790,18 @@
          
          // Loads gapi for all browsers but IE8 and below if not disabled or if enabled and in embed mode
          // Special case: Cannot load in asynchronous code below
-         if (typeof window.DriveClient === 'function' &&
-             (typeof gapi === 'undefined' && (((urlParams['embed'] != '1' && urlParams['gapi'] != '0') ||
-             (urlParams['embed'] == '1' && urlParams['gapi'] == '1')) && isSvgBrowser &&
-             isLocalStorage && (document.documentMode == null || document.documentMode >= 10))))
-         {
-             mxscript('https://apis.google.com/js/api.js?onload=DrawGapiClientCallback', null, null, null, mxClient.IS_SVG);
-         }
-         // Disables client
-         else if (typeof window.gapi === 'undefined')
-         {
-             window.DriveClient = null;
-         }
+        //  if (typeof window.DriveClient === 'function' &&
+        //      (typeof gapi === 'undefined' && (((urlParams['embed'] != '1' && urlParams['gapi'] != '0') ||
+        //      (urlParams['embed'] == '1' && urlParams['gapi'] == '1')) && isSvgBrowser &&
+        //      isLocalStorage && (document.documentMode == null || document.documentMode >= 10))))
+        //  {
+        //      mxscript('https://apis.google.com/js/api.js?onload=DrawGapiClientCallback', null, null, null, mxClient.IS_SVG);
+        //  }
+        //  // Disables client
+        //  else if (typeof window.gapi === 'undefined')
+        //  {
+        //      window.DriveClient = null;
+        //  }
      }
      
      /**
@@ -919,7 +919,7 @@
              {
                  var ui = (createUi != null) ? createUi() : new App(new Editor(
                          urlParams['chrome'] == '0' || uiTheme == 'min',
-                         null, null, null, urlParams['chrome'] != '0'));
+                         null, null, null, urlParams['chrome'] != '0'), graphContainer);
                  
                 //  if (window.mxscript != null)
                 //  {
@@ -1680,27 +1680,27 @@
              }));
          }
          
-         if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && !this.isOffline() &&
-             !mxClient.IS_ANDROID && !mxClient.IS_IOS && urlParams['open'] == null &&
-             (!this.editor.chromeless || this.editor.editable))
-         {
-             this.editor.addListener('fileLoaded', mxUtils.bind(this, function()
-             {
-                 var file = this.getCurrentFile();
-                 var mode = (file != null) ? file.getMode() : null;
+        //  if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && !this.isOffline() &&
+        //      !mxClient.IS_ANDROID && !mxClient.IS_IOS && urlParams['open'] == null &&
+        //      (!this.editor.chromeless || this.editor.editable))
+        //  {
+        //      this.editor.addListener('fileLoaded', mxUtils.bind(this, function()
+        //      {
+        //         //  var file = this.getCurrentFile();
+        //         //  var mode = (file != null) ? file.getMode() : null;
                  
-                 if (urlParams['extAuth'] != '1' && (mode == App.MODE_DEVICE || mode == App.MODE_BROWSER))
-                 {
-                     this.showDownloadDesktopBanner();
-                 }
-                 else if (urlParams['embed'] != '1' && this.getServiceName() == 'draw.io')
+        //         //  if (urlParams['extAuth'] != '1' && (mode == App.MODE_DEVICE || mode == App.MODE_BROWSER))
+        //         //  {
+        //         //      this.showDownloadDesktopBanner();
+        //         //  }
+        //         //  else if (urlParams['embed'] != '1' && this.getServiceName() == 'draw.io')
  
-                 {
-                     // just app.diagrams.net users
-                     // this.showNameConfBanner();
-                 }
-             }));
-         }
+        //         //  {
+        //         //      // just app.diagrams.net users
+        //         //      // this.showNameConfBanner();
+        //         //  }
+        //      }));
+        //  }
          
          if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && urlParams['embed'] != '1' && DrawioFile.SYNC == 'auto' &&
              urlParams['local'] != '1' && urlParams['stealth'] != '1' && !this.isOffline() &&
@@ -4469,6 +4469,7 @@
              
              var dlg = new CreateDialog(this, filename, mxUtils.bind(this, function(name, mode, input)
              {
+                 console.log("creatFn",name, mode, input)
                  if (name != null && name.length > 0)
                  {
                      // Handles special case where PDF export is detected
@@ -4531,14 +4532,22 @@
                          }
                          else if (mode == '_blank')
                          {
-                             window.openFile = new OpenFile(function()
-                             {
-                                 window.openFile = null;
-                             });
+                             let saveCallback = this.performCallbackForAction(mode);
+                             if(saveCallback !== undefined)
+                                 try {
+                                        saveCallback({ xml: xmlData }).then(resolve => {}, reject => {console.log(reject);}).catch(e => {console.log(e);});
+                                } catch (e) {
+                                    console.log(e);
+                                }
+                            
+                            //  window.openFile = new OpenFile(function()
+                            //  {
+                            //      window.openFile = null;
+                            //  });
                              
-                             // Do not use a filename to use undefined mode
-                             window.openFile.setData(this.getFileData(true));
-                             this.openLink(this.getUrl(window.location.pathname), null, true);
+                            //  // Do not use a filename to use undefined mode
+                            //  window.openFile.setData(this.getFileData(true));
+                            //  this.openLink(this.getUrl(window.location.pathname), null, true);
                          }
                          else if (prev != mode)
                          {
@@ -5428,7 +5437,7 @@
          tip += '\n' + file.getHash();
      }
      
-     if (file.constructor == DriveLibrary)
+     /*if (file.constructor == DriveLibrary)
      {
          tip += ' (' + mxResources.get('googleDrive') + ')';
      }
@@ -5452,7 +5461,7 @@
      {
          tip += ' (' + mxResources.get('browser') + ')';
      }
-     else if (file.constructor == LocalLibrary)
+     else */if (file.constructor == LocalLibrary)
      {
          tip += ' (' + mxResources.get('device') + ')';
      }

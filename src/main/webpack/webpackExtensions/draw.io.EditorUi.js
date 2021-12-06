@@ -11371,38 +11371,38 @@
  
          if (data != null && data.length > 0)
          {
-             if (currentFile == null || (!currentFile.isModified() &&
-                 (mxClient.IS_CHROMEAPP || EditorUi.isElectronApp || fileHandle != null)))
-             {
+            //  if (currentFile == null || (!currentFile.isModified() &&
+            //      (mxClient.IS_CHROMEAPP || EditorUi.isElectronApp || fileHandle != null)))
+            //  {
                  fn();
-             }
-             else if ((mxClient.IS_CHROMEAPP || EditorUi.isElectronApp || fileHandle != null) &&
-                 currentFile != null && currentFile.isModified())
-             {
-                 this.confirm(mxResources.get('allChangesLost'), null, fn,
-                     mxResources.get('cancel'), mxResources.get('discardChanges'));
-             }
-             else
-             {
-                 window.openFile = new OpenFile(function()
-                 {
-                     window.openFile = null;
-                 });
+            //  }
+            //  else if ((mxClient.IS_CHROMEAPP || EditorUi.isElectronApp || fileHandle != null) &&
+            //      currentFile != null && currentFile.isModified())
+            //  {
+            //      this.confirm(mxResources.get('allChangesLost'), null, fn,
+            //          mxResources.get('cancel'), mxResources.get('discardChanges'));
+            //  }
+            //  else
+            //  {
+            //      window.openFile = new OpenFile(function()
+            //      {
+            //          window.openFile = null;
+            //      });
                  
-                 window.openFile.setData(data, name);
-                 window.openWindow(this.getUrl(), null, mxUtils.bind(this, function()
-                 {
-                     if (currentFile != null && currentFile.isModified())
-                     {
-                         this.confirm(mxResources.get('allChangesLost'), null, fn,
-                             mxResources.get('cancel'), mxResources.get('discardChanges'));
-                     }
-                     else
-                     {
-                         fn();
-                     }
-                 }));
-             }
+            //      window.openFile.setData(data, name);
+            //      window.openWindow(this.getUrl(), null, mxUtils.bind(this, function()
+            //      {
+            //          if (currentFile != null && currentFile.isModified())
+            //          {
+            //              this.confirm(mxResources.get('allChangesLost'), null, fn,
+            //                  mxResources.get('cancel'), mxResources.get('discardChanges'));
+            //          }
+            //          else
+            //          {
+            //              fn();
+            //          }
+            //      }));
+            //  }
          }
          else
          {
@@ -13846,7 +13846,7 @@
          this.actions.get('createRevision').setEnabled(active);
          this.actions.get('moveToFolder').setEnabled(file != null);
         //  this.actions.get('makeCopy').setEnabled(file != null && !file.isRestricted());
-         this.actions.get('editDiagram').setEnabled(active && (file == null || !file.isRestricted()));
+         if(this.actions.get('editDiagram'))this.actions.get('editDiagram').setEnabled(active && (file == null || !file.isRestricted()));
          this.actions.get('publishLink').setEnabled(file != null && !file.isRestricted());
          this.actions.get('tags').setEnabled(this.diagramContainer.style.visibility != 'hidden');
          this.actions.get('layers').setEnabled(this.diagramContainer.style.visibility != 'hidden');

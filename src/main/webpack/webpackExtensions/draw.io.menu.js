@@ -16,38 +16,38 @@
          this.div.style.maxHeight = (h0 - 10) + 'px';
      };
      
-     Menus.prototype.createHelpLink = function(href)
-     {
-         var link = document.createElement('span');
-         link.setAttribute('title', mxResources.get('help'));
-         link.style.cssText = 'color:blue;text-decoration:underline;margin-left:8px;cursor:help;';
+    //  Menus.prototype.createHelpLink = function(href)
+    //  {
+    //      var link = document.createElement('span');
+    //      link.setAttribute('title', mxResources.get('help'));
+    //      link.style.cssText = 'color:blue;text-decoration:underline;margin-left:8px;cursor:help;';
          
-         var icon = document.createElement('img');
-         mxUtils.setOpacity(icon, 50);
-         icon.style.height = '16px';
-         icon.style.width = '16px';
-         icon.setAttribute('border', '0');
-         icon.setAttribute('valign', 'bottom');
-         icon.setAttribute('src', Editor.helpImage);
-         link.appendChild(icon);
+    //      var icon = document.createElement('img');
+    //      mxUtils.setOpacity(icon, 50);
+    //      icon.style.height = '16px';
+    //      icon.style.width = '16px';
+    //      icon.setAttribute('border', '0');
+    //      icon.setAttribute('valign', 'bottom');
+    //      icon.setAttribute('src', Editor.helpImage);
+    //      link.appendChild(icon);
          
-         mxEvent.addGestureListeners(link, mxUtils.bind(this, function(evt)
-         {
-             this.editorUi.hideCurrentMenu();
-             this.editorUi.openLink(href);
-             mxEvent.consume(evt);
-         }));
+    //      mxEvent.addGestureListeners(link, mxUtils.bind(this, function(evt)
+    //      {
+    //          this.editorUi.hideCurrentMenu();
+    //          this.editorUi.openLink(href);
+    //          mxEvent.consume(evt);
+    //      }));
          
-         return link;
-     };
+    //      return link;
+    //  };
  
-     Menus.prototype.addLinkToItem = function(item, href)
-     {
-         if (item != null)
-         {
-             item.firstChild.nextSibling.appendChild(this.createHelpLink(href));
-         }
-     };
+    //  Menus.prototype.addLinkToItem = function(item, href)
+    //  {
+    //      if (item != null)
+    //      {
+    //          item.firstChild.nextSibling.appendChild(this.createHelpLink(href));
+    //      }
+    //  };
  
      var menusInit = Menus.prototype.init;
      Menus.prototype.init = function()
@@ -82,89 +82,89 @@
              });
          }
  
-         editorUi.actions.addAction('new...', function()
-         {
-             var compact = editorUi.isOffline();
+        //  editorUi.actions.addAction('new...', function()
+        //  {
+        //      var compact = editorUi.isOffline();
              
-             if (!compact && urlParams['newTempDlg'] == '1' && editorUi.mode == App.MODE_GOOGLE)
-             {
-                 function driveObjToTempDlg(item)
-                 {
-                     return {id: item.id, isExt: true, url: item.downloadUrl, title: item.title, imgUrl: item.thumbnailLink,
-                             changedBy: item.lastModifyingUserName, lastModifiedOn: item.modifiedDate}
-                 };
+        //      if (!compact && urlParams['newTempDlg'] == '1' && editorUi.mode == App.MODE_GOOGLE)
+        //      {
+        //          function driveObjToTempDlg(item)
+        //          {
+        //              return {id: item.id, isExt: true, url: item.downloadUrl, title: item.title, imgUrl: item.thumbnailLink,
+        //                      changedBy: item.lastModifyingUserName, lastModifiedOn: item.modifiedDate}
+        //          };
                  
-                 var tempDlg = new TemplatesDialog(editorUi, function(templateXml, title, infoObj)
-                 {
-                     var templateLibs = infoObj.libs, templateClibs = infoObj.clibs;
+        //          var tempDlg = new TemplatesDialog(editorUi, function(templateXml, title, infoObj)
+        //          {
+        //              var templateLibs = infoObj.libs, templateClibs = infoObj.clibs;
  
-                     editorUi.pickFolder(editorUi.mode, function(folderId)
-                     {
-                         editorUi.createFile(title, templateXml, (templateLibs != null &&
-                             templateLibs.length > 0) ? templateLibs : null, null, function()
-                         {
-                             editorUi.hideDialog();
-                         }, null, folderId, null, (templateClibs != null &&
-                             templateClibs.length > 0) ? templateClibs : null);
-                     }, editorUi.stateArg == null ||
-                         editorUi.stateArg.folderId == null);
+        //              editorUi.pickFolder(editorUi.mode, function(folderId)
+        //              {
+        //                  editorUi.createFile(title, templateXml, (templateLibs != null &&
+        //                      templateLibs.length > 0) ? templateLibs : null, null, function()
+        //                  {
+        //                      editorUi.hideDialog();
+        //                  }, null, folderId, null, (templateClibs != null &&
+        //                      templateClibs.length > 0) ? templateClibs : null);
+        //              }, editorUi.stateArg == null ||
+        //                  editorUi.stateArg.folderId == null);
                      
-                 }, null, null, null, 'user', function(callback, error, username)
-                 {
-                     var oneWeek = new Date();
-                     oneWeek.setDate(oneWeek.getDate() - 7);
+        //          }, null, null, null, 'user', function(callback, error, username)
+        //          {
+        //              var oneWeek = new Date();
+        //              oneWeek.setDate(oneWeek.getDate() - 7);
                      
-                     editorUi.drive.listFiles(null, oneWeek, username? true : false, function(resp)
-                     {
-                         var results = [];
+        //              editorUi.drive.listFiles(null, oneWeek, username? true : false, function(resp)
+        //              {
+        //                  var results = [];
                          
-                         for (var i = 0; i < resp.items.length; i++)
-                         {
-                             results.push(driveObjToTempDlg(resp.items[i]));
-                         }
+        //                  for (var i = 0; i < resp.items.length; i++)
+        //                  {
+        //                      results.push(driveObjToTempDlg(resp.items[i]));
+        //                  }
                          
-                         callback(results);
-                     }, error)
-                 }, function(str, callback, error, username)
-                 {
-                     editorUi.drive.listFiles(str, null, username? true : false, function(resp)
-                     {
-                         var results = [];
+        //                  callback(results);
+        //              }, error)
+        //          }, function(str, callback, error, username)
+        //          {
+        //              editorUi.drive.listFiles(str, null, username? true : false, function(resp)
+        //              {
+        //                  var results = [];
                          
-                         for (var i = 0; i < resp.items.length; i++)
-                         {
-                             results.push(driveObjToTempDlg(resp.items[i]));
-                         }
+        //                  for (var i = 0; i < resp.items.length; i++)
+        //                  {
+        //                      results.push(driveObjToTempDlg(resp.items[i]));
+        //                  }
                          
-                         callback(results);
-                     }, error)
-                 }, function(obj, callback, error)
-                 {
-                     editorUi.drive.getFile(obj.id, function(file)
-                     {
-                         callback(file.data);
-                     }, error);
-                 }, null, null, false, false);
+        //                  callback(results);
+        //              }, error)
+        //          }, function(obj, callback, error)
+        //          {
+        //              editorUi.drive.getFile(obj.id, function(file)
+        //              {
+        //                  callback(file.data);
+        //              }, error);
+        //          }, null, null, false, false);
                  
-                 editorUi.showDialog(tempDlg.container, window.innerWidth, window.innerHeight, true, false, null, false, true);
+        //          editorUi.showDialog(tempDlg.container, window.innerWidth, window.innerHeight, true, false, null, false, true);
  
-                 return;	
-             };
+        //          return;	
+        //      };
              
-             var dlg = new NewDialog(editorUi, compact, !(editorUi.mode == App.MODE_DEVICE && 'chooseFileSystemEntries' in window));
+        //      var dlg = new NewDialog(editorUi, compact, !(editorUi.mode == App.MODE_DEVICE && 'chooseFileSystemEntries' in window));
  
-             editorUi.showDialog(dlg.container, (compact) ? 350 : 620, (compact) ? 70 : 460, true, true, function(cancel)
-             {
-                 editorUi.sidebar.hideTooltip();
+        //      editorUi.showDialog(dlg.container, (compact) ? 350 : 620, (compact) ? 70 : 460, true, true, function(cancel)
+        //      {
+        //          editorUi.sidebar.hideTooltip();
                  
-                 if (cancel && editorUi.getCurrentFile() == null)
-                 {
-                     editorUi.showSplash();
-                 }
-             });
+        //          if (cancel && editorUi.getCurrentFile() == null)
+        //          {
+        //              editorUi.showSplash();
+        //          }
+        //      });
              
-             dlg.init();
-         });
+        //      dlg.init();
+        //  });
  
          editorUi.actions.put('insertTemplate', new Action(mxResources.get('template') + '...', function()
          {
@@ -912,22 +912,22 @@
              editorUi.openLink('https://www.youtube.com/watch?v=Z0D96ZikMkc');
          });
          
-         editorUi.actions.addAction('forkme', function()
-         {
-             if (EditorUi.isElectronApp)
-             {
-                 editorUi.openLink('https://github.com/jgraph/drawio-desktop');
-             }
-             else
-             {
-                 editorUi.openLink('https://github.com/jgraph/drawio');
-             }
-         }).label = 'Fork me on GitHub...';
+        //  editorUi.actions.addAction('forkme', function()
+        //  {
+        //      if (EditorUi.isElectronApp)
+        //      {
+        //          editorUi.openLink('https://github.com/jgraph/drawio-desktop');
+        //      }
+        //      else
+        //      {
+        //          editorUi.openLink('https://github.com/jgraph/drawio');
+        //      }
+        //  }).label = 'Fork me on GitHub...';
          
-         editorUi.actions.addAction('downloadDesktop...', function()
-         {
-             editorUi.openLink('https://get.diagrams.net/');
-         });
+        //  editorUi.actions.addAction('downloadDesktop...', function()
+        //  {
+        //      editorUi.openLink('https://get.diagrams.net/');
+        //  });
          
          action = editorUi.actions.addAction('tags', mxUtils.bind(this, function()
          {
@@ -1459,107 +1459,107 @@
              editorUi.menus.addMenuItem(menu, 'runLayout', parent, null, null, mxResources.get('apply') + '...');
          };
          
-         this.put('help', new Menu(mxUtils.bind(this, function(menu, parent)
-         {
-             if (!mxClient.IS_CHROMEAPP && editorUi.isOffline())
-             {
-                 this.addMenuItems(menu, ['about'], parent);
-             }
-             else
-             {
-                 // No translation for menu item since help is english only
-                 var item = menu.addItem('Search:', null, null, parent, null, null, false);
-                 item.style.backgroundColor = Editor.isDarkMode() ? '#505759' : 'whiteSmoke';
-                 item.style.cursor = 'default';
+        //  this.put('help', new Menu(mxUtils.bind(this, function(menu, parent)
+        //  {
+        //      if (!mxClient.IS_CHROMEAPP && editorUi.isOffline())
+        //      {
+        //          this.addMenuItems(menu, ['about'], parent);
+        //      }
+        //      else
+        //      {
+        //          // No translation for menu item since help is english only
+        //          var item = menu.addItem('Search:', null, null, parent, null, null, false);
+        //          item.style.backgroundColor = Editor.isDarkMode() ? '#505759' : 'whiteSmoke';
+        //          item.style.cursor = 'default';
                  
-                 var input = document.createElement('input');
-                 input.setAttribute('type', 'text');
-                 input.setAttribute('size', '25');
-                 input.style.marginLeft = '8px';
+        //          var input = document.createElement('input');
+        //          input.setAttribute('type', 'text');
+        //          input.setAttribute('size', '25');
+        //          input.style.marginLeft = '8px';
  
-                 mxEvent.addListener(input, 'keydown', mxUtils.bind(this, function(e)
-                 {
-                     var term = mxUtils.trim(input.value);
+        //          mxEvent.addListener(input, 'keydown', mxUtils.bind(this, function(e)
+        //          {
+        //              var term = mxUtils.trim(input.value);
                      
-                     if (e.keyCode == 13 && term.length > 0)
-                     {
-                         this.editorUi.openLink('https://www.diagrams.net/search?src=' +
-                             EditorUi.isElectronApp? 'DESKTOP' : encodeURIComponent(location.host) + 
-                             '&search=' + encodeURIComponent(term));
-                         input.value = '';
-                         EditorUi.logEvent({category: 'SEARCH-HELP', action: 'search', label: term});
+        //              if (e.keyCode == 13 && term.length > 0)
+        //              {
+        //                  this.editorUi.openLink('https://www.diagrams.net/search?src=' +
+        //                      EditorUi.isElectronApp? 'DESKTOP' : encodeURIComponent(location.host) + 
+        //                      '&search=' + encodeURIComponent(term));
+        //                  input.value = '';
+        //                  EditorUi.logEvent({category: 'SEARCH-HELP', action: 'search', label: term});
                          
-                         window.setTimeout(mxUtils.bind(this, function()
-                         {
-                             this.editorUi.hideCurrentMenu();
-                         }), 0);
-                     }
-                     else if (e.keyCode == 27)
-                     {
-                         input.value = '';
-                     }
-                 }));
+        //                  window.setTimeout(mxUtils.bind(this, function()
+        //                  {
+        //                      this.editorUi.hideCurrentMenu();
+        //                  }), 0);
+        //              }
+        //              else if (e.keyCode == 27)
+        //              {
+        //                  input.value = '';
+        //              }
+        //          }));
                  
-                 item.firstChild.nextSibling.appendChild(input);
+        //          item.firstChild.nextSibling.appendChild(input);
                  
-                 mxEvent.addGestureListeners(input, function(evt)
-                 {
-                     if (document.activeElement != input)
-                     {
-                         input.focus();
-                     }
+        //          mxEvent.addGestureListeners(input, function(evt)
+        //          {
+        //              if (document.activeElement != input)
+        //              {
+        //                  input.focus();
+        //              }
                      
-                     mxEvent.consume(evt);
-                 }, function(evt)
-                 {
-                     mxEvent.consume(evt);
-                 }, function(evt)
-                 {
-                     mxEvent.consume(evt);
-                 });
+        //              mxEvent.consume(evt);
+        //          }, function(evt)
+        //          {
+        //              mxEvent.consume(evt);
+        //          }, function(evt)
+        //          {
+        //              mxEvent.consume(evt);
+        //          });
                  
-                 window.setTimeout(function()
-                 {
-                     input.focus();
-                 }, 0);
+        //          window.setTimeout(function()
+        //          {
+        //              input.focus();
+        //          }, 0);
  
-                 if (EditorUi.isElectronApp)
-                 {
-                     editorUi.actions.addAction('website...', function()
-                     {
-                         editorUi.openLink('https://www.diagrams.net');
-                     });
+        //          if (EditorUi.isElectronApp)
+        //          {
+        //              editorUi.actions.addAction('website...', function()
+        //              {
+        //                  editorUi.openLink('https://www.diagrams.net');
+        //              });
                      
-                     editorUi.actions.addAction('check4Updates', function()
-                     {
-                         editorUi.checkForUpdates();
-                     });
+        //              editorUi.actions.addAction('check4Updates', function()
+        //              {
+        //                  editorUi.checkForUpdates();
+        //              });
                      
-                     console.log('electron help menu');
-                     this.addMenuItems(menu, ['-', 'keyboardShortcuts', 'quickStart',
-                         'website', 'support', '-'], parent);
+        //              console.log('electron help menu');
+        //              this.addMenuItems(menu, ['-', 'keyboardShortcuts', 'quickStart',
+        //                  'website', 'support', '-'], parent);
                          
-                     if (urlParams['disableUpdate'] != '1')
-                     {
-                         this.addMenuItems(menu, ['check4Updates', '-'], parent);
-                     }
+        //              if (urlParams['disableUpdate'] != '1')
+        //              {
+        //                  this.addMenuItems(menu, ['check4Updates', '-'], parent);
+        //              }
                          
-                     this.addMenuItems(menu, ['forkme', '-', 'about'], parent);
+        //              this.addMenuItems(menu, ['forkme', '-', 'about'], parent);
  
-                 }
-                 else
-                 {
-                     this.addMenuItems(menu, ['-', 'keyboardShortcuts', 'quickStart',
-                         'support', '-', 'forkme', 'downloadDesktop', '-', 'about'], parent);
-                 }
-             }
+        //          }
+        //          else
+        //          {
+        //              this.addMenuItems(menu, ['-', 'keyboardShortcuts', 'quickStart',
+        //                  'support', '-', 'forkme', 'downloadDesktop', '-', 'about'], parent);
+        //          }
+        //      }
              
-             if (urlParams['test'] == '1')
-             {
-                 menu.addSeparator(parent);
-                 this.addSubmenu('testDevelop', menu, parent);
-             }
-         })));
+        //      if (urlParams['test'] == '1')
+        //      {
+        //          menu.addSeparator(parent);
+        //          this.addSubmenu('testDevelop', menu, parent);
+        //      }
+        //  })));
  
          // Experimental
          mxResources.parse('diagramLanguage=Diagram Language');
@@ -2386,7 +2386,7 @@
              if (!editorUi.isOffline())
              {
                  menu.addSeparator(parent);
-                 this.addMenuItem(menu, 'export', parent).firstChild.nextSibling.innerHTML = mxResources.get('advanced') + '...';
+                 if(this.addMenuItem(menu, 'export', parent))this.addMenuItem(menu, 'export', parent).firstChild.nextSibling.innerHTML = mxResources.get('advanced') + '...';
              }
          })));
  
@@ -3664,117 +3664,117 @@
              }
          })));
          
-         this.put('extras', new Menu(mxUtils.bind(this, function(menu, parent)
-         {
-             if (urlParams['noLangIcon'] == '1')
-             {
-                 this.addSubmenu('language', menu, parent);
-                 menu.addSeparator(parent);
-             }
+        //  this.put('extras', new Menu(mxUtils.bind(this, function(menu, parent)
+        //  {
+        //      if (urlParams['noLangIcon'] == '1')
+        //      {
+        //          this.addSubmenu('language', menu, parent);
+        //          menu.addSeparator(parent);
+        //      }
              
-             if (urlParams['embed'] != '1')
-             {
-                 this.addSubmenu('theme', menu, parent);
-                 menu.addSeparator(parent);
-             }
+        //      if (urlParams['embed'] != '1')
+        //      {
+        //          this.addSubmenu('theme', menu, parent);
+        //          menu.addSeparator(parent);
+        //      }
  
-             if (typeof(MathJax) !== 'undefined')
-             {
-                 var item = this.addMenuItem(menu, 'mathematicalTypesetting', parent);
+        //     //  if (typeof(MathJax) !== 'undefined')
+        //     //  {
+        //     //      var item = this.addMenuItem(menu, 'mathematicalTypesetting', parent);
                  
-                 if (!editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
-                 {
-                     this.addLinkToItem(item, 'https://www.diagrams.net/doc/faq/math-typesetting');
-                 }
-             }
+        //     //      if (!editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
+        //     //      {
+        //     //          this.addLinkToItem(item, 'https://www.diagrams.net/doc/faq/math-typesetting');
+        //     //      }
+        //     //  }
              
-             this.addMenuItems(menu, ['copyConnect', 'collapseExpand', '-'], parent);
+        //     //  this.addMenuItems(menu, ['copyConnect', 'collapseExpand', '-'], parent);
              
-             if (urlParams['embed'] != '1' && (isLocalStorage || mxClient.IS_CHROMEAPP))
-             {
-                 this.addMenuItems(menu, ['showStartScreen'], parent);
-             }
+        //      if (urlParams['embed'] != '1' && (isLocalStorage || mxClient.IS_CHROMEAPP))
+        //      {
+        //          this.addMenuItems(menu, ['showStartScreen'], parent);
+        //      }
  
-             if (urlParams['embed'] != '1')
-             {
-                 this.addMenuItems(menu, ['autosave'], parent);
-             }
+        //      if (urlParams['embed'] != '1')
+        //      {
+        //          this.addMenuItems(menu, ['autosave'], parent);
+        //      }
              
-             menu.addSeparator(parent);
+        //      menu.addSeparator(parent);
              
-             if (!editorUi.isOfflineApp() && isLocalStorage)
-             {
-                 this.addMenuItem(menu, 'plugins', parent);
-             }
+        //      if (!editorUi.isOfflineApp() && isLocalStorage)
+        //      {
+        //          this.addMenuItem(menu, 'plugins', parent);
+        //      }
  
-             this.addMenuItems(menu, ['-', 'editDiagram'], parent);
+        //      this.addMenuItems(menu, ['-', 'editDiagram'], parent);
      
-             if (Graph.translateDiagram)
-             {
-                 this.addMenuItems(menu, ['diagramLanguage']);
-             }
+        //      if (Graph.translateDiagram)
+        //      {
+        //          this.addMenuItems(menu, ['diagramLanguage']);
+        //      }
              
-             this.addMenuItems(menu, ['-', 'configuration'], parent);
+        //      this.addMenuItems(menu, ['-', 'configuration'], parent);
              
-             // Adds trailing separator in case new plugin entries are added
-             menu.addSeparator(parent);
+        //      // Adds trailing separator in case new plugin entries are added
+        //      menu.addSeparator(parent);
              
-             if (urlParams['newTempDlg'] == '1')
-             {
-                 editorUi.actions.addAction('templates', function()
-                 {
-                     function driveObjToTempDlg(item)
-                     {
-                         return {id: item.id, isExt: true, url: item.downloadUrl, title: item.title, imgUrl: item.thumbnailLink,
-                                 changedBy: item.lastModifyingUserName, lastModifiedOn: item.modifiedDate}
-                     };
+        //      if (urlParams['newTempDlg'] == '1')
+        //      {
+        //          editorUi.actions.addAction('templates', function()
+        //          {
+        //              function driveObjToTempDlg(item)
+        //              {
+        //                  return {id: item.id, isExt: true, url: item.downloadUrl, title: item.title, imgUrl: item.thumbnailLink,
+        //                          changedBy: item.lastModifyingUserName, lastModifiedOn: item.modifiedDate}
+        //              };
                      
-                     var tempDlg = new TemplatesDialog(editorUi, function(xml){console.log(arguments)}, null,
-                             null, null, 'user', function(callback, error, username)
-                     {
-                         var oneWeek = new Date();
-                         oneWeek.setDate(oneWeek.getDate() - 7);
+        //              var tempDlg = new TemplatesDialog(editorUi, function(xml){console.log(arguments)}, null,
+        //                      null, null, 'user', function(callback, error, username)
+        //              {
+        //                  var oneWeek = new Date();
+        //                  oneWeek.setDate(oneWeek.getDate() - 7);
                          
-                         editorUi.drive.listFiles(null, oneWeek, username? true : false, function(resp)
-                         {
-                             var results = [];
+        //                  editorUi.drive.listFiles(null, oneWeek, username? true : false, function(resp)
+        //                  {
+        //                      var results = [];
                              
-                             for (var i = 0; i < resp.items.length; i++)
-                             {
-                                 results.push(driveObjToTempDlg(resp.items[i]));
-                             }
+        //                      for (var i = 0; i < resp.items.length; i++)
+        //                      {
+        //                          results.push(driveObjToTempDlg(resp.items[i]));
+        //                      }
                              
-                             callback(results);
-                         }, error)
-                     }, function(str, callback, error, username)
-                     {
-                         editorUi.drive.listFiles(str, null, username? true : false, function(resp)
-                         {
-                             var results = [];
+        //                      callback(results);
+        //                  }, error)
+        //              }, function(str, callback, error, username)
+        //              {
+        //                  editorUi.drive.listFiles(str, null, username? true : false, function(resp)
+        //                  {
+        //                      var results = [];
                              
-                             for (var i = 0; i < resp.items.length; i++)
-                             {
-                                 results.push(driveObjToTempDlg(resp.items[i]));
-                             }
+        //                      for (var i = 0; i < resp.items.length; i++)
+        //                      {
+        //                          results.push(driveObjToTempDlg(resp.items[i]));
+        //                      }
                              
-                             callback(results);
-                         }, error)
-                     }, function(obj, callback, error)
-                     {
-                         editorUi.drive.getFile(obj.id, function(file)
-                         {
-                             callback(file.data);
-                         }, error);
-                     }, null, function(callback)
-                     {
-                         callback({'Test': []}, 1);
-                     }, true, false);
+        //                      callback(results);
+        //                  }, error)
+        //              }, function(obj, callback, error)
+        //              {
+        //                  editorUi.drive.getFile(obj.id, function(file)
+        //                  {
+        //                      callback(file.data);
+        //                  }, error);
+        //              }, null, function(callback)
+        //              {
+        //                  callback({'Test': []}, 1);
+        //              }, true, false);
                      
-                     editorUi.showDialog(tempDlg.container, window.innerWidth, window.innerHeight, true, false, null, false, true);
-                 });
-                 this.addMenuItem(menu, 'templates', parent);
-             }
-         })));
+        //              editorUi.showDialog(tempDlg.container, window.innerWidth, window.innerHeight, true, false, null, false, true);
+        //          });
+        //          this.addMenuItem(menu, 'templates', parent);
+        //      }
+        //  })));
  
          this.put('file', new Menu(mxUtils.bind(this, function(menu, parent)
          {
@@ -3863,18 +3863,18 @@
                 //  }
                 //  else
                  {
-                     if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp &&
-                         file != null && (file.constructor != LocalFile ||
-                         file.fileHandle != null))
-                     {	
-                         menu.addSeparator(parent);
-                         var item = this.addMenuItem(menu, 'synchronize', parent);
+                    //  if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp &&
+                    //      file != null && (file.constructor != LocalFile ||
+                    //      file.fileHandle != null))
+                    //  {	
+                    //      menu.addSeparator(parent);
+                    //      var item = this.addMenuItem(menu, 'synchronize', parent);
                          
-                         if (!editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
-                         {
-                             this.addLinkToItem(item, 'https://www.diagrams.net/doc/faq/synchronize');
-                         }
-                     }
+                    //      if (!editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
+                    //      {
+                    //          this.addLinkToItem(item, 'https://www.diagrams.net/doc/faq/synchronize');
+                    //      }
+                    //  }
                      
                      this.addMenuItems(menu, ['-', 'save', 'saveAs', '-'], parent);
                      

@@ -71,7 +71,7 @@ window.mxscript = (src, onLoad, id, dataAppKey, noWrite) => {
 
 /**
  * @typedef {{ orgChartDev?: boolean, printSetting?: {isPrint:boolean},visible: {menu?:{help?:boolean} subMenu? : {new?: OptNew, save?: OptOut, saveAs?: OptOut, open?: OptIn, import?: OptIn, export?: OptOut}} }} GraphInitConfig
- * @typedef {{ xml: string }} GraphXmlData
+ * @typedef {{ xml: string, name: string }} GraphXmlData
  * @typedef {{ status: string}} GraphEditorNew
  * @typedef {{ status: string, graphData: GraphXmlData}} GraphEditorOut
  * @typedef {{ status: string, graphData?: GraphXmlData}} GraphEditorIn
@@ -91,7 +91,7 @@ export class GraphEditor {
 
     /** @private */
     hideMenus = {
-        menu: ['help'],
+        menu: ['help','extra'],
         subMenu: ['new', 'open', 'import', 'export', 'editDiagram', 'save', 'saveAs']
     }
     /** @private */
@@ -200,7 +200,7 @@ export class GraphEditor {
                     })
                 })
             } else {
-                // this.postScript(config);
+                this.postScript(config); // move this to after App.main()
                 resolve({
                     scriptLoaded: true,
                     scriptIndex: [scriptIndex]
@@ -401,16 +401,15 @@ export class GraphEditor {
         this.addWebScript(undefined, './webpackExtensions/draw.io.extension.js');
 
 
-        console.log("webpackScripts", webpackScripts)
+        // console.log("webpackScripts", webpackScripts)
         return this.appendScriptAtIndex(0, scriptContainer, config);
 
     }
-
     /**
      * @private
      * @param {GraphInitConfig} [config] - Grapheditor Configuration.
      */
-    postScript(config) {
+    postScript(config, ui) {
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
 
 
@@ -434,24 +433,14 @@ export class GraphEditor {
         }
 
         /**
-         * Remove the action under the given name.
-         */
-        Actions.prototype.removeAction = function (key) {
-            // console.log("Actions:removeAction", key, this.actions[key]);
-            if (this.actions[key] != undefined) {
-                delete this.actions[key];
-            }
-        };
-
-        /**
          * Remove actions.
          */
         let editorUiInit = EditorUi.prototype.init;
+        // console.log("editorUiInit", editorUiInit.toString());
         // visible: {menu?:{help?:boolean} subMenu? : {new?: boolean, open?: boolean, import?: boolean, export?:boolean,editDiagram?:boolean}}
-
         EditorUi.prototype.init = function () {
 
-
+            editorUiInit.apply(this, arguments);
             self.hideMenus.subMenu.forEach(item => {
                 // console.log("subMenu", item, config.visible.subMenu[item],!(config.visible.subMenu[item] instanceof Function), (typeof config.visible.subMenu[item]));
 
@@ -460,9 +449,8 @@ export class GraphEditor {
                     this.actions.removeAction(item);
                 }
             })
-
-            editorUiInit.apply(this, arguments);
         }
+
         /**
          * Extends: EditorUi.prototype.openFile and open GraphXmlData content in TS-Func.
          */
@@ -482,47 +470,63 @@ export class GraphEditor {
                 });
             } catch (e) {}
         };
+
+        EditorUi.prototype.performCallbackForAction = function (callbackFor) {
+            console.log("getCallback", callbackFor);
+
+        }
+
         /**
          * Extends: EditorUi.prototype.saveFile and save GraphXmlData content in TS-Func.
          */
         // let superSaveFile = EditorUi.prototype.saveFile;
-        EditorUi.prototype.saveFile = function (forceDialog) {
+        App.prototype.saveFile = function (forceDialog, success) {
 
             // superSaveFile.apply(this, arguments);
+            var file = this.getCurrentFile();
 
-            if (this.editor.graph.isEditing()) {
-                this.editor.graph.stopEditing();
-            }
+            if (file != null) {
+                // FIXME: Invoke for local files
+                var done = mxUtils.bind(this, function () {
+                    if (EditorUi.enableDrafts) {
+                        file.removeDraft();
+                    }
 
-            var xmlData = mxUtils.getXml(this.editor.getGraphXml());
-            // console.log("saveFile", forceDialog, xml);
-            try {
-                config.visible.subMenu.save({
-                    xml: xmlData
-                }).then(resolve => {
-                    console.log("saveGraphEditor", resolve);
-                    this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('saved')) + ' ' + new Date());
-                    this.editor.setModified(false);
-                    this.editor.setFilename('ts.xml');
-                    this.updateDocumentTitle();
-                }, reject => {
-                    console.log("saveGraphEditor:reject", reject);
-                    // if (reject != undefined && reject.status != undefined) {
-                    //     mxUtils.alert(reject.status);
-                    // }
-                }).catch(e => {
-                    console.log(e);
+                    if (this.getCurrentFile() != file && !file.isModified()) {
+                        // Workaround for possible status update while save as dialog is showing
+                        // is to show no saved status for device files
+                        this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('allChangesSaved')));
+                    }
                 });
-            } catch (e) {
-                this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('errorSavingFile')));
+
+                var filename = (file.getTitle() != null) ? file.getTitle() : this.defaultFilename;
+                var xmlData = this.getFileData(true);
+                // console.log("saveFile", forceDialog, xml);
+                try {
+                    config.visible.subMenu.save({
+                        xml: xmlData,
+                        name: filename
+                    }).then(resolve => {
+                        console.log("saveGraphEditor", resolve);
+                        done();
+                    }, reject => {
+                        console.log("saveGraphEditor:reject", reject);
+                    }).catch(e => {
+                        console.log(e);
+                    });
+                } catch (e) {
+                    this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('errorSavingFile')));
+                }
+
             }
+            // if (this.editor.graph.isEditing()) {
+            //     this.editor.graph.stopEditing();
+            // }
+
+
 
         };
     }
-
-
-
-
 
     /**
      * @param {GraphXmlData} graphData - Grapheditor xml.
@@ -532,16 +536,8 @@ export class GraphEditor {
         return new Promise((resolve, reject) => {
             try {
                 // console.log('typeof', this.editorUiObj);
-                let xmlDoc = mxUtils.parseXml(graphData.xml);
-                if (this.editorUiObj instanceof EditorUi) {
-                    // console.log("setGraphData", graphData, doc);
-                    this.editorUiObj.editor.setGraphXml(xmlDoc.documentElement);
-                    this.editorUiObj.editor.setModified(false);
-                    this.editorUiObj.editor.undoManager.clear();
-                } else {
-                    var codec = new mxCodec(xmlDoc);
-                    codec.decode(xmlDoc.documentElement, this.editorUiObj.getModel());
-                }
+                this.editorUiObj.openLocalFile(graphData.xml, graphData.name, false);
+                
                 resolve({
                     status: "Loaded",
                     graphData: graphData,
@@ -569,13 +565,18 @@ export class GraphEditor {
 
             this.init(scriptContainer, config).then(res => {
                 this.pouplateScriptVars();
-                // console.log('script init', res, grapheditorKeys);
-                App.main();
 
-                resolve({
-                    status: 'Initialized',
-                    graphEditorObj: undefined
-                })
+                // console.log('script init', res, grapheditorKeys);
+                App.main((ui) => {
+                    // console.log("App.main", ui);
+                    this.editorUiObj = ui;
+                    resolve({
+                        status: 'Initialized',
+                        graphEditorObj: ui
+                    })
+                }, null, container);
+                // this.postScript(config);
+
                 // let self = this;
                 // // Adds required resources (disables loading of fallback properties, this can only
                 // // be used if we know that all keys are defined in the language specific file)
@@ -671,7 +672,8 @@ export class GraphEditor {
 if (typeof isWebpack !== 'undefined') {
     // grapheditor(document.getElementById('mxgraph-diagram-container'), document.getElementById('mxgraph-scripts-container'));
     // let xmlData = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"850\" pageHeight=\"1100\"><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"4\" value=\"\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"3\"><mxGeometry relative=\"1\" as=\"geometry\"/></mxCell><mxCell id=\"6\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"5\"><mxGeometry relative=\"1\" as=\"geometry\"><Array as=\"points\"><mxPoint x=\"440\" y=\"210\"/><mxPoint x=\"590\" y=\"210\"/></Array></mxGeometry></mxCell><mxCell id=\"2\" value=\"Actor\" style=\"shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"410\" y=\"170\" width=\"30\" height=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"3\" value=\"\" style=\"swimlane;startSize=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"120\" y=\"80\" width=\"200\" height=\"200\" as=\"geometry\"/></mxCell><mxCell id=\"5\" value=\"\" style=\"shape=tape;whiteSpace=wrap;html=1;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"530\" y=\"60\" width=\"120\" height=\"100\" as=\"geometry\"/></mxCell></root></mxGraphModel>";
-    let xmlData = '<mxfile host="app.diagrams.net" modified="2021-12-01T19:48:16.875Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36" etag="HP6KexOF3TBy4hIKSY8U" version="15.8.8" type="device"><diagram id="AyI7jbf7Y4loTYQYZaz9" name="Page-1">xVbBcpswEP0aju1ggWP3GttpDunUM55pk6NstiBXsIwsAvTrK2CFTKldO/FMLzb7pIXV27cPvGCRVp8Vz5MvGIH0mB9VXrD0GJvfzcxvA9QdMAsJiJWIOmjigI34BQT6hBYigsNgo0aUWuRDcIdZBjs9wLhSWA63/UA5fGrOYxgBmx2XY/S7iHRCx5r6Dn8EESf2yROfVlJuNxNwSHiE5REUrLxgoRB1d5VWC5ANd5aXLu/hxGpfmIJMX5Kw/7pms23+c7+WjwzjtT8Psg8h1aZre2CIzPkpRKUTjDHjcuXQe4VFFkFzV99Ebs8TYm7AiQH3oHVNzeSFRgMlOpW0agpW9TPlt8FLE3yc2nBZHS8ua4q6WpsCT1JA0AELtYMz57ZS4ioGfWZf0DfKCBwwBVOPyVMguRavwzo4SS3u9/WpaxSmQubTVISfSBM0FIHViL1FVxdluZ6ai6MyHNR2+oquU8GvXBZ0hJEMjFrz5jLCXZG29N6XidCwyXlLbGmmfdjVbSeLp60F6CGgNFTnGzYm2CbcDYlidu5KN4sTS15yNIdz/3RPBmxeSx27nDrd/v2Lthuw1FsMsRSGF7LUm9XNaZr+F1+phH52TmKil6MVZypNYD2l96LJdV7URmtQwvAF6vYGFVxoUOydBvWuLgejYfhmdCzM29OgC8w0F5khZzQgpUglz+A26g//9Ag2Vj/z/6J+9gb1m9C9sTs7dp89weo3</diagram></mxfile>';
+    // let xmlData = '<mxfile host="app.diagrams.net" modified="2021-12-01T19:48:16.875Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36" etag="HP6KexOF3TBy4hIKSY8U" version="15.8.8" type="device"><diagram id="AyI7jbf7Y4loTYQYZaz9" name="Page-1">xVbBcpswEP0aju1ggWP3GttpDunUM55pk6NstiBXsIwsAvTrK2CFTKldO/FMLzb7pIXV27cPvGCRVp8Vz5MvGIH0mB9VXrD0GJvfzcxvA9QdMAsJiJWIOmjigI34BQT6hBYigsNgo0aUWuRDcIdZBjs9wLhSWA63/UA5fGrOYxgBmx2XY/S7iHRCx5r6Dn8EESf2yROfVlJuNxNwSHiE5REUrLxgoRB1d5VWC5ANd5aXLu/hxGpfmIJMX5Kw/7pms23+c7+WjwzjtT8Psg8h1aZre2CIzPkpRKUTjDHjcuXQe4VFFkFzV99Ebs8TYm7AiQH3oHVNzeSFRgMlOpW0agpW9TPlt8FLE3yc2nBZHS8ua4q6WpsCT1JA0AELtYMz57ZS4ioGfWZf0DfKCBwwBVOPyVMguRavwzo4SS3u9/WpaxSmQubTVISfSBM0FIHViL1FVxdluZ6ai6MyHNR2+oquU8GvXBZ0hJEMjFrz5jLCXZG29N6XidCwyXlLbGmmfdjVbSeLp60F6CGgNFTnGzYm2CbcDYlidu5KN4sTS15yNIdz/3RPBmxeSx27nDrd/v2Lthuw1FsMsRSGF7LUm9XNaZr+F1+phH52TmKil6MVZypNYD2l96LJdV7URmtQwvAF6vYGFVxoUOydBvWuLgejYfhmdCzM29OgC8w0F5khZzQgpUglz+A26g//9Ag2Vj/z/6J+9gb1m9C9sTs7dp89weo3</diagram></mxfile>';
+    let xmlData = '<mxfile host=\"\" modified=\"2021-12-06T19:31:46.338Z\" agent=\"5.0 (Windows)\" etag=\"pzJbhBRwLw9TT0dpwoMQ\" version=\"@DRAWIO-VERSION@\" type=\"device\" pages=\"3\"><diagram id=\"AyI7jbf7Y4loTYQYZaz9\" name=\"Page-1\">xVbBjpswEP0ajq3AkDa9bpLdPWxVpEjt7tGBKTg1DHJMgH59DdgYliZNupFWihTmeQzjN28eOP4qqx8ELdKvGAN3iBvXjr92CPECQpz258ZNj/hB0AOJYLFOssCW/QYNuhotWQyHSaJE5JIVUzDCPIdITjAqBFbTtJ/Ip08taAIzYBtRPkd/sFimPbpcuBZ/BJak5smeq1cyapI1cEhpjNUI8jeOvxKIsr/K6hXwljzDS7/v/sTqUJiAXF6yYf8tJJ93xa99yB8JJqG79PMPuhkH2ZgDQ6zOr0MUMsUEc8o3Fr0TWOYxtHd1VWRznhALBXoK3IOUjW4mLSUqKJUZ16uqYNE86/1d8NIGHxcmXNfjxXWjo/mJNQkHLEUEZ45plENFAvJMnt/ntRyMHqD5fADMQNWjEgRwKtlxqhGqpZYMecPWEJkqmbh6LIIvWhNmKIxGzC36QvUu21N1MSrDQl2nr+i6LvhIeamPMJOBUmvRXsYYlVnH912VMgnbgnZMV2rcp13d9bJ42hngZLuOICTUZwk2q5+mRBEzd5WdRc+Ql47mcOme7smEzWupI5dTJ7u/f9F2A5YGi9EsBcGFLA1mdXOaFu/iKzWTz9ZJVPQyWrGm0gbGUwYv8q7zoi4KQTDFF4g3G5R/oUGRWxvUm7rsz4bhuxItU29Pha4wl5TlipzZgFQs4zSH26g/eO0RZK5+4v5F/eQ/1K9C+8bu7dh+9/ibPw==</diagram><diagram id=\"rl1k0B-hDyAjVCUa-9g7\" name=\"Page-2\">rZPbToQwEIafhksTStF4LeDhQhODh+uGjm21UNLtCuzTW5YpB/fCbGJCwszX6ZT+/xDRrO7vLGvlo+GgoyTmfUTzKElImiTR+MR8mAhN0wkIqzgWLaBUB0AYI90rDrtNoTNGO9VuYWWaBiq3Ycxa023LPozentoyASegrJg+pe+KOznR68t44feghAwnkxhXahaKEewk46ZbIVpENLPGuCmq+wz0KF7Q5fnhxbwWw5P4fDsUeS6UJF8XU7Pbc7bMV7DQuP9tjeZ+M71HvfCubggC+mu3Y+iOr5tOKgdly6qRdX5mPJOu1j4jPsR+YB30vwz44+vJLKmfRTA1ODv4fdiFXqELOIaEYt4tppLglFwbGvxkOEhi7r2I5QPUK6SLrce11c9Bix8=</diagram><diagram id=\"qJsf2gRpfi9BWSCdwc7R\" name=\"Page-3\">rZNNb4MwDIZ/DcdKQNjGuR/rpGmHiUnVdouIS6IFglJTYL9+oThQ1sM0aRIH+4njyO9rArYpu73ltXwxAnQQh6IL2DaI4yiJ42D4QtGPhCXJCAqrBBXNIFNfQDAk2igBp0UhGqNR1UuYm6qCHBeMW2vaZdnR6OWrNS/gBmQ517f0oATKkaZ34cyfQBXSvxyFdFJyX0zgJLkw7RViu4BtrDE4RmW3AT2I53X5ODev5fs2Odh0df8M67do/7kamz3+5co0goUK/7c1mXvmuiG9aFbsvYBu7HoIBUeeobEXvdetVAhZzfPhqHWr45jEUrsscuFRdeCXYcjpGbAI3Q9ffhkqmpR2KwqmBLS9u0dd2AOZ0/t9pbydvZ4clVc+p8Q4rVcxtZ4ldAGp6NPZ7MvZ1S/Ddt8=</diagram></mxfile>';
     let graphEditor = new GraphEditor();
     graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
@@ -692,22 +694,22 @@ if (typeof isWebpack !== 'undefined') {
                                 })
                             })
                         },
-                        save: true
-                        // save: (graphData) => {
-                        //     return new Promise((resolve, reject) => {
-                        //         reject({
-                        //             status: "Implementation required",
-                        //             graphData: graphData
-                        //         })
-                        //     })
-                        // }
+                        save: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Implementation required",
+                                    graphData: graphData
+                                })
+                            })
+                        }
                     }
                 }
             })
         .then(resolve => {
             console.log("init", resolve)
             graphEditor.setGrapheditorData({
-                xml: xmlData
+                xml: xmlData,
+                name: "data init"
             }).then(resolve => {
                 console.log("setGraphEditor", resolve)
             }, reject => {
