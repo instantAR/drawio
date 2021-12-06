@@ -37,10 +37,6 @@ module.exports = {
       isJsInclude: true,
       context: 'root'
     }, {
-      from: 'math',
-      to: 'mxgraph/grapheditor/math',
-      isJsInclude: true
-    }, {
       from: 'mxgraph',
       to: 'mxgraph',
       isJsInclude: true
@@ -88,6 +84,12 @@ function getCopyConfig(copyItems) {
     patterns: patterns
   })
 }
+
+// {
+//   from: 'math',
+//   to: 'mxgraph/grapheditor/math',
+//   isJsInclude: true
+// },
 
 // {
 //   from: 'js/grapheditor',
