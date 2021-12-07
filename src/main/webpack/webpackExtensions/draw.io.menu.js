@@ -672,22 +672,22 @@
              }
          });
  
-         if (typeof(MathJax) !== 'undefined')
-         {
-             var action = editorUi.actions.addAction('mathematicalTypesetting', function()
-             {
-                 var change = new ChangePageSetup(editorUi);
-                 change.ignoreColor = true;
-                 change.ignoreImage = true;
-                 change.mathEnabled = !editorUi.isMathEnabled();
+        //  if (typeof(MathJax) !== 'undefined')
+        //  {
+        //      var action = editorUi.actions.addAction('mathematicalTypesetting', function()
+        //      {
+        //          var change = new ChangePageSetup(editorUi);
+        //          change.ignoreColor = true;
+        //          change.ignoreImage = true;
+        //          change.mathEnabled = !editorUi.isMathEnabled();
                  
-                 graph.model.execute(change);
-             });
+        //          graph.model.execute(change);
+        //      });
              
-             action.setToggleAction(true);
-             action.setSelectedCallback(function() { return editorUi.isMathEnabled(); });
-             action.isEnabled = isGraphEnabled;
-         }
+        //      action.setToggleAction(true);
+        //      action.setSelectedCallback(function() { return editorUi.isMathEnabled(); });
+        //      action.isEnabled = isGraphEnabled;
+        //  }
          
          if (isLocalStorage)
          {

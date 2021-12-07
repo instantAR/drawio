@@ -324,7 +324,7 @@ export class GraphEditor {
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Dialogs.js');
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Editor.js')
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/EditorUi.js')
-        this.addWebScript(undefined, './webpackExtensions/draw.io.EditorUi.js')
+        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.EditorUi.js')
 
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DiffSync.js');
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Settings.js');
@@ -362,8 +362,8 @@ export class GraphEditor {
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/NotionClient.js');
 
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/App.js');
-        this.addWebScript(undefined, './webpackExtensions/draw.io.app.js');
-        this.addWebScript(undefined, './webpackExtensions/draw.io.menu.js');
+        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.app.js');
+        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.menu.js');
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Menus.js');
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Pages.js');
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Trees.js');
@@ -398,7 +398,7 @@ export class GraphEditor {
         this.addWebScript(undefined, './mxgraph/grapheditor/stencils.min.js');
         this.addWebScript(undefined, './mxgraph/grapheditor/extensions.min.js');
 
-        this.addWebScript(undefined, './webpackExtensions/draw.io.extension.js');
+        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.extension.js');
 
 
         // console.log("webpackScripts", webpackScripts)
@@ -412,7 +412,7 @@ export class GraphEditor {
     postScript(config, ui) {
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
 
-
+        document.body.className += ' geEditor';
         let self = this;
 
 

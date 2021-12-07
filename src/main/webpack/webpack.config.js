@@ -33,7 +33,7 @@ module.exports = {
     }),
     getCopyConfig([{
       from: './webpackExtensions',
-      to: './webpackExtensions',
+      to: './mxgraph/webpackExtensions',
       isJsInclude: true,
       context: 'root'
     }, {
