@@ -31,6 +31,7 @@
  // each properties file since only one file is loaded.
  window.mxBasePath = window.mxBasePath || 'mxgraph/';
  window.mxImageBasePath = window.mxImageBasePath || 'mxgraph/images';
+ window.imageBasePath = window.imageBasePath || 'mxgraph/images';
  window.mxLanguage = window.mxLanguage || urlParams['lang'];
 //  window.mxLanguages = window.mxLanguages || ['de', 'se'];
 
@@ -148,7 +149,7 @@ window.mxLanguageMap = window.mxLanguageMap ||
 if (typeof window.mxBasePath === 'undefined')
 {
 	window.mxBasePath = 'mxgraph';
-	window.mxImageBasePath = 'mxgraphmxgraph/images';
+	window.mxImageBasePath = 'mxgraph/images';
 }
 
 if (window.mxLanguages == null)

@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = {
   entry: ['./webpack.index.js'],
-  stats: 'verbose',
+  stats: 'errors-warnings',
   output: {
     path: path.resolve(__dirname, 'dist'),
     library: 'grapheditor',
@@ -36,6 +36,10 @@ module.exports = {
       to: './mxgraph/webpackExtensions',
       isJsInclude: true,
       context: 'root'
+    }, {
+      from: 'math',
+      to: 'mxgraph/grapheditor/math',
+      isJsInclude: true
     }, {
       from: 'mxgraph',
       to: 'mxgraph',

@@ -11346,8 +11346,9 @@
       */
      EditorUi.prototype.openLocalFile = function(data, name, temp, fileHandle, desc)
      {
-         var currentFile = this.getCurrentFile();
          
+         var currentFile = this.getCurrentFile();
+        //  console.log("openLocalFile", currentFile);
          var fn = mxUtils.bind(this, function()
          {
              window.openFile = null;
@@ -11403,7 +11404,17 @@
             //          }
             //      }));
             //  }
-         }
+         } else if (name != null && name.length > 0 && currentFile != null && name != currentFile.getTitle() && this.spinner.spin(document.body, mxResources.get('renaming'))) {
+            // Delete old file, save new file in dropbox if autosize is enabled
+            currentFile.rename(name, mxUtils.bind(this, function(resp)
+            {
+                this.spinner.stop();
+            }),
+            mxUtils.bind(this, function(resp)
+            {
+                this.handleError(resp, (resp != null) ? mxResources.get('errorRenamingFile') : null);
+            }));
+        }
          else
          {
              throw new Error(mxResources.get('notADiagramFile'));
@@ -13848,9 +13859,9 @@
         //  this.actions.get('makeCopy').setEnabled(file != null && !file.isRestricted());
          if(this.actions.get('editDiagram'))this.actions.get('editDiagram').setEnabled(active && (file == null || !file.isRestricted()));
          this.actions.get('publishLink').setEnabled(file != null && !file.isRestricted());
-         this.actions.get('tags').setEnabled(this.diagramContainer.style.visibility != 'hidden');
-         this.actions.get('layers').setEnabled(this.diagramContainer.style.visibility != 'hidden');
-         this.actions.get('outline').setEnabled(this.diagramContainer.style.visibility != 'hidden');
+         if(this.actions.get('tags'))this.actions.get('tags').setEnabled(this.diagramContainer.style.visibility != 'hidden');
+         if(this.actions.get('layers'))this.actions.get('layers').setEnabled(this.diagramContainer.style.visibility != 'hidden');
+         if(this.actions.get('outline'))this.actions.get('outline').setEnabled(this.diagramContainer.style.visibility != 'hidden');
          this.actions.get('rename').setEnabled((file != null && file.isRenamable()) || urlParams['embed'] == '1');
          this.actions.get('close').setEnabled(file != null);
         //  this.menus.get('publish').setEnabled(file != null && !file.isRestricted());

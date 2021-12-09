@@ -1717,7 +1717,7 @@ Actions.prototype.init = function()
 		if (this.outlineWindow == null)
 		{
 			// LATER: Check layers window for initial placement
-			this.outlineWindow = new OutlineWindow(ui, document.body.offsetWidth - 260, 100, 180, 180);
+			this.outlineWindow = new OutlineWindow(ui, ui.container.offsetWidth - 260, 100, 180, 180);
 			this.outlineWindow.window.addListener('show', mxUtils.bind(this, function()
 			{
 				ui.fireEvent(new mxEventObject('outline'));

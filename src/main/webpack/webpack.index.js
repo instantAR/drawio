@@ -1,4 +1,3 @@
-// src/main/webapp/js/grapheditor
 import './webpack.init';
 
 window.graphEditorRefCount = 0;
@@ -68,9 +67,11 @@ window.mxscript = (src, onLoad, id, dataAppKey, noWrite) => {
  * @callback OptNew
  * @returns {Promise<GraphEditorNew>} Promise<GraphEditorNew>
  */
-
+//  {new?: OptNew, save?: OptOut, saveAs?: OptOut, open?: OptIn, import?: OptIn, export?: OptOut}
 /**
- * @typedef {{ orgChartDev?: boolean, printSetting?: {isPrint:boolean},visible: {menu?:{help?:boolean} subMenu? : {new?: OptNew, save?: OptOut, saveAs?: OptOut, open?: OptIn, import?: OptIn, export?: OptOut}} }} GraphInitConfig
+ * @typedef {{ orgChartDev?: boolean, printSetting?: {isPrint:boolean},
+ * actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
+ * extraActions?: {[key:string]: { [key:string]:OptOut|OptIn|{[key:string]:OptOut|OptIn}}} }} GraphInitConfig
  * @typedef {{ xml: string, name: string }} GraphXmlData
  * @typedef {{ status: string}} GraphEditorNew
  * @typedef {{ status: string, graphData: GraphXmlData}} GraphEditorOut
@@ -91,8 +92,8 @@ export class GraphEditor {
 
     /** @private */
     hideMenus = {
-        menu: ['help','extra'],
-        subMenu: ['new', 'open', 'import', 'export', 'editDiagram', 'save', 'saveAs']
+        menu: ['help', 'extra'],
+        subMenu: ['new', 'open', 'editDiagram', 'save', 'saveAs', 'outline', 'layers', 'tags']
     }
     /** @private */
     editorUiObj;
@@ -405,13 +406,38 @@ export class GraphEditor {
         return this.appendScriptAtIndex(0, scriptContainer, config);
 
     }
+
     /**
      * @private
      * @param {GraphInitConfig} [config] - Grapheditor Configuration.
      */
-    postScript(config, ui) {
-        // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
+    preScript(config) {
+        // Menus.prototype.defaultMenuItems = ['file', 'edit', 'view', 'arrange', 'extras', 'help'];
+        if (config['extraActions'] !== undefined) {
+            Object.keys(config.extraActions).forEach(menuName => {
+                if (typeof config['extraActions'][menuName] === 'object') {
+                    Object.keys(config['extraActions'][menuName]).forEach((subMenuName) => {
+                        if (typeof config['extraActions'][menuName][subMenuName] === 'function') {
+                            let menuFound = Menus.prototype.defaultMenuItems.filter(item => item == menuName);
+                            // console.log(menuFound);
+                            if (menuFound.length < 1) {
+                                Menus.prototype.defaultMenuItems.push(menuName);
+                            }
+                        }
+                    })
+                }
+            })
+        }
+    }
 
+    /**
+     * @private
+     * @param {GraphInitConfig} [config] - Grapheditor Configuration.
+     */
+    postScript(config) {
+        this.preScript(config);
+        // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
+        DrawIOExtension(config);
         document.body.className += ' geEditor';
         let self = this;
 
@@ -423,8 +449,8 @@ export class GraphEditor {
         Menus.prototype.createMenubar = function (container) {
 
             self.hideMenus.menu.forEach(item => {
-                if (config === undefined || (config.visible == undefined || config.visible.menu == undefined) ||
-                    (config.visible.menu[item] === undefined || config.visible.menu[item] === false)) {
+                if (config === undefined || (config.actions == undefined || config.actions.menu == undefined) ||
+                    (config.actions.menu[item] === undefined || config.actions.menu[item] === false)) {
                     this.defaultMenuItems = this.defaultMenuItems.filter((menu) => menu.toLowerCase() != item)
                 }
             })
@@ -437,15 +463,15 @@ export class GraphEditor {
          */
         let editorUiInit = EditorUi.prototype.init;
         // console.log("editorUiInit", editorUiInit.toString());
-        // visible: {menu?:{help?:boolean} subMenu? : {new?: boolean, open?: boolean, import?: boolean, export?:boolean,editDiagram?:boolean}}
+        // actions: {menu?:{help?:boolean} subMenu? : {new?: boolean, open?: boolean, import?: boolean, export?:boolean,editDiagram?:boolean}}
         EditorUi.prototype.init = function () {
 
             editorUiInit.apply(this, arguments);
             self.hideMenus.subMenu.forEach(item => {
-                // console.log("subMenu", item, config.visible.subMenu[item],!(config.visible.subMenu[item] instanceof Function), (typeof config.visible.subMenu[item]));
+                // console.log("subMenu", item, config.actions.subMenu[item],!(config.actions.subMenu[item] instanceof Function), (typeof config.actions.subMenu[item]));
 
-                if (config === undefined || (config.visible === undefined || config.visible.subMenu === undefined) ||
-                    (config.visible.subMenu[item] === undefined || !(config.visible.subMenu[item] instanceof Function))) {
+                if (config === undefined || (config.actions === undefined || config.actions.subMenu === undefined) ||
+                    (config.actions.subMenu[item] === undefined || !(config.actions.subMenu[item] instanceof Function))) {
                     this.actions.removeAction(item);
                 }
             })
@@ -457,7 +483,7 @@ export class GraphEditor {
         // let superOpenFile = EditorUi.prototype.openFile;
         EditorUi.prototype.openFile = function () {
             try {
-                config.visible.subMenu.open().then(resolve => {
+                config.actions.subMenu.open().then(resolve => {
                     console.log("openFile:resolve", resolve);
                     self.setGrapheditorData(resolve.graphData);
                 }, reject => {
@@ -503,7 +529,7 @@ export class GraphEditor {
                 var xmlData = this.getFileData(true);
                 // console.log("saveFile", forceDialog, xml);
                 try {
-                    config.visible.subMenu.save({
+                    config.actions.subMenu.save({
                         xml: xmlData,
                         name: filename
                     }).then(resolve => {
@@ -537,11 +563,10 @@ export class GraphEditor {
             try {
                 // console.log('typeof', this.editorUiObj);
                 this.editorUiObj.openLocalFile(graphData.xml, graphData.name, false);
-                
+
                 resolve({
                     status: "Loaded",
-                    graphData: graphData,
-                    document: xmlDoc
+                    graphData: graphData
                 })
             } catch (e) {
                 reject({
@@ -554,6 +579,19 @@ export class GraphEditor {
     }
 
     /**
+     * @private
+     * @returns {{menu: menuList,subMenu: subMenuList}} Menu & SubMenu List
+     */
+    getMenuList() {
+        // console.log("menuList", DrawIOExtension.prototype.menuList.sort(), DrawIOExtension.prototype.subMenuList.sort());
+        let dE = new DrawIOExtension();
+        return {
+            menu: [...dE.menuList],
+            subMenu: [...dE.subMenuList]
+        }
+    }
+
+    /**
      * @param {HTMLDivElement | HTMLElement} container - Grapheditor container.
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      * @param {GraphInitConfig} [config] - Grapheditor Configuration.
@@ -562,14 +600,18 @@ export class GraphEditor {
     initialized(container, scriptContainer, config) {
         return new Promise((resolve, reject) => {
 
+            // console.log('initialized', config);
 
             this.init(scriptContainer, config).then(res => {
                 this.pouplateScriptVars();
-
                 // console.log('script init', res, grapheditorKeys);
                 App.main((ui) => {
                     // console.log("App.main", ui);
                     this.editorUiObj = ui;
+                    if (ui != undefined && ui.actions != undefined && ui.actions.actions != undefined) {
+                        DrawIOExtension.prototype.subMenuList = [...Object.keys(ui.actions.actions)];
+                    }
+                    // console.log("menuList", DrawIOExtension.prototype.menuList.sort(), DrawIOExtension.prototype.subMenuList.sort());
                     resolve({
                         status: 'Initialized',
                         graphEditorObj: ui
@@ -675,13 +717,58 @@ if (typeof isWebpack !== 'undefined') {
     // let xmlData = '<mxfile host="app.diagrams.net" modified="2021-12-01T19:48:16.875Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36" etag="HP6KexOF3TBy4hIKSY8U" version="15.8.8" type="device"><diagram id="AyI7jbf7Y4loTYQYZaz9" name="Page-1">xVbBcpswEP0aju1ggWP3GttpDunUM55pk6NstiBXsIwsAvTrK2CFTKldO/FMLzb7pIXV27cPvGCRVp8Vz5MvGIH0mB9VXrD0GJvfzcxvA9QdMAsJiJWIOmjigI34BQT6hBYigsNgo0aUWuRDcIdZBjs9wLhSWA63/UA5fGrOYxgBmx2XY/S7iHRCx5r6Dn8EESf2yROfVlJuNxNwSHiE5REUrLxgoRB1d5VWC5ANd5aXLu/hxGpfmIJMX5Kw/7pms23+c7+WjwzjtT8Psg8h1aZre2CIzPkpRKUTjDHjcuXQe4VFFkFzV99Ebs8TYm7AiQH3oHVNzeSFRgMlOpW0agpW9TPlt8FLE3yc2nBZHS8ua4q6WpsCT1JA0AELtYMz57ZS4ioGfWZf0DfKCBwwBVOPyVMguRavwzo4SS3u9/WpaxSmQubTVISfSBM0FIHViL1FVxdluZ6ai6MyHNR2+oquU8GvXBZ0hJEMjFrz5jLCXZG29N6XidCwyXlLbGmmfdjVbSeLp60F6CGgNFTnGzYm2CbcDYlidu5KN4sTS15yNIdz/3RPBmxeSx27nDrd/v2Lthuw1FsMsRSGF7LUm9XNaZr+F1+phH52TmKil6MVZypNYD2l96LJdV7URmtQwvAF6vYGFVxoUOydBvWuLgejYfhmdCzM29OgC8w0F5khZzQgpUglz+A26g//9Ag2Vj/z/6J+9gb1m9C9sTs7dp89weo3</diagram></mxfile>';
     let xmlData = '<mxfile host=\"\" modified=\"2021-12-06T19:31:46.338Z\" agent=\"5.0 (Windows)\" etag=\"pzJbhBRwLw9TT0dpwoMQ\" version=\"@DRAWIO-VERSION@\" type=\"device\" pages=\"3\"><diagram id=\"AyI7jbf7Y4loTYQYZaz9\" name=\"Page-1\">xVbBjpswEP0ajq3AkDa9bpLdPWxVpEjt7tGBKTg1DHJMgH59DdgYliZNupFWihTmeQzjN28eOP4qqx8ELdKvGAN3iBvXjr92CPECQpz258ZNj/hB0AOJYLFOssCW/QYNuhotWQyHSaJE5JIVUzDCPIdITjAqBFbTtJ/Ip08taAIzYBtRPkd/sFimPbpcuBZ/BJak5smeq1cyapI1cEhpjNUI8jeOvxKIsr/K6hXwljzDS7/v/sTqUJiAXF6yYf8tJJ93xa99yB8JJqG79PMPuhkH2ZgDQ6zOr0MUMsUEc8o3Fr0TWOYxtHd1VWRznhALBXoK3IOUjW4mLSUqKJUZ16uqYNE86/1d8NIGHxcmXNfjxXWjo/mJNQkHLEUEZ45plENFAvJMnt/ntRyMHqD5fADMQNWjEgRwKtlxqhGqpZYMecPWEJkqmbh6LIIvWhNmKIxGzC36QvUu21N1MSrDQl2nr+i6LvhIeamPMJOBUmvRXsYYlVnH912VMgnbgnZMV2rcp13d9bJ42hngZLuOICTUZwk2q5+mRBEzd5WdRc+Ql47mcOme7smEzWupI5dTJ7u/f9F2A5YGi9EsBcGFLA1mdXOaFu/iKzWTz9ZJVPQyWrGm0gbGUwYv8q7zoi4KQTDFF4g3G5R/oUGRWxvUm7rsz4bhuxItU29Pha4wl5TlipzZgFQs4zSH26g/eO0RZK5+4v5F/eQ/1K9C+8bu7dh+9/ibPw==</diagram><diagram id=\"rl1k0B-hDyAjVCUa-9g7\" name=\"Page-2\">rZPbToQwEIafhksTStF4LeDhQhODh+uGjm21UNLtCuzTW5YpB/fCbGJCwszX6ZT+/xDRrO7vLGvlo+GgoyTmfUTzKElImiTR+MR8mAhN0wkIqzgWLaBUB0AYI90rDrtNoTNGO9VuYWWaBiq3Ycxa023LPozentoyASegrJg+pe+KOznR68t44feghAwnkxhXahaKEewk46ZbIVpENLPGuCmq+wz0KF7Q5fnhxbwWw5P4fDsUeS6UJF8XU7Pbc7bMV7DQuP9tjeZ+M71HvfCubggC+mu3Y+iOr5tOKgdly6qRdX5mPJOu1j4jPsR+YB30vwz44+vJLKmfRTA1ODv4fdiFXqELOIaEYt4tppLglFwbGvxkOEhi7r2I5QPUK6SLrce11c9Bix8=</diagram><diagram id=\"qJsf2gRpfi9BWSCdwc7R\" name=\"Page-3\">rZNNb4MwDIZ/DcdKQNjGuR/rpGmHiUnVdouIS6IFglJTYL9+oThQ1sM0aRIH+4njyO9rArYpu73ltXwxAnQQh6IL2DaI4yiJ42D4QtGPhCXJCAqrBBXNIFNfQDAk2igBp0UhGqNR1UuYm6qCHBeMW2vaZdnR6OWrNS/gBmQ517f0oATKkaZ34cyfQBXSvxyFdFJyX0zgJLkw7RViu4BtrDE4RmW3AT2I53X5ODev5fs2Odh0df8M67do/7kamz3+5co0goUK/7c1mXvmuiG9aFbsvYBu7HoIBUeeobEXvdetVAhZzfPhqHWr45jEUrsscuFRdeCXYcjpGbAI3Q9ffhkqmpR2KwqmBLS9u0dd2AOZ0/t9pbydvZ4clVc+p8Q4rVcxtZ4ldAGp6NPZ7MvZ1S/Ddt8=</diagram></mxfile>';
     let graphEditor = new GraphEditor();
+
     graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
             document.getElementById('mxgraph-scripts-container'), {
                 printSetting: {
                     isPrint: false
                 },
-                visible: {
+                extraActions: {
+                    file: {
+                        test: () => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "test Open From TS Func",
+                                    graphData: {
+                                        xml: xmlData
+                                    }
+                                })
+                            })
+                        },
+                        test2: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "test2 Implementation required",
+                                    graphData: graphData
+                                })
+                            })
+                        },
+                        exportAs: {
+                            'Dwp Library': (graphData) => {
+                                return new Promise((resolve, reject) => {
+                                    resolve({
+                                        status: "Dwp Library Implementation required",
+                                        graphData: graphData
+                                    })
+                                })
+                            }
+                        }
+                    },
+                    setting: true,
+                    ex: {
+                        test2: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "ex test2 Implementation required",
+                                    graphData: graphData
+                                })
+                            })
+                        }
+                    }
+
+                },
+                actions: {
                     subMenu: {
                         open: () => {
                             return new Promise((resolve, reject) => {
@@ -707,8 +794,10 @@ if (typeof isWebpack !== 'undefined') {
             })
         .then(resolve => {
             console.log("init", resolve)
+            let menuList = graphEditor.getMenuList();
+            console.log("menuList", menuList.menu.sort(), menuList.subMenu.sort())
             graphEditor.setGrapheditorData({
-                xml: xmlData,
+                xml: null,
                 name: "data init"
             }).then(resolve => {
                 console.log("setGraphEditor", resolve)

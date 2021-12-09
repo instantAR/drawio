@@ -3136,94 +3136,94 @@
 		
 		this.put('openFrom', new Menu(function(menu, parent)
 		{
-			if (editorUi.drive != null)
-			{
-				menu.addItem(mxResources.get('googleDrive') + '...', null, function()
-				{
-					editorUi.pickFile(App.MODE_GOOGLE);
-				}, parent);
-			}
-			else if (googleEnabled && typeof window.DriveClient === 'function')
-			{
-				menu.addItem(mxResources.get('googleDrive') + ' (' + mxResources.get('loading') + '...)', null, function()
-				{
-					// do nothing
-				}, parent, null, false);
-			}
+			// if (editorUi.drive != null)
+			// {
+			// 	menu.addItem(mxResources.get('googleDrive') + '...', null, function()
+			// 	{
+			// 		editorUi.pickFile(App.MODE_GOOGLE);
+			// 	}, parent);
+			// }
+			// else if (googleEnabled && typeof window.DriveClient === 'function')
+			// {
+			// 	menu.addItem(mxResources.get('googleDrive') + ' (' + mxResources.get('loading') + '...)', null, function()
+			// 	{
+			// 		// do nothing
+			// 	}, parent, null, false);
+			// }
 			
-			if (editorUi.oneDrive != null)
-			{
-				menu.addItem(mxResources.get('oneDrive') + '...', null, function()
-				{
-					editorUi.pickFile(App.MODE_ONEDRIVE);
-				}, parent);
-			}
-			else if (oneDriveEnabled && typeof window.OneDriveClient === 'function')
-			{
-				menu.addItem(mxResources.get('oneDrive') + ' (' + mxResources.get('loading') + '...)', null, function()
-				{
-					// do nothing
-				}, parent, null, false);
-			}
+			// if (editorUi.oneDrive != null)
+			// {
+			// 	menu.addItem(mxResources.get('oneDrive') + '...', null, function()
+			// 	{
+			// 		editorUi.pickFile(App.MODE_ONEDRIVE);
+			// 	}, parent);
+			// }
+			// else if (oneDriveEnabled && typeof window.OneDriveClient === 'function')
+			// {
+			// 	menu.addItem(mxResources.get('oneDrive') + ' (' + mxResources.get('loading') + '...)', null, function()
+			// 	{
+			// 		// do nothing
+			// 	}, parent, null, false);
+			// }
 			
-			if (editorUi.dropbox != null)
-			{
-				menu.addItem(mxResources.get('dropbox') + '...', null, function()
-				{
-					editorUi.pickFile(App.MODE_DROPBOX);
-				}, parent);
-			}
-			else if (dropboxEnabled && typeof window.DropboxClient === 'function')
-			{
-				menu.addItem(mxResources.get('dropbox') + ' (' + mxResources.get('loading') + '...)', null, function()
-				{
-					// do nothing
-				}, parent, null, false);
-			}
+			// if (editorUi.dropbox != null)
+			// {
+			// 	menu.addItem(mxResources.get('dropbox') + '...', null, function()
+			// 	{
+			// 		editorUi.pickFile(App.MODE_DROPBOX);
+			// 	}, parent);
+			// }
+			// else if (dropboxEnabled && typeof window.DropboxClient === 'function')
+			// {
+			// 	menu.addItem(mxResources.get('dropbox') + ' (' + mxResources.get('loading') + '...)', null, function()
+			// 	{
+			// 		// do nothing
+			// 	}, parent, null, false);
+			// }
 
-			menu.addSeparator(parent);
+			// menu.addSeparator(parent);
 			
-			if (editorUi.gitHub != null)
-			{
-				menu.addItem(mxResources.get('github') + '...', null, function()
-				{
-					editorUi.pickFile(App.MODE_GITHUB);
-				}, parent);
-			}
+			// if (editorUi.gitHub != null)
+			// {
+			// 	menu.addItem(mxResources.get('github') + '...', null, function()
+			// 	{
+			// 		editorUi.pickFile(App.MODE_GITHUB);
+			// 	}, parent);
+			// }
 			
-			if (editorUi.gitLab != null)
-			{
-				menu.addItem(mxResources.get('gitlab') + '...', null, function()
-				{
-					editorUi.pickFile(App.MODE_GITLAB);
-				}, parent);
-			}
+			// if (editorUi.gitLab != null)
+			// {
+			// 	menu.addItem(mxResources.get('gitlab') + '...', null, function()
+			// 	{
+			// 		editorUi.pickFile(App.MODE_GITLAB);
+			// 	}, parent);
+			// }
 
-			if (editorUi.notion != null)
-			{
-				menu.addSeparator(parent);
-				menu.addItem(mxResources.get('notion') + '...', null, function()
-				{
-					editorUi.pickFile(App.MODE_NOTION);
-				}, parent);
-			}
+			// if (editorUi.notion != null)
+			// {
+			// 	menu.addSeparator(parent);
+			// 	menu.addItem(mxResources.get('notion') + '...', null, function()
+			// 	{
+			// 		editorUi.pickFile(App.MODE_NOTION);
+			// 	}, parent);
+			// }
 
-			if (editorUi.trello != null)
-			{
-				menu.addItem(mxResources.get('trello') + '...', null, function()
-				{
-					editorUi.pickFile(App.MODE_TRELLO);
-				}, parent);
-			}
-			else if (trelloEnabled && typeof window.TrelloClient === 'function')
-			{
-				menu.addItem(mxResources.get('trello') + ' (' + mxResources.get('loading') + '...)', null, function()
-				{
-					// do nothing
-				}, parent, null, false);
-			}
+			// if (editorUi.trello != null)
+			// {
+			// 	menu.addItem(mxResources.get('trello') + '...', null, function()
+			// 	{
+			// 		editorUi.pickFile(App.MODE_TRELLO);
+			// 	}, parent);
+			// }
+			// else if (trelloEnabled && typeof window.TrelloClient === 'function')
+			// {
+			// 	menu.addItem(mxResources.get('trello') + ' (' + mxResources.get('loading') + '...)', null, function()
+			// 	{
+			// 		// do nothing
+			// 	}, parent, null, false);
+			// }
 			
-			menu.addSeparator(parent);
+			// menu.addSeparator(parent);
 
 			if (isLocalStorage && urlParams['browser'] != '0')
 			{
