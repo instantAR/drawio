@@ -69,9 +69,78 @@ let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guide
 
     //Div container to load Graph Editor
     this.graphEditor.initialized(this.container.nativeElement, this.mxgraphScriptsContainer.nativeElement, {
-      visible: {
+      actions: {
         subMenu: {
-          open: true
+          open: (): Promise<GraphEditorIn> => {
+            return new Promise((resolve, reject) => {
+              resolve({
+                status: "Open From TS",
+                graphData: { xml: xml, name: "ts name" }
+              })
+            })
+          },
+          save: (xml): Promise<GraphEditorOut> => {
+            return new Promise((resolve, reject) => {
+              resolve({
+                status: "From TS",
+                graphData: xml
+              })
+            })
+          }
+        }
+      },
+      extraActions: {
+        file: {
+          exportAs: {
+            'TS Library': (graphData) => {
+              return new Promise((resolve, reject) => {
+                resolve({
+                  status: "TS Library Implementation required",
+                  graphData: graphData
+                })
+              })
+            }
+          },
+          importFrom: {
+            'TS Library': (graphData) => {
+              return new Promise((resolve, reject) => {
+                resolve({
+                  status: "TS Library Implementation required",
+                  graphData: graphData
+                })
+              })
+            }
+          },
+          openFrom: {
+            'TS Library': (graphData) => {
+              return new Promise((resolve, reject) => {
+                resolve({
+                  status: "TS Library Implementation required",
+                  graphData: graphData
+                })
+              })
+            }
+          }
+        },
+        Setting: {
+          'Setting Opt from TS': (graphData) => {
+            return new Promise((resolve, reject) => {
+              resolve({
+                status: "Setting Opt from TS Implementation required",
+                graphData: graphData
+              })
+            })
+          }
+        },
+        Ex: {
+          test2: (graphData) => {
+            return new Promise((resolve, reject) => {
+              resolve({
+                status: "ex test2 Implementation required",
+                graphData: graphData
+              })
+            })
+          }
         }
       }
     } as GraphInitConfig)
@@ -88,7 +157,7 @@ let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guide
   }, reject => {
     console.log(reject);
   })
-
+~~
     //Override - SaveGraphEditor function - Deal save as per task requirements
     this.graphEditor.saveGrapheditor = (xml: GraphXmlData) => {
       return new Promise((resolve, reject) => {
@@ -108,7 +177,7 @@ let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guide
         })
       })
     }
-
+~~
 }
 ```
 License
