@@ -157,7 +157,7 @@ let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guide
   }, reject => {
     console.log(reject);
   })
-~~
+~ ~
     //Override - SaveGraphEditor function - Deal save as per task requirements
     this.graphEditor.saveGrapheditor = (xml: GraphXmlData) => {
       return new Promise((resolve, reject) => {
@@ -177,7 +177,7 @@ let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guide
         })
       })
     }
-~~
+~ ~
 }
 ```
 License
