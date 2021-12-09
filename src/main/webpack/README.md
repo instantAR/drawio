@@ -157,27 +157,6 @@ let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guide
   }, reject => {
     console.log(reject);
   })
-~ ~
-    //Override - SaveGraphEditor function - Deal save as per task requirements
-    this.graphEditor.saveGrapheditor = (xml: GraphXmlData) => {
-      return new Promise((resolve, reject) => {
-        resolve({
-          status: "From TS",
-          graphData: xml
-        })
-      })
-    }
-
-    //Override - openGraphEditorList function - Deal save as per task requirements
-    this.graphEditor.openGraphEditorList = () => {
-      return new Promise((resolve, reject) => {
-        resolve({
-          status: "Open From TS",
-          graphData: { xml: xml } as GraphXmlData
-        })
-      })
-    }
-~ ~
 }
 ```
 License
