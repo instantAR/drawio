@@ -58,7 +58,7 @@ DrawIOExtension = function (config) {
 
 				this.put((subSubMenuName ? subMenuName : menuName), actionMenu).isEnabled = isGraphEnabled;
 			} else {
-				console.log("actionMenu not found", menuName, subMenuName, subSubMenuName)
+				// console.log("actionMenu not found", menuName, subMenuName, subSubMenuName)
 
 				this.put((subSubMenuName ? subMenuName : menuName), new Menu(mxUtils.bind(this, function (menu, parent) {
 					menu.addSeparator(parent);
@@ -79,7 +79,7 @@ DrawIOExtension = function (config) {
 			sendSuccessResponse = function (customAction, success) {
 				if (customAction['callbackOnFinish'] !== undefined && typeof customAction['callbackOnFinish'] === 'function') {
 					customAction['callbackOnFinish'](success).then(res => {
-						console.log("sendSuccessResponse done");
+						console.log("sendSuccessResponse done",res);
 					})
 				}
 			}
