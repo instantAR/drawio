@@ -67,11 +67,30 @@ window.mxscript = (src, onLoad, id, dataAppKey, noWrite) => {
  * @callback OptNew
  * @returns {Promise<GraphEditorNew>} Promise<GraphEditorNew>
  */
+
+/**
+ * Enum for Action-Type values.
+ * @readonly
+ * @enum {string}
+ */
+var ActionType = {
+    DEFAULT: 'default',
+    CUSTOM: 'custom',
+    IMPORT: 'import_OptIn',
+    EXPORT: 'export_OptOut',
+    NEW: 'new_OptNew',
+    OPEN: 'open_OptIn',
+};
+
 //  {new?: OptNew, save?: OptOut, saveAs?: OptOut, open?: OptIn, import?: OptIn, export?: OptOut}
 /**
+ * @typedef {{ action: {actionType:ActionType, calback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any} }} MenuActionType
  * @typedef {{ orgChartDev?: boolean, printSetting?: {isPrint:boolean},
- * actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
- * extraActions?: {[key:string]: { [key:string]:OptOut|OptIn|{[key:string]:OptOut|OptIn}}} }} GraphInitConfig
+ *      actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
+ *      extraActions?: {[key:string]: 
+ *          { [key:string]:MenuActionType | {[key:string]: MenuActionType }}
+ *      } 
+ * }} GraphInitConfig
  * @typedef {{ xml: string, name: string }} GraphXmlData
  * @typedef {{ status: string}} GraphEditorNew
  * @typedef {{ status: string, graphData: GraphXmlData}} GraphEditorOut
@@ -79,7 +98,6 @@ window.mxscript = (src, onLoad, id, dataAppKey, noWrite) => {
  * @typedef {{ status: string, graphData: GraphXmlData, document?: DOMParser|XMLDocument , reason?: any }} GraphEditorData
  * @typedef {{ status: string, graphEditorObj?: any, message?: string , reason?: any }} GraphEditorLoaded
  */
-
 
 export class GraphEditor {
 
@@ -417,7 +435,8 @@ export class GraphEditor {
             Object.keys(config.extraActions).forEach(menuName => {
                 if (typeof config['extraActions'][menuName] === 'object') {
                     Object.keys(config['extraActions'][menuName]).forEach((subMenuName) => {
-                        if (typeof config['extraActions'][menuName][subMenuName] === 'function') {
+                        if (config['extraActions'][menuName][subMenuName]['callback'] !== undefined &&
+                            typeof config['extraActions'][menuName][subMenuName]['callback'] === 'function') {
                             let menuFound = Menus.prototype.defaultMenuItems.filter(item => item == menuName);
                             // console.log(menuFound);
                             if (menuFound.length < 1) {
@@ -529,7 +548,7 @@ export class GraphEditor {
                 var xmlData = this.getFileData(true);
                 // console.log("saveFile", forceDialog, xml);
                 try {
-                    config.actions.subMenu.save({
+                    config && config.actions && config.actions.subMenu && config.actions.subMenu.save && config.actions.subMenu.save({
                         xml: xmlData,
                         name: filename
                     }).then(resolve => {
@@ -726,44 +745,91 @@ if (typeof isWebpack !== 'undefined') {
                 },
                 extraActions: {
                     file: {
-                        test: () => {
-                            return new Promise((resolve, reject) => {
-                                resolve({
-                                    status: "test Open From TS Func",
-                                    graphData: {
-                                        xml: xmlData
-                                    }
-                                })
-                            })
-                        },
-                        test2: (graphData) => {
-                            return new Promise((resolve, reject) => {
-                                resolve({
-                                    status: "test2 Implementation required",
-                                    graphData: graphData
-                                })
-                            })
-                        },
-                        exportAs: {
-                            'Dwp Library': (graphData) => {
+                        test: {
+                            actionType: ActionType.NEW,
+                            callback: () => {
                                 return new Promise((resolve, reject) => {
                                     resolve({
-                                        status: "Dwp Library Implementation required",
-                                        graphData: graphData
+                                        status: "test Open From TS Func"
                                     })
                                 })
+                            }
+                        },
+                        test2: {
+                            actionType: ActionType.OPEN,
+                            callback: () => {
+                                return new Promise((resolve, reject) => {
+                                    resolve({
+                                        status: "test2 Implementation required",
+                                        graphData: { xml: xmlData, name: 'import from func' }
+                                    })
+                                })
+                            }
+                        },
+                        exportAs: {
+                            'Dwp Library': {
+                                actionType: ActionType.EXPORT,
+                                callback: (graphData) => {
+                                    return new Promise((resolve, reject) => {
+                                        resolve({
+                                            status: "Dwp Library Implementation required",
+                                            graphData: graphData
+                                        })
+                                    })
+                                },
+                                callbackOnError: (graphData) => {
+                                    return new Promise((resolve, reject) => {
+                                        resolve({
+                                            status: "Dwp Library import error Implementation required",
+                                            graphData: graphData
+                                        })
+                                    })
+                                }
+                            }
+                        },
+                        importFrom: {
+                            'Dwp Library': {
+                                actionType: ActionType.IMPORT,
+                                callback: () => {
+                                    return new Promise((resolve, reject) => {
+                                        resolve({
+                                            status: "Dwp Library import Implementation required",
+                                            graphData: { xml: xmlData, name: 'import from func' }
+                                        })
+                                    })
+                                },
+                                callbackOnFinish: (graphData) => {
+                                    return new Promise((resolve, reject) => {
+                                        resolve({
+                                            status: "Dwp Library import finish Implementation required",
+                                            graphData: graphData
+                                        })
+                                    })
+                                }
                             }
                         }
                     },
                     setting: true,
                     ex: {
-                        test2: (graphData) => {
-                            return new Promise((resolve, reject) => {
-                                resolve({
-                                    status: "ex test2 Implementation required",
-                                    graphData: graphData
+                        test2: {
+                            actionType: ActionType.DEFAULT,
+                            callback: () => {
+                                return new Promise((resolve, reject) => {
+                                    resolve({
+                                        status: "ex test2 Implementation required"
+                                    })
                                 })
-                            })
+                            }
+                        },
+                        test: {
+                            actionType: ActionType.CUSTOM,
+                            callback: () => {
+                                return new Promise((resolve, reject) => {
+                                    resolve({
+                                        status: "ex test2 Implementation required"
+                                    })
+                                })
+                            }
                         }
                     }
 

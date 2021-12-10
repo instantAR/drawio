@@ -8092,6 +8092,7 @@
                  {
                      if (input.files != null)
                      {
+                         console.log(input.files);
                          // Using null for position will disable crop of input file
                          this.importFiles(input.files, null, null, this.maxImageSize);
                          
