@@ -1,21 +1,23 @@
 /**
  * @param {GraphInitConfig} [config] - Grapheditor Configuration.
  */
-//extraActions: [key:string]: { [key:string] : OptOut | OptIn}
 DrawIOExtension = function (config) {
 	if (config !== undefined && config['extraActions'] !== undefined) {
 		Object.keys(config['extraActions']).forEach((menuName) => {
-			// console.log('extraActions', menuName, (typeof config['extraActions'][menuName]));
+
 			if (typeof config['extraActions'][menuName] === 'object') {
-				// console.log('extraActions:valid', menuName);
+
 				Object.keys(config['extraActions'][menuName]).forEach((subMenuName) => {
-					// console.log('extraActions', menuName, subMenuName, (typeof config['extraActions'][menuName][subMenuName]));
-					if (typeof config['extraActions'][menuName][subMenuName] === 'function') {
-						// console.log('extraActions:valid', menuName, subMenuName);
+
+					if (config['extraActions'][menuName][subMenuName]['callback'] !== undefined &&
+						typeof config['extraActions'][menuName][subMenuName]['callback'] === 'function') {
 						addMenuItem(menuName, subMenuName);
 					} else if (typeof config['extraActions'][menuName][subMenuName] === 'object') {
+
 						Object.keys(config['extraActions'][menuName][subMenuName]).forEach((subSubMenuName) => {
-							if (typeof config['extraActions'][menuName][subMenuName][subSubMenuName] === 'function') {
+
+							if (config['extraActions'][menuName][subMenuName][subSubMenuName]['callback'] !== undefined &&
+								typeof config['extraActions'][menuName][subMenuName][subSubMenuName]['callback'] === 'function') {
 								addMenuItem(menuName, subMenuName, subSubMenuName);
 							}
 						})
@@ -30,6 +32,7 @@ DrawIOExtension = function (config) {
 		var menusInitExt = Menus.prototype.init;
 		Menus.prototype.init = function () {
 			menusInitExt.apply(this, arguments);
+
 			var editorUi = this.editorUi;
 			var graph = editorUi.editor.graph;
 			var isGraphEnabled = mxUtils.bind(graph, graph.isEnabled);
@@ -49,32 +52,155 @@ DrawIOExtension = function (config) {
 					oldActionMenu.apply(this, arguments);
 					menu.addSeparator(parent);
 					menu.addItem((subSubMenuName ? subSubMenuName : subMenuName), null, function () {
-						performAction().then(resolve => {
-							console.log("extraActions", resolve)
-						}, reject => {
-							console.log("extraActions", reject)
-						}).catch(e => {
-							console.log("extraActions", e)
-						});
+						this.performCustomAction(performAction);
 					}, parent);
 				}
 
 				this.put((subSubMenuName ? subMenuName : menuName), actionMenu).isEnabled = isGraphEnabled;
 			} else {
-				// console.log("actionMenu not found")
+				console.log("actionMenu not found", menuName, subMenuName, subSubMenuName)
 
 				this.put((subSubMenuName ? subMenuName : menuName), new Menu(mxUtils.bind(this, function (menu, parent) {
 					menu.addSeparator(parent);
 					menu.addItem((subSubMenuName ? subSubMenuName : subMenuName), null, function () {
-						performAction().then(resolve => {
-							console.log("extraActions", resolve)
-						}, reject => {
-							console.log("extraActions", reject)
-						}).catch(e => {
-							console.log("extraActions", e)
-						});
+						this.performCustomAction(performAction);
 					}, parent);
 				}), isGraphEnabled))
+			}
+
+			sendErrorResponse = function (customAction, error) {
+				if (customAction['callbackOnError'] !== undefined && typeof customAction['callbackOnError'] === 'function') {
+					customAction['callbackOnError'](error).then(res => {
+						console.log("sendErrorResponse done");
+					})
+				}
+			}
+
+			sendSuccessResponse = function (customAction, success) {
+				if (customAction['callbackOnFinish'] !== undefined && typeof customAction['callbackOnFinish'] === 'function') {
+					customAction['callbackOnFinish'](success).then(res => {
+						console.log("sendSuccessResponse done");
+					})
+				}
+			}
+
+			//TODO: Need to improve it...
+			performCustomAction = function (customAction) {
+				switch (customAction['actionType']) {
+					case 'import_OptIn':
+						try {
+							customAction['callback']().then(resolve => {
+								editorUi.importFile(resolve.graphData.xml, "text/xml", 0, 0, 240, 160, resolve.graphData.name, function () {
+									console.log("done");
+									sendSuccessResponse(customAction, {
+										status: "import successfully",
+										graphData: resolve.graphData
+									});
+								}, null, false, undefined, undefined);
+
+								console.log("import_OptIn", resolve)
+
+							}, reject => {
+								console.log("import_OptIn", reject)
+							}).catch(e => {
+								console.log("import_OptIn", e)
+							});
+						} catch (e) {
+							console.log(e);
+							sendErrorResponse(customAction, {
+								status: "something went wrong",
+								graphData: e
+							});
+						}
+						break;
+					case 'export_OptOut':
+						try {
+							var file = editorUi.getCurrentFile();
+							var optOut = {
+								xml: null,
+								name: null
+							}
+							if (file != null) {
+								optOut.name = (file.getTitle() != null) ? file.getTitle() : this.defaultFilename;
+								optOut.xml = editorUi.getFileData(true);
+								customAction['callback'](optOut).then(resolve => {
+									console.log("export_OptOut", resolve)
+								}, reject => {
+									console.log("export_OptOut", reject)
+								}).catch(e => {
+									console.log("export_OptOut", e)
+								});
+							} else {
+								console.log("file not found");
+								sendErrorResponse(customAction, {
+									status: "export error",
+									graphData: optOut
+								});
+							}
+
+						} catch (e) {
+							console.log(e);
+							sendErrorResponse(customAction, {
+								status: "something went wrong",
+								graphData: e
+							});
+						}
+						break;
+					case 'open_OptIn':
+						try {
+							customAction['callback']().then(resolve => {
+								console.log("open_OptIn", resolve)
+								editorUi.openLocalFile(resolve.graphData.xml, resolve.graphData.name, false);
+							}, reject => {
+								console.log("open_OptIn", reject)
+							}).catch(e => {
+								console.log("open_OptIn", e)
+							});
+						} catch (e) {
+							console.log(e);
+							sendErrorResponse(customAction, {
+								status: "something went wrong",
+								graphData: e
+							});
+						}
+						break;
+					case 'new_OptNew':
+						try {
+							customAction['callback']().then(resolve => {
+								console.log("new_OptNew", resolve)
+							}, reject => {
+								console.log("new_OptNew", reject)
+							}).catch(e => {
+								console.log("new_OptNew", e)
+							});
+						} catch (e) {
+							console.log(e);
+							sendErrorResponse(customAction, {
+								status: "something went wrong",
+								graphData: e
+							});
+						}
+						break;
+					case 'custom':
+					case 'default':
+					default:
+						try {
+							customAction['callback']().then(resolve => {
+								console.log("default-custom", resolve)
+							}, reject => {
+								console.log("default-custom", reject)
+							}).catch(e => {
+								console.log("default-custom", e)
+							});
+						} catch (e) {
+							console.log(e);
+							sendErrorResponse(customAction, {
+								status: "something went wrong",
+								graphData: e
+							});
+						}
+				}
+
 			}
 
 		}
@@ -85,6 +211,7 @@ DrawIOExtension = function (config) {
 
 DrawIOExtension.prototype.menuList = [];
 DrawIOExtension.prototype.subMenuList = [];
+
 
 /**
  * Creates the keyboard event handler for the current graph and history.
