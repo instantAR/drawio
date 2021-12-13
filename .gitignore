@@ -6,3 +6,4 @@ node_modules
 dist
 src/main/webpack/package-lock.json
 src/main/webpack/*-draw.io-*.tgz
+src/main/webpack/out.txt
