@@ -7,8 +7,9 @@
   "scripts": {
     "start": "rmdir dist /S /Q & npx webpack --mode=development --config webpack.config.js --watch",
     "build:types": "rmdir dist\\types /S /Q & tsc -p tsconfig.json",
-    "clean": "rmdir dist /S /Q & del *-draw.io-*.tgz",
-    "build": "npm run clean & npm run build:types & npx webpack --mode=production --config webpack.config.js --progress --profile & npm pack",
+    "clean": "del out.txt & rmdir dist /S /Q & del *-draw.io-*.tgz",
+    "build:prod": "npm run clean & npm run build:types & npx webpack --mode=production --config webpack.config.js --progress --profile & npm pack",
+    "build": "npm run build:prod > out.txt",
     "tsc": "tsc"
   },
   "repository": {
