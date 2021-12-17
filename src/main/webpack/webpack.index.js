@@ -54,8 +54,8 @@ window.mxscript = (src, onLoad, id, dataAppKey, noWrite) => {
 
 /**
  * @callback OptOut
- * @param {GraphXmlData} graphData Grapheditor xml
- * @returns {Promise<GraphEditorOut>} Promise<GraphEditorOut>
+ * @param {GraphXmlData | GraphEditorSVG} graphData Grapheditor xml
+ * @returns {Promise<GraphEditorOut | GraphEditorSVG>} Promise<GraphEditorOut | GraphEditorSVG>
  */
 
 /**
@@ -78,25 +78,36 @@ export var ActionType = {
     CUSTOM: 'custom',
     IMPORT: 'import_OptIn',
     EXPORT: 'export_OptOut',
+    EXPORTSVG: 'export_SvG_OptOut',
     NEW: 'new_OptNew',
     OPEN: 'open_OptIn',
 };
 
+/**
+ * @param { mimeType:string } mimeType
+ * @param { base64Encoded:string } base64Encoded
+ */
+export function getImageSrc(mimeType, base64Encoded) {
+    return ('data:' + mimeType + ';base64,' + base64Encoded)
+}
+
 //  {new?: OptNew, save?: OptOut, saveAs?: OptOut, open?: OptIn, import?: OptIn, export?: OptOut}
 /**
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any }} MenuActionType
- * @typedef {{ orgChartDev?: boolean, printSetting?: {isPrint:boolean},
+ * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, printSetting?: {isPrint:boolean},
  *      actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
  *      extraActions?: {[key:string]: 
  *          { [key:string]:MenuActionType | {[key:string]: MenuActionType }}
  *      } 
  * }} GraphInitConfig
  * @typedef {{ xml: string, name: string }} GraphXmlData
- * @typedef {{ status: string}} GraphEditorNew
- * @typedef {{ status: string, graphData: GraphXmlData}} GraphEditorOut
- * @typedef {{ status: string, graphData?: GraphXmlData}} GraphEditorIn
+ * @typedef {{ status: string, reason?: any}} GraphEditorNew
+ * @typedef {{ status: string, graphData: GraphXmlData, reason?: any}} GraphEditorOut
+ * @typedef {{ status: string, graphData?: GraphXmlData, reason?: any}} GraphEditorIn
  * @typedef {{ status: string, graphData: GraphXmlData, document?: DOMParser|XMLDocument , reason?: any }} GraphEditorData
  * @typedef {{ status: string, graphEditorObj?: any, message?: string , reason?: any }} GraphEditorLoaded
+ * @typedef {{ base64Encoded: string, mimeType: string, getImageSrc: getImageSrc }} GraphEditorImage
+ * @typedef {{ status: string svg:string, xml?: string, name?: string, image: GraphEditorImage, reason?: any }} GraphEditorSVG
  */
 
 export class GraphEditor {
@@ -459,7 +470,11 @@ export class GraphEditor {
         DrawIOExtension(config);
         document.body.className += ' geEditor';
         let self = this;
-
+        if (config.navitgateToUrl) {
+            Editor.prototype.editBlankUrl = config.navitgateToUrl;
+        } else {
+            Editor.prototype.editBlankUrl = '';
+        }
 
         /**
          * Creates the keyboard event handler for the current graph and history.
@@ -572,7 +587,7 @@ export class GraphEditor {
 
         };
     }
-
+    
     /**
      * @param {GraphXmlData} graphData - Grapheditor xml.
      * @returns {Promise<GraphEditorData>} Promise<GraphEditorData>
@@ -633,55 +648,11 @@ export class GraphEditor {
                     // console.log("menuList", DrawIOExtension.prototype.menuList.sort(), DrawIOExtension.prototype.subMenuList.sort());
                     resolve({
                         status: 'Initialized',
-                        graphEditorObj: ui
+                        graphEditorObj: ui,
+                        config: config
                     })
                 }, null, container);
-                // this.postScript(config);
 
-                // let self = this;
-                // // Adds required resources (disables loading of fallback properties, this can only
-                // // be used if we know that all keys are defined in the language specific file)
-                // mxResources.loadDefaultBundle = false;
-                // var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
-                //     mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
-
-                // // Fixes possible asynchronous requests
-                // mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function (xhr) {
-                //     // Adds bundle text to resources
-                //     mxResources.parse(xhr[0].getText());
-                //     if (config === undefined || config.printSetting === undefined || config.printSetting.isPrint === false) {
-                //         // Configures the default graph theme
-                //         var themes = new Object();
-                //         themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement();
-
-                //         // Main
-                //         let isChromeless = urlParams['chrome'] == '0' || uiTheme == 'min'; // true; // 
-                //         let isEditable = urlParams['chrome'] != '0'; // false; // 
-                //         self.editorUiObj = new EditorUi(new Editor(isChromeless, null, null, null, isEditable), container);
-
-                //     } else {
-                //         //Print Mod
-                //         self.editorUiObj = new Graph(container);
-                //         // graph.resizeContainer = true;
-                //         self.editorUiObj.setEnabled(false);
-                //         self.editorUiObj.setGridEnabled(true)
-                //     }
-                //     resolve({
-                //         status: 'Initialized',
-                //         graphEditorObj: self.editorUiObj || graph
-                //     })
-                // }, function () {
-
-                //     const element = document.createElement('div');
-
-                //     element.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';
-
-                //     container.appendChild(element);
-                //     reject({
-                //         status: 'Failed',
-                //         message: 'Error loading resource files. Please check browser console.'
-                //     });
-                // });
 
             }, rej => {
                 console.log("grapheditor-init:reject", rej);
@@ -740,6 +711,7 @@ if (typeof isWebpack !== 'undefined') {
     graphEditor.initialized(
             document.getElementById('mxgraph-diagram-container'),
             document.getElementById('mxgraph-scripts-container'), {
+                navitgateToUrl: "https://public_url/route/path",
                 printSetting: {
                     isPrint: false
                 },
@@ -761,7 +733,10 @@ if (typeof isWebpack !== 'undefined') {
                                 return new Promise((resolve, reject) => {
                                     resolve({
                                         status: "test2 Implementation required",
-                                        graphData: { xml: xmlData, name: 'import from func' }
+                                        graphData: {
+                                            xml: xmlData,
+                                            name: 'import from func'
+                                        }
                                     })
                                 })
                             }
@@ -794,7 +769,10 @@ if (typeof isWebpack !== 'undefined') {
                                     return new Promise((resolve, reject) => {
                                         resolve({
                                             status: "Dwp Library import Implementation required",
-                                            graphData: { xml: xmlData, name: 'import from func' }
+                                            graphData: {
+                                                xml: xmlData,
+                                                name: 'import from func'
+                                            }
                                         })
                                     })
                                 },
@@ -811,6 +789,25 @@ if (typeof isWebpack !== 'undefined') {
                     },
                     setting: true,
                     ex: {
+                        testSvg: {
+                            actionType: ActionType.EXPORTSVG,
+                            callback: (graphData) => {
+                                return new Promise((resolve, reject) => {
+                                    resolve({
+                                        status: "Dwp Library EXPORTSVG Implementation required",
+                                        graphData: graphData
+                                    })
+                                })
+                            },
+                            callbackOnError: (graphData) => {
+                                return new Promise((resolve, reject) => {
+                                    resolve({
+                                        status: "Dwp Library EXPORTSVG error Implementation required",
+                                        graphData: graphData
+                                    })
+                                })
+                            }
+                        },
                         test2: {
                             actionType: ActionType.DEFAULT,
                             callback: () => {
@@ -863,7 +860,7 @@ if (typeof isWebpack !== 'undefined') {
             let menuList = graphEditor.getMenuList();
             console.log("menuList", menuList.menu.sort(), menuList.subMenu.sort())
             graphEditor.setGrapheditorData({
-                xml: null,
+                xml: xmlData,
                 name: "data init"
             }).then(resolve => {
                 console.log("setGraphEditor", resolve)

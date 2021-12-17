@@ -79,8 +79,27 @@ DrawIOExtension = function (config) {
 			sendSuccessResponse = function (customAction, success) {
 				if (customAction['callbackOnFinish'] !== undefined && typeof customAction['callbackOnFinish'] === 'function') {
 					customAction['callbackOnFinish'](success).then(res => {
-						console.log("sendSuccessResponse done",res);
+						console.log("sendSuccessResponse done", res);
 					})
+				}
+			}
+
+			getGraphXmlData = function () {
+				var file = editorUi.getCurrentFile();
+				var optOut = {
+					xml: null,
+					name: null
+				}
+				if (file != null) {
+					optOut.name = (file.getTitle() != null) ? file.getTitle() : this.defaultFilename;
+					optOut.xml = editorUi.getFileData(true);
+					return optOut;
+				} else {
+					console.log("file not found");
+					return {
+						status: "export error",
+						graphData: optOut
+					}
 				}
 			}
 
@@ -109,20 +128,67 @@ DrawIOExtension = function (config) {
 							console.log(e);
 							sendErrorResponse(customAction, {
 								status: "something went wrong",
-								graphData: e
+								graphData: null,
+								reason: e
+							});
+						}
+						break;
+					case 'export_SvG_OptOut':
+						try {
+							let editable = true;
+							let ignoreSelection = true;
+							let currentPage = true;
+							let transparentBackground = true;
+							var svgRoot = editorUi.editor.graph.getSvg((transparentBackground ? null: "#ffffff"), 1, "0", true, null, true, null, null, null, null, true, null, "diagram");
+							// if (addShadow) {
+							//     this.editor.graph.addSvgShadow(svgRoot);
+							// }
+							if (editable) {
+								svgRoot.setAttribute('content', editorUi.getFileData(true, null, null, null, ignoreSelection,
+									currentPage, null, null, null, false));
+							}
+
+							let svgData = (Graph.xmlDeclaration + '\n' + ((editable) ? Graph.svgFileComment + '\n' : '') + Graph.svgDoctype + '\n' + mxUtils.getXml(svgRoot));
+							let mime = 'image/svg+xml';
+							let imgBase64Encode = btoa(unescape(encodeURIComponent(svgData)));
+							// let src = ('data:' + mime + ';base64,' + imgBase64Encode);
+							// console.log('export_SvG', svgData, src);
+							var graphData = getGraphXmlData();
+							let optOut = {
+								...graphData,
+								status: 'Exported_SVG_AND_Image',
+								svg: svgData,
+								image: {
+									base64Encoded: imgBase64Encode,
+									mimeType: mime,
+									getImageSrc: (mimeType, base64Encoded) => {
+										return ('data:' + mimeType + ';base64,' + base64Encoded)
+									}
+								}
+							}
+							customAction['callback'](optOut).then(resolve => {
+								console.log("export_SvG_OptOut", resolve)
+							}, reject => {
+								console.log("export_SvG_OptOut", reject)
+							}).catch(e => {
+								console.log("export_SvG_OptOut", e)
+							});
+						} catch (e) {
+							console.log(e);
+							sendErrorResponse(customAction, {
+								status: "something went wrong",
+								svg: null,
+								image: null,
+								xml: null,
+								name: null,
+								reason: e
 							});
 						}
 						break;
 					case 'export_OptOut':
 						try {
-							var file = editorUi.getCurrentFile();
-							var optOut = {
-								xml: null,
-								name: null
-							}
-							if (file != null) {
-								optOut.name = (file.getTitle() != null) ? file.getTitle() : this.defaultFilename;
-								optOut.xml = editorUi.getFileData(true);
+							var optOut = getGraphXmlData();
+							if (optOut && optOut.xml && optOut.name) {
 								customAction['callback'](optOut).then(resolve => {
 									console.log("export_OptOut", resolve)
 								}, reject => {
@@ -131,18 +197,17 @@ DrawIOExtension = function (config) {
 									console.log("export_OptOut", e)
 								});
 							} else {
-								console.log("file not found");
 								sendErrorResponse(customAction, {
 									status: "export error",
 									graphData: optOut
 								});
 							}
-
 						} catch (e) {
 							console.log(e);
 							sendErrorResponse(customAction, {
 								status: "something went wrong",
-								graphData: e
+								graphData: null,
+								reason: e
 							});
 						}
 						break;
@@ -160,7 +225,8 @@ DrawIOExtension = function (config) {
 							console.log(e);
 							sendErrorResponse(customAction, {
 								status: "something went wrong",
-								graphData: e
+								graphData: null,
+								reason: e
 							});
 						}
 						break;
@@ -177,7 +243,8 @@ DrawIOExtension = function (config) {
 							console.log(e);
 							sendErrorResponse(customAction, {
 								status: "something went wrong",
-								graphData: e
+								graphData: null,
+								reason: e
 							});
 						}
 						break;
@@ -196,7 +263,8 @@ DrawIOExtension = function (config) {
 							console.log(e);
 							sendErrorResponse(customAction, {
 								status: "something went wrong",
-								graphData: e
+								graphData: enull,
+								reason: e
 							});
 						}
 				}
