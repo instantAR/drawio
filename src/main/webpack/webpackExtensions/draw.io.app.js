@@ -1650,7 +1650,7 @@
           * Holds the background element.
           */
          this.bg = this.createBackground();
-         document.body.appendChild(this.bg);
+         this.container.appendChild(this.bg) || document.body.appendChild(this.bg);
          this.diagramContainer.style.visibility = 'hidden';
          this.formatContainer.style.visibility = 'hidden';
          this.hsplit.style.display = 'none';
@@ -1981,7 +1981,7 @@
                  '0aj0RGAz5ZlHUgpx2erR/V6/d1wOHwK4CGA/QsBnPN9AN+llH+WkqFare4R0QGAO/M6M8Ysey81/wGqa8MlVvHPNAAAAABJRU5ErkJggg==';
  
              mxUtils.write(banner, 'Please rate us');
-             document.body.appendChild(banner);
+             this.container.appendChild(banner) || document.body.appendChild(banner);
      
              var star1 = document.createElement('img');
              star1.setAttribute('border', '0');
@@ -2382,7 +2382,7 @@
              };
              
              graph.getGlobalVariable = graphGetGlobalVariable;
-             document.body.appendChild(graph.container);
+             this.container.appendChild(graph.container) || document.body.appendChild(graph.container);
              graph.model.setRoot(page.root);
          }
          
@@ -3024,7 +3024,7 @@
              }
          });
          
-         document.body.appendChild(div);
+         this.container.appendChild(div) || document.body.appendChild(div);
          
          // Delayed to get smoother animation after DOM rendering
          window.setTimeout(function()
@@ -3969,7 +3969,7 @@
                      }));
                      
                      input.style.display = 'none';
-                     document.body.appendChild(input);
+                     this.container.appendChild(input) || document.body.appendChild(input);
                      this.openFileInputElt = input;
                  }
                  
@@ -4158,7 +4158,7 @@
              }));
              
              input.style.display = 'none';
-             document.body.appendChild(input);
+             this.container.appendChild(input) || document.body.appendChild(input);
              this.libFileInputElt = input;
          }
          
@@ -4889,7 +4889,7 @@
          if (dataNode != null && /\.svg$/i.test(file.getTitle()))
          {
              graph = this.createTemporaryGraph(this.editor.graph.getStylesheet());
-             document.body.appendChild(graph.container);
+             this.container.appendChild(graph.container) || document.body.appendChild(graph.container);
              node = this.decodeNodeIntoGraph(node, graph);
          }
          

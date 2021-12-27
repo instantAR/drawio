@@ -1638,7 +1638,7 @@
                      return graphGetGlobalVariable.apply(this, arguments);
                  };
          
-                 document.body.appendChild(graph.container);
+                 this.container.appendChild(graph.container) || document.body.appendChild(graph.container);
                  graph.model.setRoot(page.root);
              }
          }
@@ -4196,7 +4196,7 @@
              banner.appendChild(img);
              
              mxUtils.write(banner, text);
-             document.body.appendChild(banner);
+             this.container.appendChild(banner) || document.body.appendChild(banner);
              this.bannerShowing = true;
              
              var div = document.createElement('div');
@@ -4482,7 +4482,7 @@
                      a.setAttribute('target', '_blank');
                  }
  
-                 document.body.appendChild(a);
+                 this.container.appendChild(a) || document.body.appendChild(a);
                  
                  try
                  {
@@ -4765,7 +4765,7 @@
                      // Puts the dialog on top of the container z-index
                      var style = mxUtils.getCurrentStyle(this.editor.graph.container);
                      this.tagsDialog.style.zIndex = style.zIndex;
-                     document.body.appendChild(this.tagsDialog);
+                     this.container.appendChild(this.tagsDialog) || document.body.appendChild(this.tagsDialog);
  
                      this.tagsComponent.refresh();
                      this.editor.fireEvent(new mxEventObject('tagsDialogShown'));
@@ -4928,7 +4928,7 @@
                         }), null, null, null, null, null, null, null, Editor.defaultBorder);
                      
                      mxEvent.addListener(this.editor.graph.container, 'click', clickHandler);
-                        document.body.appendChild(this.exportDialog);
+                     this.container.appendChild(this.exportDialog) || document.body.appendChild(this.exportDialog);
                  }
                  
                  mxEvent.consume(evt);
@@ -6672,7 +6672,7 @@
              {
                  graph = this.createTemporaryGraph((darkTheme) ?
                      graph.getDefaultStylesheet() : graph.getStylesheet());
-                 document.body.appendChild(graph.container);
+                     this.container.appendChild(graph.container) || document.body.appendChild(graph.container);
                  this.decodeNodeIntoGraph(this.editor.extractGraphModel(
                      mxUtils.parseXml(optionalData).documentElement, true), graph);
                  diagramData = optionalData;
@@ -6709,7 +6709,7 @@
                      return graphGetGlobalVariable.apply(this, arguments);
                  };
          
-                 document.body.appendChild(graph.container);
+                 this.container.appendChild(graph.container) || document.body.appendChild(graph.container);
                  graph.model.setRoot(page.root);
              }
              
@@ -8104,7 +8104,7 @@
                  }));
                  
                  input.style.display = 'none';
-                 document.body.appendChild(input);
+                 this.container.appendChild(input) || document.body.appendChild(input);
                  this.importFileInputElt = input;
              }
              
@@ -11100,7 +11100,7 @@
          }
          else
          {
-             document.body.appendChild(hl);
+            this.container.appendChild(h1) || document.body.appendChild(hl);
          }
          
          return hl;
@@ -12193,7 +12193,7 @@
                                                  return graphGetGlobalVariable.apply(this, arguments);
                                              };
                                      
-                                             document.body.appendChild(graph.container);
+                                             this.container.appendChild(graph.container) || document.body.appendChild(graph.container);
                                              graph.model.setRoot(page.root);
                                          }
          
@@ -14393,7 +14393,7 @@
                                  var drawioFrame = document.createElement('iframe');
                                  drawioFrame.style.display = 'none';
                                  drawioFrame.setAttribute('src', 'https://www.draw.io?embed=1&proto=json&forceMigration=' + urlParams['forceMigration']);
-                                 document.body.appendChild(drawioFrame);
+                                 this.container.appendChild(drawioFrame) || document.body.appendChild(drawioFrame);
                                  var collectNames = true, allDone = false;
                                  var fileNames, index = 0;
                                  

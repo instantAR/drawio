@@ -2398,7 +2398,7 @@ EditorUi.prototype.initCanvas = function()
 						var style = mxUtils.getCurrentStyle(this.editor.graph.container);
 						this.layersDialog.style.zIndex = style.zIndex;
 						
-						document.body.appendChild(this.layersDialog);
+						this.container.appendChild(this.layersDialog) || document.body.appendChild(this.layersDialog);
 						this.editor.fireEvent(new mxEventObject('layersDialogShown'));
 					}
 					

@@ -82,7 +82,7 @@ function mxRuler(editorUi, unit, isVertical, isSecondery)
 	
 	this.updateStyle();
 
-    document.body.appendChild(container);
+    editorUi.container.appendChild(container) || document.body.appendChild(container);
 	mxEvent.disableContextMenu(container);
 
 	this.editorUiRefresh = editorUi.refresh;

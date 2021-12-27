@@ -379,7 +379,7 @@ EditorUi.prototype.getImageForPage = function(page, sourcePage, sourceGraph)
 		}
 	};
 
-	document.body.appendChild(graph.container);
+	this.ui.container.appendChild(graph.container) || document.body.appendChild(graph.container);
 
 	this.updatePageRoot(page);
 	graph.model.setRoot(page.root);

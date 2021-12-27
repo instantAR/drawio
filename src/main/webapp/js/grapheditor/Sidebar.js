@@ -18,7 +18,7 @@ function Sidebar(editorUi, container)
 	this.graph.container.style.visibility = 'hidden';
 	this.graph.foldingEnabled = false;
 
-	document.body.appendChild(this.graph.container);
+	editorUi.container.appendChild(this.graph.container) || document.body.appendChild(this.graph.container);
 	
 	this.pointerUpHandler = mxUtils.bind(this, function()
 	{
@@ -287,7 +287,7 @@ Sidebar.prototype.createTooltip = function(elt, cells, w, h, title, showLabel, o
 		this.tooltip.className = 'geSidebarTooltip';
 		this.tooltip.style.userSelect = 'none';
 		this.tooltip.style.zIndex = mxPopupMenu.prototype.zIndex - 1;
-		document.body.appendChild(this.tooltip);
+		this.editorUi.container.appendChild(this.tooltip) || document.body.appendChild(this.tooltip);
 
 		mxEvent.addMouseWheelListener(mxUtils.bind(this, function(evt)
 		{

@@ -589,7 +589,7 @@
 							mxUtils.getXml(body) + '</html>';
 		
 						clone.style.position = 'absolute';
-						window.document.body.appendChild(clone);
+						this.editorUi.container.appendChild(clone) || window.document.body.appendChild(clone);
 						var h = clone.clientHeight + 18;
 						clone.parentNode.removeChild(clone);
 						

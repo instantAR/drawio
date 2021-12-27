@@ -2237,7 +2237,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 			{
 				var container = document.createElement('div');
 				container.style.visibility = 'hidden';
-				document.body.appendChild(container);
+				editorUi.container.appendChild(container) || document.body.appendChild(container);
 				
 				// Temporary graph for running the layout
 				var graph = new Graph(container);
@@ -3930,7 +3930,7 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 				});
 				
 				fileInput.style.display = 'none';
-				document.body.appendChild(fileInput);
+				editorUi.container.appendChild(fileInput) || document.body.appendChild(fileInput);
 				editorUi.newDlgFileInputElt = fileInput;
 			}
 			
@@ -4858,7 +4858,7 @@ var ImageDialog = function(editorUi, title, initialValue, fn, ignoreExisting, co
 			});
 			
 			fileInput.style.display = 'none';
-			document.body.appendChild(fileInput);
+			editorUi.container.appendChild(fileInput) || document.body.appendChild(fileInput);
 			editorUi.imgDlgFileInputElt = fileInput;
 		}
 		
@@ -9579,7 +9579,7 @@ var LibraryDialog = function(editorUi, name, library, initialImages, file, mode)
 			});
 			
 			fileInput.style.display = 'none';
-			document.body.appendChild(fileInput);
+			editorUi.container.appendChild(fileInput) || document.body.appendChild(fileInput);
 			editorUi.libDlgFileInputElt = fileInput;
 		}
 		
