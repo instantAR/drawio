@@ -380,8 +380,8 @@ Draw.loadPlugin(function(ui)
 		linksSelect.style.marginTop = '-2px';
 
 		var opts = [{value: 'auto', title: mxResources.get('automatic')},
-			{value: 'blank', title: mxResources.get('openInNewWindow')},
-			{value: 'self', title: mxResources.get('openInThisWindow')}]
+			/**{value: 'blank', title: mxResources.get('openInNewWindow')},
+	{value: 'self', title: mxResources.get('openInThisWindow')}**/]
 		var validLinks = false;
 
 		for (var i = 0; i < opts.length; i++)

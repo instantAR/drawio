@@ -1808,15 +1808,15 @@ EditorUi.prototype.createPageMenu = function(page, label)
 			this.duplicatePage(page, mxResources.get('copyOf', [page.getName()]));
 		}), parent);
 		
-		if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && this.getServiceName() == 'draw.io')
-		{		
-			menu.addSeparator(parent);
+		// if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && this.getServiceName() == 'draw.io')
+		// {		
+		// 	menu.addSeparator(parent);
 			
-			menu.addItem(mxResources.get('openInNewWindow'), null, mxUtils.bind(this, function()
-			{
-				this.editor.editAsNew(this.getFileData(true, null, null, null, true, true));
-			}), parent);
-		}
+		// 	menu.addItem(mxResources.get('openInNewWindow'), null, mxUtils.bind(this, function()
+		// 	{
+		// 		this.editor.editAsNew(this.getFileData(true, null, null, null, true, true));
+		// 	}), parent);
+		// }
 	});
 };
 

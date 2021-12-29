@@ -731,77 +731,77 @@ var EmbedDialog = function(editorUi, result, timeout, ignoreSize, previewFn, tit
 	buttons.style.bottom = '36px';
 	buttons.style.right = '32px';
 	
-	var previewBtn = null;
+	// var previewBtn = null;
 	
-	// Loads forever in IE9
-	if (EmbedDialog.showPreviewOption && (!mxClient.IS_CHROMEAPP || validUrl) && !navigator.standalone && (validUrl ||
-		(mxClient.IS_SVG && (document.documentMode == null || document.documentMode > 9))))
-	{
-		previewBtn = mxUtils.button((previewTitle != null) ? previewTitle :
-			mxResources.get((result.length < maxSize) ? 'preview' : 'openInNewWindow'), function()
-		{
-			var value = (result.length < maxSize) ? text.value : result;
+	// // Loads forever in IE9
+	// if (EmbedDialog.showPreviewOption && (!mxClient.IS_CHROMEAPP || validUrl) && !navigator.standalone && (validUrl ||
+	// 	(mxClient.IS_SVG && (document.documentMode == null || document.documentMode > 9))))
+	// {
+	// 	previewBtn = mxUtils.button((previewTitle != null) ? previewTitle :
+	// 		mxResources.get((result.length < maxSize) ? 'preview' : 'openInNewWindow'), function()
+	// 	{
+	// 		var value = (result.length < maxSize) ? text.value : result;
 			
-			if (previewFn != null)
-			{
-				previewFn(value);
-			}
-			else
-			{
-				if (validUrl)
-				{
-					try
-					{
-						var win = editorUi.openLink(value);
+	// 		if (previewFn != null)
+	// 		{
+	// 			previewFn(value);
+	// 		}
+	// 		else
+	// 		{
+	// 			if (validUrl)
+	// 			{
+	// 				try
+	// 				{
+	// 					var win = editorUi.openLink(value);
 						
-						if (win != null && (timeout == null || timeout > 0))
-						{
-							window.setTimeout(mxUtils.bind(this, function()
-							{
-								try
-								{
-									if (win != null && win.location.href != null &&
-										win.location.href.substring(0, 8) != value.substring(0, 8))
-									{
-										win.close();
-										editorUi.handleError({message: mxResources.get('drawingTooLarge')});
-									}
-								}
-								catch (e)
-								{
-									// ignore
-								}
-							}), timeout || 500);
-						}
-					}
-					catch (e)
-					{
-						editorUi.handleError({message: e.message || mxResources.get('drawingTooLarge')});
-					}
-				}
-				else
-				{
-					var wnd = window.open();
-					var doc = (wnd != null) ? wnd.document : null;
+	// 					if (win != null && (timeout == null || timeout > 0))
+	// 					{
+	// 						window.setTimeout(mxUtils.bind(this, function()
+	// 						{
+	// 							try
+	// 							{
+	// 								if (win != null && win.location.href != null &&
+	// 									win.location.href.substring(0, 8) != value.substring(0, 8))
+	// 								{
+	// 									win.close();
+	// 									editorUi.handleError({message: mxResources.get('drawingTooLarge')});
+	// 								}
+	// 							}
+	// 							catch (e)
+	// 							{
+	// 								// ignore
+	// 							}
+	// 						}), timeout || 500);
+	// 					}
+	// 				}
+	// 				catch (e)
+	// 				{
+	// 					editorUi.handleError({message: e.message || mxResources.get('drawingTooLarge')});
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				var wnd = window.open();
+	// 				var doc = (wnd != null) ? wnd.document : null;
 					
-					if (doc != null)
-					{
-						doc.writeln('<html><head><title>' + encodeURIComponent(mxResources.get('preview')) +
-							'</title><meta charset="utf-8"></head>' +
-							'<body>' + result + '</body></html>');
-						doc.close();
-					}
-					else
-					{
-						editorUi.handleError({message: mxResources.get('errorUpdatingPreview')});
-					}
-				}
-			}
-		});
+	// 				if (doc != null)
+	// 				{
+	// 					doc.writeln('<html><head><title>' + encodeURIComponent(mxResources.get('preview')) +
+	// 						'</title><meta charset="utf-8"></head>' +
+	// 						'<body>' + result + '</body></html>');
+	// 					doc.close();
+	// 				}
+	// 				else
+	// 				{
+	// 					editorUi.handleError({message: mxResources.get('errorUpdatingPreview')});
+	// 				}
+	// 			}
+	// 		}
+	// 	});
 		
-		previewBtn.className = 'geBtn';
-		buttons.appendChild(previewBtn);
-	}
+	// 	previewBtn.className = 'geBtn';
+	// 	buttons.appendChild(previewBtn);
+	// }
 	
 	if (!validUrl || result.length > 7500)
 	{
@@ -4434,16 +4434,16 @@ var CreateDialog = function(editorUi, title, createFn, cancelFn, dlgTitle, btnLa
 		btns.appendChild(laterBtn);
 	}
 
-	if (allowTab && Editor.popupsAllowed)
-	{
-		var openBtn = mxUtils.button(mxResources.get('openInNewWindow'), function()
-		{
-			create('_blank');
-		});
+	// if (allowTab && Editor.popupsAllowed)
+	// {
+	// 	var openBtn = mxUtils.button(mxResources.get('openInNewWindow'), function()
+	// 	{
+	// 		create('_blank');
+	// 	});
 		
-		openBtn.className = 'geBtn';
-		btns.appendChild(openBtn);
-	}
+	// 	openBtn.className = 'geBtn';
+	// 	btns.appendChild(openBtn);
+	// }
 
 	if (CreateDialog.showDownloadButton)
 	{
@@ -4523,22 +4523,22 @@ var PopupDialog = function(editorUi, url, pre, fallback, hideDialog)
 	mxUtils.br(div);
 	mxUtils.br(div);
 
-	var replaceBtn = mxUtils.button(mxResources.get('openInThisWindow'), function()
-	{
-		if (hideDialog)
-		{
-			editorUi.hideDialog();
-		}
+	// var replaceBtn = mxUtils.button(mxResources.get('openInThisWindow'), function()
+	// {
+	// 	if (hideDialog)
+	// 	{
+	// 		editorUi.hideDialog();
+	// 	}
 		
-		if (fallback != null)
-		{
-			fallback();
-		}
-	});
-	replaceBtn.className = 'geBtn';
-	replaceBtn.style.marginBottom = '8px';
-	replaceBtn.style.width = '280px';
-	div.appendChild(replaceBtn);
+	// 	if (fallback != null)
+	// 	{
+	// 		fallback();
+	// 	}
+	// });
+	// replaceBtn.className = 'geBtn';
+	// replaceBtn.style.marginBottom = '8px';
+	// replaceBtn.style.width = '280px';
+	// div.appendChild(replaceBtn);
 	
 	mxUtils.br(div);
 	

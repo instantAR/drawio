@@ -1,4 +1,8 @@
 /**
+ * Add embed dialog option.
+ */
+ EmbedDialog.showPreviewOption = false;
+/**
  * @param {GraphInitConfig} [config] - Grapheditor Configuration.
  */
 DrawIOExtension = function (config) {

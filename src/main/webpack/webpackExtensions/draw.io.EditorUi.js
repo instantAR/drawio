@@ -4649,37 +4649,37 @@
       */
      EditorUi.prototype.openInNewWindow = function(data, mimeType, base64Encoded)
      {
-         var win = window.open('about:blank');
+        //  var win = window.open('about:blank');
          
-         if (win == null || win.document == null)
-         {
-             mxUtils.popup(data, true);
-         }
-         else
-         {
-             if (mimeType == 'image/svg+xml' && !mxClient.IS_SVG)
-             {
-                 // KNOWN: Output is scaled in Chrome on macOS
-                 win.document.write('<html><pre>' + mxUtils.htmlEntities(data, false) + '</pre></html>');
-                 win.document.close();
-             }
-             else
-             {
-                 if (mimeType == 'image/svg+xml')
-                 {
-                     win.document.write('<html>'+ data + '</html>');
-                 }
-                 else
-                 {
-                     var temp = (base64Encoded) ? data : btoa(unescape(encodeURIComponent(data)));
+        //  if (win == null || win.document == null)
+        //  {
+        //      mxUtils.popup(data, true);
+        //  }
+        //  else
+        //  {
+        //      if (mimeType == 'image/svg+xml' && !mxClient.IS_SVG)
+        //      {
+        //          // KNOWN: Output is scaled in Chrome on macOS
+        //          win.document.write('<html><pre>' + mxUtils.htmlEntities(data, false) + '</pre></html>');
+        //          win.document.close();
+        //      }
+        //      else
+        //      {
+        //          if (mimeType == 'image/svg+xml')
+        //          {
+        //              win.document.write('<html>'+ data + '</html>');
+        //          }
+        //          else
+        //          {
+        //              var temp = (base64Encoded) ? data : btoa(unescape(encodeURIComponent(data)));
                  
-                     win.document.write('<html><img style="max-width:100%;" src="data:' +
-                         mimeType  + ';base64,' + temp + '"/></html>');
-                 }
+        //              win.document.write('<html><img style="max-width:100%;" src="data:' +
+        //                  mimeType  + ';base64,' + temp + '"/></html>');
+        //          }
                  
-                 win.document.close();
-             }
-         }
+        //          win.document.close();
+        //      }
+        //  }
      };
      
      var editoUiAddChromelessToolbarItems = EditorUi.prototype.addChromelessToolbarItems;
@@ -4910,17 +4910,17 @@
                                img.style.cursor = 'pointer';
                                img.style.backgroundColor = 'white';
                                
-                               img.setAttribute('title', mxResources.get('openInNewWindow'));
+                            //    img.setAttribute('title', mxResources.get('openInNewWindow'));
                                img.setAttribute('border', '0');
                                img.setAttribute('src', data);
                                
                                this.exportDialog.appendChild(img);
  
-                         mxEvent.addListener(img, 'click', mxUtils.bind(this, function()
-                         {
-                             this.openInNewWindow(data.substring(data.indexOf(',') + 1), 'image/png', true);
-                             clickHandler.apply(this, arguments);
-                         }));
+                        //  mxEvent.addListener(img, 'click', mxUtils.bind(this, function()
+                        //  {
+                        //      this.openInNewWindow(data.substring(data.indexOf(',') + 1), 'image/png', true);
+                        //      clickHandler.apply(this, arguments);
+                        //  }));
                         }), null, this.thumbImageCache, null, mxUtils.bind(this, function(e)
                         {
                             this.spinner.stop();
@@ -5359,24 +5359,24 @@
          mxUtils.write(autoOption, mxResources.get('automatic'));
          linkSelect.appendChild(autoOption);
  
-         var blankOption = document.createElement('option');
-         blankOption.setAttribute('value', 'blank');
-         mxUtils.write(blankOption, mxResources.get('openInNewWindow'));
-         linkSelect.appendChild(blankOption);
+        //  var blankOption = document.createElement('option');
+        //  blankOption.setAttribute('value', 'blank');
+        //  mxUtils.write(blankOption, mxResources.get('openInNewWindow'));
+        //  linkSelect.appendChild(blankOption);
  
-         var selfOption = document.createElement('option');
-         selfOption.setAttribute('value', 'self');
-         mxUtils.write(selfOption, mxResources.get('openInThisWindow'));
-         linkSelect.appendChild(selfOption);
+        //  var selfOption = document.createElement('option');
+        //  selfOption.setAttribute('value', 'self');
+        //  mxUtils.write(selfOption, mxResources.get('openInThisWindow'));
+        //  linkSelect.appendChild(selfOption);
  
-         if (showFrameOption)
-         {
-             var frameOption = document.createElement('option');
-             frameOption.setAttribute('value', 'frame');
-             mxUtils.write(frameOption, mxResources.get('openInThisWindow') +
-                 ' (' + mxResources.get('iframe') + ')');
-             linkSelect.appendChild(frameOption);
-         }
+        //  if (showFrameOption)
+        //  {
+        //      var frameOption = document.createElement('option');
+        //      frameOption.setAttribute('value', 'frame');
+        //      mxUtils.write(frameOption, mxResources.get('openInThisWindow') +
+        //          ' (' + mxResources.get('iframe') + ')');
+        //      linkSelect.appendChild(frameOption);
+        //  }
          
          div.appendChild(linkSelect);
          
@@ -6187,15 +6187,15 @@
          mxUtils.write(autoOption, mxResources.get('automatic'));
          linkSelect.appendChild(autoOption);
  
-         var blankOption = document.createElement('option');
-         blankOption.setAttribute('value', 'blank');
-         mxUtils.write(blankOption, mxResources.get('openInNewWindow'));
-         linkSelect.appendChild(blankOption);
+        //  var blankOption = document.createElement('option');
+        //  blankOption.setAttribute('value', 'blank');
+        //  mxUtils.write(blankOption, mxResources.get('openInNewWindow'));
+        //  linkSelect.appendChild(blankOption);
  
-         var selfOption = document.createElement('option');
-         selfOption.setAttribute('value', 'self');
-         mxUtils.write(selfOption, mxResources.get('openInThisWindow'));
-         linkSelect.appendChild(selfOption);
+        //  var selfOption = document.createElement('option');
+        //  selfOption.setAttribute('value', 'self');
+        //  mxUtils.write(selfOption, mxResources.get('openInThisWindow'));
+        //  linkSelect.appendChild(selfOption);
  
          if (format == 'svg')
          {

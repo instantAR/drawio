@@ -2468,19 +2468,19 @@ EditorUi.prototype.initCanvas = function()
 
 			if (toolbarConfig.fullscreenBtn != null && window.self !== window.top)
 			{
-				addButton(mxUtils.bind(this, function(evt)
-				{
-					if (toolbarConfig.fullscreenBtn.url)
-					{
-						graph.openLink(toolbarConfig.fullscreenBtn.url);
-					}
-					else
-					{
-						graph.openLink(window.location.href);
-					}
+				// addButton(mxUtils.bind(this, function(evt)
+				// {
+				// 	if (toolbarConfig.fullscreenBtn.url)
+				// 	{
+				// 		graph.openLink(toolbarConfig.fullscreenBtn.url);
+				// 	}
+				// 	else
+				// 	{
+				// 		graph.openLink(window.location.href);
+				// 	}
 					
-					mxEvent.consume(evt);
-				}), Editor.fullscreenImage, mxResources.get('openInNewWindow', null, 'Open in New Window'));
+				// 	mxEvent.consume(evt);
+				// }), Editor.fullscreenImage, mxResources.get('openInNewWindow', null, 'Open in New Window'));
 			}
 			
 			if ((toolbarConfig.closeBtn && window.self === window.top) ||
