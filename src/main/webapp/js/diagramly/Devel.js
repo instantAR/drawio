@@ -19,6 +19,8 @@ if (!mxIsElectron && location.protocol !== 'http:')
 			//----------------------------------------------------------//
 			//------------- Bootstrap script in index.html -------------//
 			//----------------------------------------------------------//
+			// Version 15.8.3
+			'\'sha256-r/ILW7KMSJxeo9EYqCTzZyCT0PZ9gHN1BLgki7vpR+A=\' ' +
 			// Version 14.6.5
 			'\'sha256-5DtSB5mj34lxcEf+HFWbBLEF49xxJaKnWGDWa/utwQA=\' ' +
 			// Version 14.1.1
@@ -64,6 +66,9 @@ if (!mxIsElectron && location.protocol !== 'http:')
 			'style-src %style-src% \'self\'  https://fonts.googleapis.com ' +
 			// Replaces unsafe-inline style-src with hashes with safe-style-src URL parameter
 			((urlParams['safe-style-src'] == '1') ? styleHashes : '\'unsafe-inline\'; ') +
+			'form-action \'none\';' +
+			'base-uri \'none\';' +
+			'child-src \'none\';' +
 			'object-src \'none\';';
 			
 		var csp = hashes + directives;
@@ -97,9 +102,6 @@ if (!mxIsElectron && location.protocol !== 'http:')
 				'frame-src \'self\' https://viewer.diagrams.net https://*.google.com; ' +
 				'style-src \'self\' https://fonts.googleapis.com ' + styleHashes + ' ' +
 				'object-src \'none\';' +
-				'form-action \'none\';' +
-				'base-uri \'none\';' +
-				'child-src \'none\';' +
 				'frame-src \'none\';' +
 				'worker-src https://se.diagrams.net/service-worker.js;'
 			console.log('se.diagrams.net:', se_diagrams_net);
@@ -207,7 +209,7 @@ mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-Flowchart.js');
 mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-FluidPower.js');
 mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-GCP.js');
 mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-GCP2.js');
-mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-GCP3.js');
+mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-GCPIcons.js');
 mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-Gmdl.js');
 mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-IBM.js');
 mxscript(drawDevUrl + 'js/diagramly/sidebar/Sidebar-Infographic.js');

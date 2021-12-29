@@ -7,13 +7,142 @@
  */
 (function()
 {
+	function TableLineShape(line, stroke, strokewidth)
+	{
+		mxShape.call(this);
+		this.line = line;
+		this.stroke = stroke;
+		this.strokewidth = (strokewidth != null) ? strokewidth : 1;
+		this.updateBoundsFromLine();
+	};
+
+	/**
+	 * Extends mxShape.
+	 */
+	mxUtils.extend(TableLineShape, mxShape);
+
+	/**
+	 * Function: paintVertexShape
+	 * 
+	 * Redirects to redrawPath for subclasses to work.
+	 */
+	TableLineShape.prototype.updateBoundsFromLine = function()
+	{
+		var box = null;
+
+		if (this.line != null)
+		{
+			for (var i = 0; i < this.line.length; i++)
+			{
+				var curr = this.line[i];
+
+				if (curr != null)
+				{
+					var temp = new mxRectangle(curr.x, curr.y,
+						this.strokewidth, this.strokewidth);
+
+					if (box == null)
+					{
+						box = temp;
+					}
+					else
+					{
+						box.add(temp);
+					}
+				}
+			}
+		}
+
+		this.bounds = (box != null) ? box : new mxRectangle();
+	};
+
+	/**
+	 * Function: paintVertexShape
+	 * 
+	 * Redirects to redrawPath for subclasses to work.
+	 */
+	TableLineShape.prototype.paintVertexShape = function(c, x, y, w, h)
+	{
+		this.paintTableLine(c, this.line, 0, 0);
+	};
+
+	/**
+	 * Function: paintTableLine
+	 * 
+	 * Redirects to redrawPath for subclasses to work.
+	 */
+	TableLineShape.prototype.paintTableLine = function(c, line, dx, dy)
+	{
+		if (line != null)
+		{
+			var last = null;
+			c.begin();
+
+			for (var i = 0; i < line.length; i++)
+			{
+				var curr = line[i];
+
+				if (curr != null)
+				{
+					if (last == null)
+					{
+						c.moveTo(curr.x + dx, curr.y + dy);
+					}
+					else if (last != null)
+					{
+						c.lineTo(curr.x + dx, curr.y + dy);
+					}
+				}
+
+				last = curr;
+			}
+
+			c.end();
+			c.stroke();
+		}
+	};
+
+	/**
+	 * Function: intersectsRectangle
+	 * 
+	 * Returns true if the shape intersects the given rectangle.
+	 */
+	TableLineShape.prototype.intersectsRectangle = function(rect)
+	{
+		var result = false;
+
+		if (mxShape.prototype.intersectsRectangle.apply(this, arguments))
+		{
+			if (this.line != null)
+			{
+				var last = null;
+	
+				for (var i = 0; i < this.line.length && !result; i++)
+				{
+					var curr = this.line[i];
+	
+					if (curr != null && last != null)
+					{
+						result = mxUtils.rectangleIntersectsSegment(rect, last, curr);
+					}
+	
+					last = curr;
+				}
+			}
+		}
+
+		return result;
+	};
+
+	mxCellRenderer.registerShape('tableLine', TableLineShape);
+
 	// LATER: Use this to implement striping
 	function paintTableBackground(state, c, x, y, w, h, r)
 	{
 		if (state != null)
 		{
 			var graph = state.view.graph;
-			var start = graph.getActualStartSize(state.cell);
+			var start = graph.getActualStartSize(state.cell, true);
 			var rows = graph.model.getChildCells(state.cell, true);
 			
 			if (rows.length > 0)
@@ -131,9 +260,8 @@
 	
 	TableShape.prototype.paintVertexShape = function(c, x, y, w, h)
 	{
-		// LATER: Split background to add striping
+		// LATER: Split background to add striping, paint rows and cells
 		//paintTableBackground(this.state, c, x, y, w, h);
-		
 		var start = this.getTitleSize();
 		
 		if (start == 0)
@@ -174,122 +302,21 @@
 			this.paintTableForeground(c, x, y, w, h);
 		}
 	};
-	
+
 	TableShape.prototype.paintTableForeground = function(c, x, y, w, h)
 	{
-		var graph = this.state.view.graph;
-		var start = graph.getActualStartSize(this.state.cell);
-		var rows = graph.model.getChildCells(this.state.cell, true);
-		
-		if (rows.length > 0)
+		var lines = this.state.view.graph.getTableLines(this.state.cell,
+			mxUtils.getValue(this.state.style, 'rowLines', '1') != '0',
+			mxUtils.getValue(this.state.style, 'columnLines', '1') != '0');
+
+		for (var i = 0; i < lines.length; i++)
 		{
-			var rowLines = mxUtils.getValue(this.state.style,
-				'rowLines', '1') != '0';
-			var columnLines = mxUtils.getValue(this.state.style,
-				'columnLines', '1') != '0';
-			var geo = graph.getCellGeometry(rows[0]);
-			var cells = graph.model.getChildCells(rows[0], true);
-			var rowData = [{y: (geo != null) ? geo.y + geo.height : 0,
-				x: 0, cells: cells, colspans: []}];
-			
-			// Paints row lines
-			if (rowLines)
-			{
-				for (var i = 1; i < rows.length; i++)
-				{
-					geo = graph.getCellGeometry(rows[i]);
-
-					var data = {y: 0, cells: graph.model.
-						getChildCells(rows[i], true),
-						colspans: []};
-					rowData.push(data);
-
-					if (geo != null)
-					{
-						data.y = geo.y + geo.height;
-
-						c.begin();
-						c.moveTo(x + start.x, y + geo.y);
-						var tw = 0;
-
-						for (j = 0; j < data.cells.length; j++)
-						{
-							if (graph.model.isVisible(data.cells[j]))
-							{
-								tw = data.x;
-							}
-							else
-							{
-								if (tw > 0)
-								{
-									c.lineTo(x + tw - start.width, y + geo.y);
-								}
-
-								c.moveTo(x + geo.x + geo.width + start.x, y + geo.y);
-								tw = 0;
-							}
-						}
-
-						c.lineTo(x + w - start.width, y + geo.y);
-						c.end();
-						c.stroke();
-					}
-				}
-			}
-			
-			// Paints column lines
-			if (columnLines)
-			{
-				var cols = rowData[0].cells;
-				
-				for (var i = 1; i < cols.length; i++)
-				{
-					geo = graph.getCellGeometry(cols[i]);
-					
-					if (geo != null)
-					{
-						c.begin();
-						c.moveTo(x + geo.x + start.x, y + start.y);
-						var th = 0;
-
-						for (var j = 0; j < rowData.length; j++)
-						{
-							var data = rowData[j];
-							var colspan = (i == 1) ? parseInt(graph.getCurrentCellStyle(
-								data.cells[i - 1], true)['colspan'] || 1) :
-									rowData[j].colspans[i - 1];
-
-							data.colspans[i] = colspan - 1;
-
-							if (data.colspans[i] < 1)
-							{
-								data.colspans[i] = parseInt(graph.getCurrentCellStyle(
-									data.cells[i], true)['colspan'] || 1);
-								th = data.y;
-							}
-							else
-							{
-								if (th > 0)
-								{
-									c.lineTo(x + geo.x + start.x, y + th - start.height);
-								}
-
-								c.moveTo(x + geo.x + start.x, y + data.y);
-								th = 0;
-							}
-						}
-
-						c.lineTo(x + geo.x + start.x, y + h - start.height);
-						c.end();
-						c.stroke();
-					}
-				}
-			}
+			TableLineShape.prototype.paintTableLine(c, lines[i], x, y);
 		}
-	};
-	
+	}
+
 	mxCellRenderer.registerShape('table', TableShape);
-	
+
 	// Cube Shape, supports size style
 	function CubeShape()
 	{
@@ -3395,6 +3422,7 @@
 
 			c.pointerEvents = pointerEvents;
 			c.setStrokeColor(this.stroke);
+			c.setLineCap('square');
 			c.begin();
 			c.moveTo(x, y);
 			
@@ -3432,6 +3460,7 @@
 						
 			c.end();
 			c.stroke();
+			c.setLineCap('flat');
 		}
 	};
 
@@ -5096,12 +5125,14 @@
 			
 			StyleFormatPanel.prototype.getCustomColors = function()
 			{
-				var ss = this.format.getSelectionState();
+				var ss = this.editorUi.getSelectionState();
 				var result = styleFormatPanelGetCustomColors.apply(this, arguments);
 				
 				if (ss.style.shape == 'umlFrame')
 				{
-					result.push({title: mxResources.get('laneColor'), key: 'swimlaneFillColor', defaultValue: '#ffffff'});
+					result.push({title: mxResources.get('laneColor'),
+						key: 'swimlaneFillColor',
+						defaultValue: 'default'});
 				}
 				
 				return result;
@@ -5665,7 +5696,7 @@
 						state.style['width'] = Math.round(w * 2) / state.view.scale;
 						
 						// Applies to opposite side
-						if (mxEvent.isControlDown(me.getEvent()))
+						if (mxEvent.isShiftDown(me.getEvent()) || mxEvent.isControlDown(me.getEvent()))
 						{
 							state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
 						}
@@ -5696,7 +5727,7 @@
 						state.style['startWidth'] = Math.max(0, Math.round(w * 2) - state.shape.getEdgeWidth()) / state.view.scale;
 						
 						// Applies to opposite side
-						if (mxEvent.isControlDown(me.getEvent()))
+						if (mxEvent.isShiftDown(me.getEvent()) || mxEvent.isControlDown(me.getEvent()))
 						{
 							state.style[mxConstants.STYLE_ENDSIZE] = state.style[mxConstants.STYLE_STARTSIZE];
 							state.style['endWidth'] = state.style['startWidth'];
@@ -5736,7 +5767,7 @@
 						state.style['width'] = Math.round(w * 2) / state.view.scale;
 						
 						// Applies to opposite side
-						if (mxEvent.isControlDown(me.getEvent()))
+						if (mxEvent.isShiftDown(me.getEvent()) || mxEvent.isControlDown(me.getEvent()))
 						{
 							state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
 						}
@@ -5767,7 +5798,7 @@
 						state.style['endWidth'] = Math.max(0, Math.round(w * 2) - state.shape.getEdgeWidth()) / state.view.scale;
 						
 						// Applies to opposite side
-						if (mxEvent.isControlDown(me.getEvent()))
+						if (mxEvent.isShiftDown(me.getEvent()) || mxEvent.isControlDown(me.getEvent()))
 						{
 							state.style[mxConstants.STYLE_STARTSIZE] = state.style[mxConstants.STYLE_ENDSIZE];
 							state.style['startWidth'] = state.style['endWidth'];
@@ -5800,7 +5831,7 @@
 					var size = parseFloat(mxUtils.getValue(state.style, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_STARTSIZE));
 					handles.push(createArcHandle(state, size / 2));
 				}
-				
+
 				// Start size handle must be last item in handles for hover to work in tables (see mouse event handler in Graph)
 				handles.push(createHandle(state, [mxConstants.STYLE_STARTSIZE], function(bounds)
 				{
@@ -5822,31 +5853,29 @@
 							Math.round(Math.max(0, Math.min(bounds.width, pt.x - bounds.x)));
 				}, false, null, function(me)
 				{
-					if (mxEvent.isControlDown(me.getEvent()))
+					var graph = state.view.graph;
+					
+					if (!mxEvent.isShiftDown(me.getEvent()) && !mxEvent.isControlDown(me.getEvent()) &&
+						(graph.isTableRow(state.cell) || graph.isTableCell(state.cell)))
 					{
-						var graph = state.view.graph;
+						var dir = graph.getSwimlaneDirection(state.style);
+						var parent = graph.model.getParent(state.cell);
+						var cells = graph.model.getChildCells(parent, true);
+						var temp = [];
 						
-						if (graph.isTableRow(state.cell) || graph.isTableCell(state.cell))
+						for (var i = 0; i < cells.length; i++)
 						{
-							var dir = graph.getSwimlaneDirection(state.style);
-							var parent = graph.model.getParent(state.cell);
-							var cells = graph.model.getChildCells(parent, true);
-							var temp = []; 
-							
-							for (var i = 0; i < cells.length; i++)
+							// Finds siblings with the same direction and to set start size
+							if (cells[i] != state.cell && graph.isSwimlane(cells[i]) &&
+								graph.getSwimlaneDirection(graph.getCurrentCellStyle(
+								cells[i])) == dir)
 							{
-								// Finds siblings with the same direction and to set start size
-								if (cells[i] != state.cell && graph.isSwimlane(cells[i]) &&
-									graph.getSwimlaneDirection(graph.getCurrentCellStyle(
-									cells[i])) == dir)
-								{
-									temp.push(cells[i]);
-								}
+								temp.push(cells[i]);
 							}
-							
-							graph.setCellStyles(mxConstants.STYLE_STARTSIZE,
-								state.style[mxConstants.STYLE_STARTSIZE], temp);
 						}
+						
+						graph.setCellStyles(mxConstants.STYLE_STARTSIZE,
+							state.style[mxConstants.STYLE_STARTSIZE], temp);
 					}					
 				}));
 				

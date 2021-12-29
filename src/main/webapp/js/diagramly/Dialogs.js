@@ -3141,6 +3141,7 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 		
 		// Shows a tooltip with the rendered template
 		var loading = false;
+		var extImg = null;
 		
 		function showTooltip(xml, x, y)
 		{
@@ -3174,6 +3175,18 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 			if (url != null && !loading && editorUi.sidebar.currentElt != elt)
 			{
 				editorUi.sidebar.hideTooltip();
+				
+				if (extImg != null)
+				{
+					//Create a diagram with the image to use the same code
+					//Note: Without compression it doesn't work for some reason. Find out why later
+					var xml = '<mxfile><diagram id="d" name="n">' + Graph.compress('<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>' +
+						'<mxCell id="2" value="" style="shape=image;image=' + extImg.src + ';imageAspect=1;" parent="1" vertex="1"><mxGeometry width="' + 
+						extImg.naturalWidth + '" height="' + extImg.naturalHeight + '" as="geometry" /></mxCell></root></mxGraphModel>') + '</diagram></mxfile>';
+					showTooltip(xml, mxEvent.getClientX(evt), mxEvent.getClientY(evt));
+					return;
+				}
+				
 				editorUi.sidebar.currentElt = elt;
 				loading = true;
 				
@@ -3203,6 +3216,7 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 			img.setAttribute('alt', tooltip);
 			img.style.maxWidth = w + 'px';
 			img.style.maxHeight = h + 'px';
+			extImg = img;
 			
 			var fallbackImgUrl = imgUrl.replace('.drawio.xml', '').replace('.drawio', '').replace('.xml', '');
 			elt.appendChild(img);
@@ -3241,10 +3255,32 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 			
 			if (title != null)
 			{
-				elt.innerHTML = '<table width="100%" height="100%" style="line-height:1.3em;' + (Editor.isDarkMode() ? '' : 'background:rgba(255,255,255,0.85);') +
-					'border:inherit;"><tr><td align="center" valign="middle"><span style="display:inline-block;padding:4px 8px 4px 8px;user-select:none;' +
-					'border-radius:3px;background:rgba(255,255,255,0.85);overflow:hidden;text-overflow:ellipsis;max-width:' + (w - 34) + 'px;">' +
-					mxUtils.htmlEntities(mxResources.get(title, null, title)) + '</span></td></tr></table>';
+				var table = document.createElement('table');
+				table.setAttribute('width', '100%');
+				table.setAttribute('height', '100%');
+				table.style.background = Editor.isDarkMode() ? 'transparent' : 'rgba(255,255,255,0.85)';
+				table.style.lineHeight = '1.3em';
+				table.style.border = 'inherit';
+				var tbody = document.createElement('tbody');
+				var row = document.createElement('tr');
+				var td = document.createElement('td');
+				td.setAttribute('align', 'center');
+				td.setAttribute('valign', 'middle');
+				var span = document.createElement('span');
+				span.style.display = 'inline-block';
+				span.style.padding = '4px 8px 4px 8px';
+				span.style.userSelect = 'none';
+				span.style.borderRadius = '3px';
+				span.style.background = 'rgba(255,255,255,0.85)';
+				span.style.overflow = 'hidden';
+				span.style.textOverflow = 'ellipsis';
+				span.style.maxWidth = (w - 34) + 'px';
+				mxUtils.write(span, mxResources.get(title, null, title));
+				td.appendChild(span);
+				row.appendChild(td);
+				tbody.appendChild(row);
+				table.appendChild(tbody);
+				elt.appendChild(table);
 			}
 			
 			function activate(doCreate)
@@ -3283,11 +3319,31 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 		}
 		else
 		{
-			elt.innerHTML = '<table width="100%" height="100%" style="line-height:1.3em;"><tr>' +
-				'<td align="center" valign="middle"><span style="display:inline-block;padding:4px 8px 4px 8px;user-select:none;' +
-				'border-radius:3px;background:#ffffff;overflow:hidden;text-overflow:ellipsis;max-width:' + (w - 34) + 'px;">' +
-				mxUtils.htmlEntities(mxResources.get(title, null, title)) + '</span></td></tr></table>';
-			
+			var table = document.createElement('table');
+			table.setAttribute('width', '100%');
+			table.setAttribute('height', '100%');
+			table.style.lineHeight = '1.3em';
+			var tbody = document.createElement('tbody');
+			var row = document.createElement('tr');
+			var td = document.createElement('td');
+			td.setAttribute('align', 'center');
+			td.setAttribute('valign', 'middle');
+			var span = document.createElement('span');
+			span.style.display = 'inline-block';
+			span.style.padding = '4px 8px 4px 8px';
+			span.style.userSelect = 'none';
+			span.style.borderRadius = '3px';
+			span.style.background = '#ffffff';
+			span.style.overflow = 'hidden';
+			span.style.textOverflow = 'ellipsis';
+			span.style.maxWidth = (w - 34) + 'px';
+			mxUtils.write(span, mxResources.get(title, null, title));
+			td.appendChild(span);
+			row.appendChild(td);
+			tbody.appendChild(row);
+			table.appendChild(tbody);
+			elt.appendChild(table);
+
 			if (select)
 			{
 				selectElement(elt);
@@ -7164,6 +7220,9 @@ var FindWindow = function(ui, x, y, w, h, withReplace)
 			substr = mxUtils.htmlEntities(substr);
 			var tagPos = [], p = -1;
 			
+			//Original position (startIndex) counts for \n which is removed when tags are removed, so handle <br> separately
+			str = str.replace(/<br>/ig, '\n');
+
 			while((p = str.indexOf('<', p + 1)) > -1)
 			{
 				tagPos.push(p);
@@ -7206,7 +7265,7 @@ var FindWindow = function(ui, x, y, w, h, withReplace)
 				tagDiff += tags[i].length;
 			}
 			
-			return newStr;
+			return newStr.replace(/\n/g, '<br>');
 		};
 		
 		var replaceFindBtn = mxUtils.button(mxResources.get('replFind'), function()
@@ -9865,7 +9924,8 @@ var EditShapeDialog = function(editorUi, cell, title, w, h)
 	this.container = table;
 };
 
-var CustomDialog = function(editorUi, content, okFn, cancelFn, okButtonText, helpLink, buttonsContent, hideCancel, cancelButtonText, hideAfterOKFn)
+var CustomDialog = function(editorUi, content, okFn, cancelFn, okButtonText, helpLink,
+		buttonsContent, hideCancel, cancelButtonText, hideAfterOKFn, customButtons)
 {
 	var div = document.createElement('div');
 	div.appendChild(content);
@@ -9944,6 +10004,28 @@ var CustomDialog = function(editorUi, content, okFn, cancelFn, okButtonText, hel
 		btns.appendChild(cancelBtn);
 	}
 
+	if (customButtons != null)
+	{
+		for (var i = 0; i < customButtons.length; i++)
+		{
+			(function(label, fn, title)
+			{
+				var customBtn = mxUtils.button(label, function(e)
+				{
+					fn(e);
+				});
+
+				if (title != null)
+				{
+					customBtn.setAttribute('title', title);
+				}
+
+				customBtn.className = 'geBtn';
+				btns.appendChild(customBtn);
+			})(customButtons[i][0], customButtons[i][1], customButtons[i][2]);
+		}
+	}
+	
 	div.appendChild(btns);
 
 	this.cancelBtn = cancelBtn;
