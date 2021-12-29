@@ -8412,7 +8412,7 @@
 							return graphGetGlobalVariable.apply(this, arguments);
 						};
 						
-						document.body.appendChild(tempGraph.container);
+						editorUi.container.appendChild(tempGraph.container) || document.body.appendChild(tempGraph.container);
 						editorUi.updatePageRoot(page);
 						tempGraph.model.setRoot(page.root);
 					}

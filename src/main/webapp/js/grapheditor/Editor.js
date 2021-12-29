@@ -859,7 +859,7 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 	
 	if (modal)
 	{
-		document.body.appendChild(this.bg);
+		editorUi.container.appendChild(this.bg) || document.body.appendChild(this.bg);
 	}
 	
 	var div = editorUi.createDiv(transparent? 'geTransDialog' : 'geDialog');
@@ -874,7 +874,7 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 	div.style.zIndex = this.zIndex;
 	
 	div.appendChild(elt);
-	document.body.appendChild(div);
+	editorUi.container.appendChild(div) || document.body.appendChild(div);
 	
 	// Adds vertical scrollbars if needed
 	if (!noScroll && elt.clientHeight > div.clientHeight - padding)
@@ -901,7 +901,7 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 			editorUi.hideDialog(true);
 		}));
 		
-		document.body.appendChild(img);
+		editorUi.container.appendChild(img) || document.body.appendChild(img);
 		this.dialogImg = img;
 		
 		if (!ignoreBgClick)

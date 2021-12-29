@@ -1224,7 +1224,7 @@
                              elt.style.filter = 'invert(100%)';
                          }
  
-                         document.body.appendChild(elt);
+                         editorUi.container.appendChild(elt) || document.body.appendChild(elt);
                      }
                  }
  

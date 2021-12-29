@@ -85,7 +85,7 @@ function P2PCollab(ui)
 			var svg = 'data:image/svg+xml;base64,' + btoa(svgP1 + clr + '">' + svgP2);
 			cursor.innerHTML = '<img src="' + svg + '" style="width:16px"><div style="color:' + clr + '">' +
 					 username + '</div>';
-			document.body.appendChild(cursor);
+			ui.container.appendChild(cursor) || document.body.appendChild(cursor);
 		}
 		else
 		{

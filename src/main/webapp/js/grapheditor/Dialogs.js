@@ -36,7 +36,7 @@ var ColorDialog = function(editorUi, color, apply, cancelFn)
 	if (mxClient.IS_IE)
 	{
 		input.style.marginTop = '10px';
-		document.body.appendChild(input);
+		editorUi.container.appendChild(input) || document.body.appendChild(input);
 	}
 
 	var applyFunction = (apply != null) ? apply : this.createApplyFunction();
@@ -1904,7 +1904,6 @@ var LinkDialog = function(editorUi, initialValue, btnLabel, fn)
  */
 var OutlineWindow = function(editorUi, x, y, w, h)
 {
-	console.log("OutlineWindow",editorUi)
 	var graph = editorUi.editor.graph;
 
 	var div = document.createElement('div');
@@ -1912,7 +1911,6 @@ var OutlineWindow = function(editorUi, x, y, w, h)
 	div.style.width = '100%';
 	div.style.height = '100%';
 	div.style.overflow = 'hidden';
-	div.style.backgroundColor = 'yellow'
 
 	this.window = new mxWindow(mxResources.get('outline'), div, x, y, w, h, true, true);
 	this.window.minimumSize = new mxRectangle(0, 0, 80, 80);
