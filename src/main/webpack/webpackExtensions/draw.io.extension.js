@@ -1,7 +1,7 @@
 /**
  * Add embed dialog option.
  */
- EmbedDialog.showPreviewOption = false;
+EmbedDialog.showPreviewOption = false;
 /**
  * @param {GraphInitConfig} [config] - Grapheditor Configuration.
  */
@@ -143,7 +143,7 @@ DrawIOExtension = function (config) {
 							let ignoreSelection = true;
 							let currentPage = true;
 							let transparentBackground = true;
-							var svgRoot = editorUi.editor.graph.getSvg((transparentBackground ? null: "#ffffff"), 1, "0", true, null, true, null, null, null, null, true, null, "diagram");
+							var svgRoot = editorUi.editor.graph.getSvg((transparentBackground ? null : "#ffffff"), 1, "0", true, null, true, null, null, null, null, true, null, "diagram");
 							// if (addShadow) {
 							//     this.editor.graph.addSvgShadow(svgRoot);
 							// }
@@ -277,8 +277,33 @@ DrawIOExtension = function (config) {
 
 		}
 	}
+
 }
 
+DrawIOOverridExport = function (config) {
+	if (config.graphSize !== undefined) {
+		const mxUtilsOverridenExports = {
+			/**
+			 * Function: getDocumentSize
+			 * 
+			 * Returns the client size for the current document as an <mxRectangle>.
+			 */
+			getDocumentSize: function () {
+				var a = document.body,
+					b = document.documentElement;
+				console.log("getDocument", config.graphSize, a, b);
+				try {
+					return new mxRectangle(0, 0, config.graphSize.width || a.clientWidth || b.clientWidth, Math.max(config.graphSize.height || a.clientHeight || 0, b.clientHeight))
+				} catch (c) {
+					return new mxRectangle
+				}
+			}
+		}
+		console.log("getDocument", mxUtils.getDocumentSize());
+		mxUtils = Object.assign(mxUtils, mxUtilsOverridenExports);
+		console.log("getDocument", mxUtils.getDocumentSize());
+	}
+}
 
 
 DrawIOExtension.prototype.menuList = [];

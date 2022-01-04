@@ -14,7 +14,7 @@ window.mxWinLoaded = false;
  */
 window.mxscript = (src, onLoad, id, dataAppKey, noWrite) => {
     var defer = onLoad == null && !noWrite;
-
+    console.log('mxscript', src, onLoad, id, dataAppKey, noWrite);
     if ((urlParams['dev'] != '1' && typeof document.createElement('canvas').getContext === "function") ||
         onLoad != null || noWrite) {
         var s = document.createElement('script');
@@ -93,8 +93,9 @@ export function getImageSrc(mimeType, base64Encoded) {
 
 //  {new?: OptNew, save?: OptOut, saveAs?: OptOut, open?: OptIn, import?: OptIn, export?: OptOut}
 /**
+ * @typedef {{ width: number, height: number }} GraphSize
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any }} MenuActionType
- * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, printSetting?: {isPrint:boolean},
+ * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, printSetting?: {isPrint:boolean}, graphSize?: GraphSize,
  *      actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
  *      extraActions?: {[key:string]: 
  *          { [key:string]:MenuActionType | {[key:string]: MenuActionType }}
@@ -106,7 +107,7 @@ export function getImageSrc(mimeType, base64Encoded) {
  * @typedef {{ status: string, graphData?: GraphXmlData, reason?: any}} GraphEditorIn
  * @typedef {{ status: string, graphData: GraphXmlData, document?: DOMParser|XMLDocument , reason?: any }} GraphEditorData
  * @typedef {{ status: string, graphEditorObj?: any, message?: string , reason?: any }} GraphEditorLoaded
- * @typedef {{ base64Encoded: string, mimeType: string, getImageSrc: getImageSrc }} GraphEditorImage
+ * @typedef {{ base64Encoded: string, mimeType: string, getImageSrc?: getImageSrc }} GraphEditorImage
  * @typedef {{ status: string svg:string, xml?: string, name?: string, image: GraphEditorImage, reason?: any }} GraphEditorSVG
  */
 
@@ -468,6 +469,7 @@ export class GraphEditor {
         this.preScript(config);
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
         DrawIOExtension(config);
+        DrawIOOverridExport(config);
         document.body.className += ' geEditor';
         let self = this;
         if (config.navitgateToUrl) {
@@ -561,13 +563,34 @@ export class GraphEditor {
 
                 var filename = (file.getTitle() != null) ? file.getTitle() : this.defaultFilename;
                 var xmlData = this.getFileData(true);
-                // console.log("saveFile", forceDialog, xml);
+                // console.log("saveFile", forceDialog, success, xmlData);
                 try {
+                    let editable = true;
+                    let ignoreSelection = true;
+                    let currentPage = true;
+                    let transparentBackground = true;
+                    var svgRoot = this.editor.graph.getSvg((transparentBackground ? null : "#ffffff"), 1, "0", true, null, true, null, null, null, null, true, null, "diagram");
+                    // if (addShadow) {
+                    //     this.editor.graph.addSvgShadow(svgRoot);
+                    // }
+                    if (editable) {
+                        svgRoot.setAttribute('content', this.getFileData(true, null, null, null, ignoreSelection,
+                            currentPage, null, null, null, false));
+                    }
+
+                    let svgData = (Graph.xmlDeclaration + '\n' + ((editable) ? Graph.svgFileComment + '\n' : '') + Graph.svgDoctype + '\n' + mxUtils.getXml(svgRoot));
+                    let mime = 'image/svg+xml';
+                    let imgBase64Encode = btoa(unescape(encodeURIComponent(svgData)));
                     config && config.actions && config.actions.subMenu && config.actions.subMenu.save && config.actions.subMenu.save({
                         xml: xmlData,
-                        name: filename
+                        name: filename,
+                        svg: svgData,
+                        image: {
+                            base64Encoded: imgBase64Encode,
+                            mimeType: mime
+                        }
                     }).then(resolve => {
-                        console.log("saveGraphEditor", resolve);
+                        // console.log("saveGraphEditor", resolve);
                         done();
                     }, reject => {
                         console.log("saveGraphEditor:reject", reject);
@@ -587,7 +610,7 @@ export class GraphEditor {
 
         };
     }
-    
+
     /**
      * @param {GraphXmlData} graphData - Grapheditor xml.
      * @returns {Promise<GraphEditorData>} Promise<GraphEditorData>
@@ -714,6 +737,10 @@ if (typeof isWebpack !== 'undefined') {
                 navitgateToUrl: "https://public_url/route/path",
                 printSetting: {
                     isPrint: false
+                },
+                graphSize: {
+                    width: 1330,
+                    height: 660
                 },
                 extraActions: {
                     file: {
