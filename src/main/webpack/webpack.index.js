@@ -123,7 +123,7 @@ export class GraphEditor {
     /** @private */
     hideMenus = {
         menu: ['help', 'extra'],
-        subMenu: ['new', 'open', 'editDiagram', 'save', 'saveAs', 'outline', 'layers', 'tags']
+        subMenu: ['new', 'open', 'editDiagram', 'save', 'saveAs', 'outline', 'layers', 'tags', 'exportPdf']
     }
     /** @private */
     editorUiObj;
@@ -569,7 +569,7 @@ export class GraphEditor {
                     let ignoreSelection = true;
                     let currentPage = true;
                     let transparentBackground = true;
-                    var svgRoot = this.editor.graph.getSvg((transparentBackground ? null : "#ffffff"), 1, "0", true, null, true, null, null, null, null, true, null, "page");
+                    var svgRoot = this.editor.graph.getSvg((transparentBackground ? null : "#ffffff"), 1, "0", true, null, true, null, null, null, null, true, null, "diagram");
                     // if (addShadow) {
                     //     this.editor.graph.addSvgShadow(svgRoot);
                     // }
