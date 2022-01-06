@@ -296,7 +296,7 @@
                  {
                      if (this.freehandWindow == null)
                      {
-                         this.freehandWindow = new FreehandWindow(editorUi, document.body.offsetWidth - 420, 102, 176, 84);
+                         this.freehandWindow = new FreehandWindow(editorUi, editorUi.container.offsetWidth - 420, 102, 176, 84);
                      }
                      
                      if (graph.freehand.isDrawing())
@@ -933,7 +933,7 @@
          {
              if (this.tagsWindow == null)
              {
-                 this.tagsWindow = new TagsWindow(editorUi, document.body.offsetWidth - 400, 60, 212, 200);
+                 this.tagsWindow = new TagsWindow(editorUi, editorUi.container.offsetWidth - 400, 60, 212, 200);
                  this.tagsWindow.window.addListener('show', mxUtils.bind(this, function()
                  {
                      editorUi.fireEvent(new mxEventObject('tags'));
@@ -965,7 +965,7 @@
                  var w = (findReplace) ? ((uiTheme == 'min') ? 330 : 300) : 240;
                  var h = (findReplace) ? ((uiTheme == 'min') ? 304 : 288) : 170;
                  this[name] = new FindWindow(editorUi,
-                     document.body.offsetWidth - (w + 20),
+                    editorUi.container.offsetWidth - (w + 20),
                      100, w, h, findReplace);
                  this[name].window.addListener('show', function()
                  {
@@ -3572,7 +3572,7 @@
              if (this.commentsWindow == null)
              {
                  // LATER: Check outline window for initial placement
-                 this.commentsWindow = new CommentsWindow(editorUi, document.body.offsetWidth - 380, 120, 300, 350);
+                 this.commentsWindow = new CommentsWindow(editorUi, editorUi.container.offsetWidth - 380, 120, 300, 350);
                  //TODO Are these events needed?
                  this.commentsWindow.window.addListener('show', function()
                  {

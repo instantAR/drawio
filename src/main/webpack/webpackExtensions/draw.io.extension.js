@@ -280,32 +280,6 @@ DrawIOExtension = function (config) {
 
 }
 
-DrawIOOverridExport = function (config) {
-	if (config.graphSize !== undefined) {
-		const mxUtilsOverridenExports = {
-			/**
-			 * Function: getDocumentSize
-			 * 
-			 * Returns the client size for the current document as an <mxRectangle>.
-			 */
-			getDocumentSize: function () {
-				var a = document.body,
-					b = document.documentElement;
-				console.log("getDocument", config.graphSize, a, b);
-				try {
-					return new mxRectangle(0, 0, config.graphSize.width || a.clientWidth || b.clientWidth, Math.max(config.graphSize.height || a.clientHeight || 0, b.clientHeight))
-				} catch (c) {
-					return new mxRectangle
-				}
-			}
-		}
-		console.log("getDocument", mxUtils.getDocumentSize());
-		mxUtils = Object.assign(mxUtils, mxUtilsOverridenExports);
-		console.log("getDocument", mxUtils.getDocumentSize());
-	}
-}
-
-
 DrawIOExtension.prototype.menuList = [];
 DrawIOExtension.prototype.subMenuList = [];
 
@@ -344,6 +318,42 @@ Actions.prototype.removeAction = function (key) {
 		delete this.actions[key];
 	}
 };
+
+DrawIOOverridExport = function (config) {
+	if (config.graphSize !== undefined) {
+		const mxUtilsOverridenExports = {
+			/**
+			 * Function: getDocumentSize
+			 * 
+			 * Returns the client size for the current document as an <mxRectangle>.
+			 */
+			getDocumentSize: function () {
+				var a = document.body,
+					b = document.documentElement;
+				console.log("getDocument", config.graphSize, a, b);
+				try {
+					return new mxRectangle(0, 0, config.graphSize.width || a.clientWidth || b.clientWidth, Math.max(config.graphSize.height || a.clientHeight || 0, b.clientHeight))
+				} catch (c) {
+					return new mxRectangle
+				}
+			}
+		}
+		console.log("getDocument", mxUtils.getDocumentSize());
+		mxUtils = Object.assign(mxUtils, mxUtilsOverridenExports);
+		console.log("getDocument", mxUtils.getDocumentSize());
+	}
+}
+
+DrawIOEmptyDivCreate = function (divContainer, divName, divStyle) {
+	if (divName == undefined) {
+		divName = (Math.random() + 1).toString(36).substring(7);
+	}
+	var div = document.createElement('div');
+	divStyle && (div.style = divStyle);
+	div.className = divName;
+	divContainer.appendChild(div);
+	return div;
+}
 
 // /**
 //  * Display a color dialog.

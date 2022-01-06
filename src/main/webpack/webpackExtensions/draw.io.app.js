@@ -2300,13 +2300,13 @@
              title = filename + ' - ' + title;
          }
          
-         if (document.title != title)
-         {
-             document.title = title;
-             var graph = this.editor.graph;
-             graph.invalidateDescendantsWithPlaceholders(graph.model.getRoot());
-             graph.view.validate();
-         }
+        //  if (document.title != title)
+        //  {
+        //      document.title = title;
+        //      var graph = this.editor.graph;
+        //      graph.invalidateDescendantsWithPlaceholders(graph.model.getRoot());
+        //      graph.view.validate();
+        //  }
      }
  };
  

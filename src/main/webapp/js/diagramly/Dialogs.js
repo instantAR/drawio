@@ -4542,23 +4542,23 @@ var PopupDialog = function(editorUi, url, pre, fallback, hideDialog)
 	
 	mxUtils.br(div);
 	
-	var wndBtn = mxUtils.button(mxResources.get('openInNewWindow'), function()
-	{
-		if (hideDialog)
-		{
-			editorUi.hideDialog();
-		}
+	// var wndBtn = mxUtils.button(mxResources.get('openInNewWindow'), function()
+	// {
+	// 	if (hideDialog)
+	// 	{
+	// 		editorUi.hideDialog();
+	// 	}
 
-		if (pre != null)
-		{
-			pre();
-		}
+	// 	if (pre != null)
+	// 	{
+	// 		pre();
+	// 	}
 		
-		editorUi.openLink(url, null, true);
-	});
-	wndBtn.className = 'geBtn gePrimaryBtn';
-	wndBtn.style.width = replaceBtn.style.width;
-	div.appendChild(wndBtn);
+	// 	editorUi.openLink(url, null, true);
+	// });
+	// wndBtn.className = 'geBtn gePrimaryBtn';
+	// wndBtn.style.width = replaceBtn.style.width;
+	// div.appendChild(wndBtn);
 	
 	mxUtils.br(div);
 	mxUtils.br(div);
@@ -5040,8 +5040,8 @@ var LinkDialog = function(editorUi, initialValue, btnLabel, fn, showPages, showN
 		
 		if (showNewWindowOption)
 		{
-			inner.appendChild(newWindowCheckbox);
-			mxUtils.write(inner, mxResources.get('openInNewWindow'));
+			// inner.appendChild(newWindowCheckbox);
+			// mxUtils.write(inner, mxResources.get('openInNewWindow'));
 		}
 		
 		mxUtils.br(inner);
@@ -7404,10 +7404,10 @@ var FindWindow = function(ui, x, y, w, h, withReplace)
 			mxEvent.consume(evt);
 		}
 	});
-
+	var containerDiv = DrawIOEmptyDivCreate(ui.container, 'findWithReplaceDiv');
 	this.window = new mxWindow(mxResources.get('find') + ((withReplace) ?
 		'/' + mxResources.get('replace') : ''),
-		div, x, y, w, h, true, true);
+		div, x, y, w, h, true, true,containerDiv);
 	this.window.destroyOnClose = false;
 	this.window.setMaximizable(false);
 	this.window.setResizable(false);
@@ -7512,8 +7512,8 @@ var FreehandWindow = function(editorUi, x, y, w, h)
 	startBtn.className = 'geBtn gePrimaryBtn';
 	
 	div.appendChild(startBtn);
-
-	this.window = new mxWindow(mxResources.get('freehand'), div, x, y, w, h, true, true);
+	var containerDiv = DrawIOEmptyDivCreate(editorUi.container, 'freehandDiv');
+	this.window = new mxWindow(mxResources.get('freehand'), div, x, y, w, h, true, true, containerDiv);
 	this.window.destroyOnClose = false;
 	this.window.setMaximizable(false);
 	this.window.setResizable(false);
@@ -7625,7 +7625,8 @@ var TagsWindow = function(editorUi, x, y, w, h)
 	});
 
 	var div = tagsComponent.div;
-	this.window = new mxWindow(mxResources.get('tags'), div, x, y, w, h, true, true);
+	var containerDiv = DrawIOEmptyDivCreate(editorUi.container, 'tagsDiv');
+	this.window = new mxWindow(mxResources.get('tags'), div, x, y, w, h, true, true,containerDiv);
 	this.window.minimumSize = new mxRectangle(0, 0, 212, 120);
 	this.window.destroyOnClose = false;
 	this.window.setMaximizable(false);

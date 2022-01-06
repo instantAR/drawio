@@ -3243,7 +3243,7 @@ EditorUi.prototype.updateDocumentTitle = function()
 		title += ' - ' + this.editor.appName;
 	}
 	
-	document.title = title;
+	// document.title = title;
 };
 
 /**
