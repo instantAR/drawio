@@ -1753,6 +1753,7 @@
          this.buttonContainer.style.paddingRight = '48px';
          this.buttonContainer.style.position = 'absolute';
          this.buttonContainer.style.right = '0px';
+         this.buttonContainer.className = 'menuButtonContainer';
          
          this.menubar.container.appendChild(this.buttonContainer);
      }

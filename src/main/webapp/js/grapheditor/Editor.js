@@ -802,6 +802,8 @@ OpenFile.prototype.cancel = function(cancel)
  */
 function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transparent, onResize, ignoreBgClick)
 {
+	w += (w / 2);
+	h += (h / 2);
 	var dx = transparent? 57 : 0;
 	var w0 = w;
 	var h0 = h;
@@ -818,12 +820,12 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 	
 	var dh = ds.height;
 	var left = Math.max(1, Math.round((ds.width - w - padding) / 2));
-	var top = Math.max(1, Math.round((dh - h - editorUi.footerHeight) / 3));
+	var top = Math.max(1, Math.round((dh - h - editorUi.footerHeight) / 6));
 	
 	// Keeps window size inside available space
 	elt.style.maxHeight = '100%';
 	
-	w = (document.body != null) ? Math.min(w, document.body.scrollWidth - padding) : w;
+	w = (editorUi.container != null) ? Math.min(w, editorUi.container.scrollWidth - padding) : w;
 	h = Math.min(h, dh - padding);
 	
 	// Increments zIndex to put subdialogs and background over existing dialogs and background
@@ -893,7 +895,7 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 		img.setAttribute('title', mxResources.get('close'));
 		img.className = 'geDialogClose';
 		img.style.top = (top + 14) + 'px';
-		img.style.left = (left + w + 38 - dx) + 'px';
+		img.style.left = (left + w - (w / 6) + 38 - dx) + 'px';
 		img.style.zIndex = this.zIndex;
 		
 		mxEvent.addListener(img, 'click', mxUtils.bind(this, function()
@@ -967,7 +969,7 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 		if (this.dialogImg != null)
 		{
 			this.dialogImg.style.top = (top + 14) + 'px';
-			this.dialogImg.style.left = (left + w + 38 - dx) + 'px';
+			this.dialogImg.style.left = (left + w - (w / 6) + 38 - dx) + 'px';
 		}
 	});
 	

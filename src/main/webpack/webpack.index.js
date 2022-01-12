@@ -95,8 +95,10 @@ export function getImageSrc(mimeType, base64Encoded) {
 /**
  * @typedef {{ width: number, height: number }} GraphSize
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any }} MenuActionType
+ * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any, title?: string }} ButtonActionType
  * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, printSetting?: {isPrint:boolean}, graphSize?: GraphSize,
  *      actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
+ *      actionsButtons?: {[key:string]: ButtonActionType},
  *      extraActions?: {[key:string]: 
  *          { [key:string]:MenuActionType | {[key:string]: MenuActionType }}
  *      } 
@@ -469,7 +471,6 @@ export class GraphEditor {
         this.preScript(config);
         // Menus.prototype.defaultMenuItems = []; // uncomment if menu need to hide
         DrawIOExtension(config);
-        DrawIOOverridExport(config);
         document.body.className += ' geEditor';
         let self = this;
         if (config.navitgateToUrl) {
@@ -663,6 +664,8 @@ export class GraphEditor {
                 this.pouplateScriptVars();
                 // console.log('script init', res, grapheditorKeys);
                 App.main((ui) => {
+                    DrawIOOverridUpdateBody(ui, config);
+                    DrawIOOverridExport(config, ui);
                     // console.log("App.main", ui);
                     this.editorUiObj = ui;
                     if (ui != undefined && ui.actions != undefined && ui.actions.actions != undefined) {
@@ -738,9 +741,49 @@ if (typeof isWebpack !== 'undefined') {
                 printSetting: {
                     isPrint: false
                 },
-                graphSize: {
-                    width: 1330,
-                    height: 660
+                actionsButtons: {
+                    'Export Library': {
+                        actionType: ActionType.EXPORT,
+                        callback: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Dwp Library Implementation required",
+                                    graphData: graphData
+                                })
+                            })
+                        },
+                        callbackOnError: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Dwp Library import error Implementation required",
+                                    graphData: graphData
+                                })
+                            })
+                        }
+                    },
+                    'Import Library': {
+                        title: "btn title",
+                        actionType: ActionType.IMPORT,
+                        callback: () => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Dwp Library import Implementation required",
+                                    graphData: {
+                                        xml: xmlData,
+                                        name: 'import from func'
+                                    }
+                                })
+                            })
+                        },
+                        callbackOnFinish: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Dwp Library import finish Implementation required",
+                                    graphData: graphData
+                                })
+                            })
+                        }
+                    }
                 },
                 extraActions: {
                     file: {
@@ -814,7 +857,25 @@ if (typeof isWebpack !== 'undefined') {
                             }
                         }
                     },
-                    setting: true,
+                    setting: {
+                        actionType: ActionType.EXPORTSVG,
+                        callback: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Dwp Library EXPORTSVG Implementation required",
+                                    graphData: graphData
+                                })
+                            })
+                        },
+                        callbackOnError: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Dwp Library EXPORTSVG error Implementation required",
+                                    graphData: graphData
+                                })
+                            })
+                        }
+                    },
                     ex: {
                         testSvg: {
                             actionType: ActionType.EXPORTSVG,
@@ -835,26 +896,26 @@ if (typeof isWebpack !== 'undefined') {
                                 })
                             }
                         },
-                        test2: {
-                            actionType: ActionType.DEFAULT,
-                            callback: () => {
-                                return new Promise((resolve, reject) => {
-                                    resolve({
-                                        status: "ex test2 Implementation required"
-                                    })
-                                })
-                            }
-                        },
-                        test: {
-                            actionType: ActionType.CUSTOM,
-                            callback: () => {
-                                return new Promise((resolve, reject) => {
-                                    resolve({
-                                        status: "ex test2 Implementation required"
-                                    })
-                                })
-                            }
-                        }
+                        // test2: {
+                        //     actionType: ActionType.DEFAULT,
+                        //     callback: () => {
+                        //         return new Promise((resolve, reject) => {
+                        //             resolve({
+                        //                 status: "ex test2 Implementation required"
+                        //             })
+                        //         })
+                        //     }
+                        // },
+                        // test: {
+                        //     actionType: ActionType.CUSTOM,
+                        //     callback: () => {
+                        //         return new Promise((resolve, reject) => {
+                        //             resolve({
+                        //                 status: "ex test2 Implementation required"
+                        //             })
+                        //         })
+                        //     }
+                        // }
                     }
 
                 },
