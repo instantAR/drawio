@@ -5499,11 +5499,11 @@
 					this.editorUi.actions.get('editStyle').funct();
 				}));
 				
-				btn.setAttribute('title', mxResources.get('editStyle') + ' (' + this.editorUi.actions.get('editStyle').shortcut + ')');
+				this.editorUi.actions.get('editStyle') && btn.setAttribute('title', mxResources.get('editStyle') + ' (' + this.editorUi.actions.get('editStyle').shortcut + ')');
 				btn.style.width = '210px';
 				btn.style.marginBottom = '2px';
 				
-				div.appendChild(btn);
+				this.editorUi.actions.get('editStyle') && div.appendChild(btn);
 			}
 			
 			var graph = this.editorUi.editor.graph;

@@ -92,12 +92,13 @@ export function getImageSrc(mimeType, base64Encoded) {
 }
 
 //  {new?: OptNew, save?: OptOut, saveAs?: OptOut, open?: OptIn, import?: OptIn, export?: OptOut}
+// graphSize?: GraphSize, printSetting?: {isPrint:boolean},
 /**
  * @typedef {{ width: number, height: number }} GraphSize
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any }} MenuActionType
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any, 
  *              title?: string, style?:CSSStyleDeclaration, className?:string }} ButtonActionType
- * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, printSetting?: {isPrint:boolean}, graphSize?: GraphSize,
+ * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string,  
  *      actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
  *      actionsButtons?: {[key:string]: ButtonActionType},
  *      extraActions?: {[key:string]: 
@@ -126,7 +127,7 @@ export class GraphEditor {
     /** @private */
     hideMenus = {
         menu: ['help', 'extra'],
-        subMenu: ['new', 'open', 'editDiagram', 'save', 'saveAs', 'outline', 'layers', 'tags', 'exportPdf']
+        subMenu: ['new', 'open', 'editDiagram', 'save', 'saveAs', 'outline', 'layers', 'tags', 'exportPdf', 'editStyle']
     }
     /** @private */
     editorUiObj;

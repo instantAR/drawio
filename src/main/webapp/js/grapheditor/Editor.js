@@ -802,8 +802,7 @@ OpenFile.prototype.cancel = function(cancel)
  */
 function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transparent, onResize, ignoreBgClick)
 {
-	w += (w / 2);
-	h += (h / 2);
+	h >= 300 ? (h += (h / 2) * 0.25) : (h >= 200 ? (h += (h / 2) * 0.75) : h <= 100 ? (h += (h / 2) * 1.5) : '');
 	var dx = transparent? 57 : 0;
 	var w0 = w;
 	var h0 = h;

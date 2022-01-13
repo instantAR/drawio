@@ -3809,7 +3809,7 @@ EditorUi.prototype.updateActionStates = function()
 	
 	for (var i = 0; i < actions.length; i++)
 	{
-		this.actions.get(actions[i]).setEnabled(selected);
+		this.actions.get(actions[i]) && this.actions.get(actions[i]).setEnabled(selected);
 	}
 
 	this.actions.get('lockUnlock').setEnabled(!graph.isSelectionEmpty());	
