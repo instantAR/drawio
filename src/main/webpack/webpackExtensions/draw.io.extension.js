@@ -2,10 +2,11 @@
  * Add embed dialog option.
  */
 EmbedDialog.showPreviewOption = false;
+
 /**
  * @param {GraphInitConfig} [config] - Grapheditor Configuration.
  */
-DrawIOExtension = function (config) {
+ DrawIOExtension = function (config) {
 	if (config !== undefined && config['extraActions'] !== undefined) {
 		Object.keys(config['extraActions']).forEach((menuName) => {
 
@@ -80,6 +81,123 @@ DrawIOExtension = function (config) {
 	}
 
 }
+
+DrawIOExtension.prototype.menuList = [];
+DrawIOExtension.prototype.subMenuList = [];
+
+/**
+ * Creates the keyboard event handler for the current graph and history.
+ */
+Menus.prototype.createMenubar = function (container) {
+	var menubar = new Menubar(this.editorUi, container);
+	var menus = this.defaultMenuItems;
+
+	for (var i = 0; i < menus.length; i++) {
+		(mxUtils.bind(this, function (menu) {
+			DrawIOExtension.prototype.menuList.push((mxResources.get(menus[i]) || menus[i]))
+			var elt = menubar.addMenu((mxResources.get(menus[i]) || menus[i]), mxUtils.bind(this, function () {
+				// Allows extensions of menu.funct
+				menu.funct.apply(this, arguments);
+			}));
+
+			this.menuCreated(menu, elt);
+		}))(this.get(menus[i]));
+	}
+	return menubar;
+};
+
+/**
+ * Disables the export URL function.
+ */
+Editor.enableExportUrl = false;
+/**
+ * Remove the action under the given name.
+ */
+Actions.prototype.removeAction = function (key) {
+	// console.log("Actions:removeAction", key, this.actions[key]);
+	if (this.actions[key] != undefined) {
+		delete this.actions[key];
+	}
+};
+
+DrawIOOverridExport = function (config, ui) {
+
+	config.actionsButtons && Object.keys(config.actionsButtons).forEach((btnKey) => {
+		let shareButton = document.createElement('div');
+		shareButton.className = 'geBtn gePrimaryBtn';
+		shareButton.style.display = 'inline-block';
+		shareButton.style.backgroundColor = '#F2931E';
+		shareButton.style.borderColor = '#F08705';
+		shareButton.style.backgroundImage = 'none';
+		shareButton.style.padding = '2px 10px 0 10px';
+		shareButton.style.marginTop = '-10px';
+		shareButton.style.height = '28px';
+		shareButton.style.lineHeight = '28px';
+		shareButton.style.minWidth = '0px';
+		shareButton.style.cssFloat = 'right';
+
+		config.actionsButtons[btnKey].style && (Object.assign(shareButton.style, config.actionsButtons[btnKey].style));
+		config.actionsButtons[btnKey].className && (shareButton.className += ' '+config.actionsButtons[btnKey].className);
+		config.actionsButtons[btnKey].title !== undefined && shareButton.setAttribute('title', config.actionsButtons[btnKey].title);
+
+		mxUtils.write(shareButton, btnKey);
+
+		config.actionsButtons[btnKey]['callback'] !== undefined && mxEvent.addListener(shareButton, 'click', mxUtils.bind(this, function () {
+			// config.actionsButtons[btnKey]['callback']
+			performCustomAction(ui, config.actionsButtons[btnKey])
+		}));
+		ui.buttonContainer.appendChild(shareButton);
+	})
+}
+
+DrawIOEmptyDivCreate = function (divContainer, divName, divStyle) {
+	if (divName == undefined) {
+		divName = (Math.random() + 1).toString(36).substring(7);
+	}
+	var div = document.createElement('div');
+	divStyle && (div.style = divStyle);
+	div.className = divName;
+	divContainer.appendChild(div);
+	return div;
+}
+
+DrawIOOverridUpdateBody = function (editorUi, config) {
+	/**
+	 * Function: showMenu
+	 * 
+	 * Shows the menu.
+	 */
+	// mxPopupMenu.prototype.showMenu = function () {
+	// 	// Disables filter-based shadow in IE9 standards mode
+	// 	if (document.documentMode >= 9) {
+	// 		this.div.style.filter = 'none';
+	// 	}
+
+	// 	// Fits the div inside the viewport
+	// 	editorUi.container.appendChild(this.div) || document.body.appendChild(this.div);
+	// 	mxUtils.fit(this.div);
+	// };
+}
+
+// /**
+//  * Display a color dialog.
+//  */
+// EditorUi.prototype.pickColor = function (color, apply) {
+// 	var graph = this.editor.graph;
+// 	var selState = graph.cellEditor.saveSelection();
+// 	var h = 300 + ((Math.ceil(ColorDialog.prototype.presetColors.length / 12) +
+// 		Math.ceil(ColorDialog.prototype.defaultColors.length / 12)) * 17);
+
+// 	var dlg = new ColorDialog(this, color || 'none', function (color) {
+// 		graph.cellEditor.restoreSelection(selState);
+// 		apply(color);
+// 	}, function () {
+// 		graph.cellEditor.restoreSelection(selState);
+// 	});
+// 	this.showDialog(dlg.container, 300, h, true, false);
+// 	dlg.init();
+// };
+
 
 sendErrorResponse = function (customAction, error) {
 	if (customAction['callbackOnError'] !== undefined && typeof customAction['callbackOnError'] === 'function') {
@@ -283,116 +401,3 @@ performCustomAction = function (editorUi, customAction) {
 	}
 
 }
-
-DrawIOExtension.prototype.menuList = [];
-DrawIOExtension.prototype.subMenuList = [];
-
-/**
- * Creates the keyboard event handler for the current graph and history.
- */
-Menus.prototype.createMenubar = function (container) {
-	var menubar = new Menubar(this.editorUi, container);
-	var menus = this.defaultMenuItems;
-
-	for (var i = 0; i < menus.length; i++) {
-		(mxUtils.bind(this, function (menu) {
-			DrawIOExtension.prototype.menuList.push((mxResources.get(menus[i]) || menus[i]))
-			var elt = menubar.addMenu((mxResources.get(menus[i]) || menus[i]), mxUtils.bind(this, function () {
-				// Allows extensions of menu.funct
-				menu.funct.apply(this, arguments);
-			}));
-
-			this.menuCreated(menu, elt);
-		}))(this.get(menus[i]));
-	}
-	return menubar;
-};
-
-/**
- * Disables the export URL function.
- */
-Editor.enableExportUrl = false;
-/**
- * Remove the action under the given name.
- */
-Actions.prototype.removeAction = function (key) {
-	// console.log("Actions:removeAction", key, this.actions[key]);
-	if (this.actions[key] != undefined) {
-		delete this.actions[key];
-	}
-};
-
-DrawIOOverridExport = function (config, ui) {
-
-	config.actionsButtons && Object.keys(config.actionsButtons).forEach((btnKey) => {
-		let shareButton = document.createElement('div');
-		shareButton.className = 'geBtn gePrimaryBtn';
-		shareButton.style.display = 'inline-block';
-		shareButton.style.backgroundColor = '#F2931E';
-		shareButton.style.borderColor = '#F08705';
-		shareButton.style.backgroundImage = 'none';
-		shareButton.style.padding = '2px 10px 0 10px';
-		shareButton.style.marginTop = '-10px';
-		shareButton.style.height = '28px';
-		shareButton.style.lineHeight = '28px';
-		shareButton.style.minWidth = '0px';
-		shareButton.style.cssFloat = 'right';
-		config.actionsButtons[btnKey].title !== undefined && shareButton.setAttribute('title', config.actionsButtons[btnKey].title);
-
-		mxUtils.write(shareButton, btnKey);
-
-		config.actionsButtons[btnKey]['callback'] !== undefined && mxEvent.addListener(shareButton, 'click', mxUtils.bind(this, function () {
-			// config.actionsButtons[btnKey]['callback']
-			performCustomAction(ui, config.actionsButtons[btnKey])
-		}));
-		ui.buttonContainer.appendChild(shareButton);
-	})
-}
-
-DrawIOEmptyDivCreate = function (divContainer, divName, divStyle) {
-	if (divName == undefined) {
-		divName = (Math.random() + 1).toString(36).substring(7);
-	}
-	var div = document.createElement('div');
-	divStyle && (div.style = divStyle);
-	div.className = divName;
-	divContainer.appendChild(div);
-	return div;
-}
-
-DrawIOOverridUpdateBody = function (editorUi, config) {
-	/**
-	 * Function: showMenu
-	 * 
-	 * Shows the menu.
-	 */
-	// mxPopupMenu.prototype.showMenu = function () {
-	// 	// Disables filter-based shadow in IE9 standards mode
-	// 	if (document.documentMode >= 9) {
-	// 		this.div.style.filter = 'none';
-	// 	}
-
-	// 	// Fits the div inside the viewport
-	// 	editorUi.container.appendChild(this.div) || document.body.appendChild(this.div);
-	// 	mxUtils.fit(this.div);
-	// };
-}
-
-// /**
-//  * Display a color dialog.
-//  */
-// EditorUi.prototype.pickColor = function (color, apply) {
-// 	var graph = this.editor.graph;
-// 	var selState = graph.cellEditor.saveSelection();
-// 	var h = 300 + ((Math.ceil(ColorDialog.prototype.presetColors.length / 12) +
-// 		Math.ceil(ColorDialog.prototype.defaultColors.length / 12)) * 17);
-
-// 	var dlg = new ColorDialog(this, color || 'none', function (color) {
-// 		graph.cellEditor.restoreSelection(selState);
-// 		apply(color);
-// 	}, function () {
-// 		graph.cellEditor.restoreSelection(selState);
-// 	});
-// 	this.showDialog(dlg.container, 300, h, true, false);
-// 	dlg.init();
-// };

@@ -95,7 +95,8 @@ export function getImageSrc(mimeType, base64Encoded) {
 /**
  * @typedef {{ width: number, height: number }} GraphSize
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any }} MenuActionType
- * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any, title?: string }} ButtonActionType
+ * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any, 
+ *              title?: string, style?:CSSStyleDeclaration, className?:string }} ButtonActionType
  * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, printSetting?: {isPrint:boolean}, graphSize?: GraphSize,
  *      actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
  *      actionsButtons?: {[key:string]: ButtonActionType},
@@ -759,10 +760,18 @@ if (typeof isWebpack !== 'undefined') {
                                     graphData: graphData
                                 })
                             })
+                        },
+                        style: {
+                            backgroundColor: '#4d90fe',
+                            border: '1px solid #3079ed',
+                            backgroundImage: 'linear-gradient(#4d90fe 0,#4787ed 100%)',
+                            height: '29px',
+                            lineHeight: '27px'
                         }
                     },
                     'Import Library': {
                         title: "btn title",
+                        className: "extended btnImport",
                         actionType: ActionType.IMPORT,
                         callback: () => {
                             return new Promise((resolve, reject) => {
