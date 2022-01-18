@@ -134,13 +134,14 @@ export class GraphEditor {
 
     /** 
      * @private 
+     * @param {number} scriptGroup
      * @param {number} scriptIndex
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      */
-    loadScript(scriptIndex, scriptContainer) {
+    loadScript(scriptGroup, scriptIndex, scriptContainer) {
         return new Promise((resolve, reject) => {
             //resolve if already loaded
-            if (webpackScripts[scriptIndex].loaded) {
+            if (webpackScripts[scriptGroup][scriptIndex].loaded) {
                 resolve({
                     script: scriptIndex,
                     loaded: true,
@@ -150,16 +151,16 @@ export class GraphEditor {
                 //load script
                 let script = document.createElement('script');
                 script.type = 'text/javascript';
-                script.src = webpackScripts[scriptIndex].src;
-                script.id = webpackScripts[scriptIndex].name;
+                script.src = webpackScripts[scriptGroup][scriptIndex].src;
+                script.id = webpackScripts[scriptGroup][scriptIndex].name;
                 if (script.readyState) { //IE
                     script.onreadystatechange = ($event) => {
                         // console.log("onreadystatechange", $event, window);
                         if (script.readyState === "loaded" || script.readyState === "complete") {
                             script.onreadystatechange = null;
-                            webpackScripts[scriptIndex].loaded = true;
+                            webpackScripts[scriptGroup][scriptIndex].loaded = true;
                             resolve({
-                                script: webpackScripts[scriptIndex],
+                                script: webpackScripts[scriptGroup][scriptIndex],
                                 loaded: true,
                                 status: 'Loaded'
                             });
@@ -168,9 +169,9 @@ export class GraphEditor {
                 } else { //Others
                     script.onload = ($event) => {
                         // console.log(".onload", $event, window);
-                        webpackScripts[scriptIndex].loaded = true;
+                        webpackScripts[scriptGroup][scriptIndex].loaded = true;
                         resolve({
-                            script: webpackScripts[scriptIndex],
+                            script: webpackScripts[scriptGroup][scriptIndex],
                             loaded: true,
                             status: 'Loaded'
                         });
@@ -178,7 +179,7 @@ export class GraphEditor {
                     };
                 }
                 script.onerror = (error) => resolve({
-                    script: webpackScripts[scriptIndex],
+                    script: webpackScripts[scriptGroup][scriptIndex],
                     loaded: false,
                     status: 'Loaded'
                 });
@@ -204,12 +205,13 @@ export class GraphEditor {
     }
 
     /** @private */
-    addWebScript(name, src) {
+    addWebScript(name, src, scriptGroup) {
         if (name == undefined) {
             name = 'E' + src.split('/').pop().split('.').shift()
         }
-
-        webpackScripts.push({
+        scriptGroup = (scriptGroup == undefined ? webpackScripts.length : scriptGroup);
+        webpackScripts[scriptGroup] == undefined && (webpackScripts[scriptGroup] = [])
+        webpackScripts[scriptGroup].push({
             name: name,
             loaded: false,
             src: src
@@ -222,15 +224,29 @@ export class GraphEditor {
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      * @param {GraphInitConfig} [config] - Grapheditor Configuration.
      */
-    appendScriptAtIndex(scriptIndex, scriptContainer, config) {
+    appendScriptAtIndex(scriptGroupIndex, scriptContainer, config) {
         return new Promise((resolve, reject) => {
-            // console.info('appendScriptAtIndex', scriptIndex);
-            if (webpackScripts[scriptIndex] != undefined) {
-                this.loadScript(scriptIndex, scriptContainer).then((scriptLoaded) => {
-                    // console.log("script loaded", scriptLoaded);
-                    this.appendScriptAtIndex(++scriptIndex, scriptContainer, config).then(solved => {
-                        // console.log(`nested:appendScriptAtIndex ${scriptIndex}`, solved);
-                        solved.scriptIndex.push(scriptIndex);
+            if(scriptGroupIndex == 1 && webpackScripts[0]){
+                let allLoadScripts = [];
+                webpackScripts[0].forEach((script, scriptIndex) => {
+                    // console.log('script', script, scriptGroupIndex, ' =>', scriptIndex);
+                    allLoadScripts.push(this.loadScript(0, scriptIndex, scriptContainer))
+                })
+                Promise.all(allLoadScripts).then(processScripts => {
+                    console.log("all alone scripts loaded ", 0, processScripts);
+                })
+            }
+            if (webpackScripts[scriptGroupIndex] != undefined) {
+                let allLoadScripts = [];
+                webpackScripts[scriptGroupIndex].forEach((script, scriptIndex) => {
+                    // console.log('script', script, scriptGroupIndex, ' =>', scriptIndex);
+                    allLoadScripts.push(this.loadScript(scriptGroupIndex, scriptIndex, scriptContainer))
+                })
+                Promise.all(allLoadScripts).then(processScripts => {
+                    console.log("all scripts", scriptGroupIndex, processScripts);
+                    this.appendScriptAtIndex(++scriptGroupIndex, scriptContainer, config).then(solved => {
+                        console.log(`nested:appendScriptAtIndex ${scriptGroupIndex}`, solved);
+                        solved.scriptIndex.push(scriptGroupIndex);
                         resolve(solved)
                     })
                 })
@@ -238,9 +254,37 @@ export class GraphEditor {
                 this.postScript(config); // move this to after App.main()
                 resolve({
                     scriptLoaded: true,
-                    scriptIndex: [scriptIndex]
+                    scriptIndex: [scriptGroupIndex]
                 })
             }
+            // webpackScripts.forEach((scripts, scriptGroupIndex) => {
+            //     // console.log('scriptGroup', scripts, scriptGroupIndex);
+            //     let allLoadScripts = [];
+            //     scripts.forEach((script, scriptIndex) => {
+            //         console.log('script', script, scriptGroupIndex, ' =>', scriptIndex);
+            //         allLoadScripts.push(this.loadScript(scriptGroupIndex, scriptIndex, scriptContainer))
+            //     })
+            //     Promise.all(allLoadScripts).then(processScripts => {
+            //         console.log("all scripts", processScripts);
+            //     })
+            // })
+            // console.info('appendScriptAtIndex', scriptIndex);
+            // if (webpackScripts[scriptGroup][scriptIndex] != undefined) {
+            //     this.loadScript(scriptIndex, scriptContainer).then((scriptLoaded) => {
+            //         // console.log("script loaded", scriptLoaded);
+            //         this.appendScriptAtIndex(++scriptIndex, scriptContainer, config).then(solved => {
+            //             console.log(`nested:appendScriptAtIndex ${scriptIndex}`, solved);
+            //             solved.scriptIndex.push(scriptIndex);
+            //             resolve(solved)
+            //         })
+            //     })
+            // } else {
+            //     this.postScript(config); // move this to after App.main()
+            //     resolve({
+            //         scriptLoaded: true,
+            //         scriptIndex: [scriptIndex]
+            //     })
+            // }
         })
     }
 
@@ -254,17 +298,17 @@ export class GraphEditor {
         graphEditorRefCount++;
 
 
-        this.addWebScript('aes.min', './mxgraph/grapheditor/cryptojs/aes.min.js')
-        this.addWebScript('spin.min', './mxgraph/grapheditor/spin/spin.min.js')
-        this.addWebScript('pako', './mxgraph/grapheditor/deflate/pako.min.js')
-        this.addWebScript('base64', './mxgraph/grapheditor/deflate/base64.js')
-        this.addWebScript('jscolor', './mxgraph/grapheditor/jscolor/jscolor.js')
-        this.addWebScript('html_sanitize', './mxgraph/grapheditor/sanitizer/sanitizer.min.js')
-        this.addWebScript('croppie.min', './mxgraph/grapheditor/croppie/croppie.min.js')
-        this.addWebScript('rough.min', './mxgraph/grapheditor/rough/rough.min.js')
+        this.addWebScript('aes.min', './mxgraph/grapheditor/cryptojs/aes.min.js', 1);
+        this.addWebScript('spin.min', './mxgraph/grapheditor/spin/spin.min.js', 1);
+        this.addWebScript('pako', './mxgraph/grapheditor/deflate/pako.min.js', 1);
+        this.addWebScript('base64', './mxgraph/grapheditor/deflate/base64.js', 1);
+        this.addWebScript('jscolor', './mxgraph/grapheditor/jscolor/jscolor.js', 1);
+        this.addWebScript('html_sanitize', './mxgraph/grapheditor/sanitizer/sanitizer.min.js', 1);
+        this.addWebScript('croppie.min', './mxgraph/grapheditor/croppie/croppie.min.js', 1);
+        this.addWebScript('rough.min', './mxgraph/grapheditor/rough/rough.min.js', 1);
 
 
-        this.addWebScript('mxClient', './mxgraph/grapheditor/PreConfig.js')
+        this.addWebScript('PreConfig', './mxgraph/grapheditor/PreConfig.js', 2);
 
         // mxscript(drawDevUrl + './mxgraph/grapheditor/diagramly/Init.js');
         // this.addWebScript('diagramly_init', './mxgraph/grapheditor/diagramly/Init.js')
@@ -273,105 +317,105 @@ export class GraphEditor {
         // this.addWebScript('mxClient', './mxgraph/')
 
         //Uses grapheditor from devhost
-        this.addWebScript('mxClient', './mxgraph/mxClient.js')
-        this.addWebScript('Editor', './mxgraph/grapheditor/grapheditor/Editor.js')
-        this.addWebScript('EditorUi', './mxgraph/grapheditor/grapheditor/EditorUi.js')
-        this.addWebScript('Sidebar', './mxgraph/grapheditor/grapheditor/Sidebar.js')
-        this.addWebScript('Graph', './mxgraph/grapheditor/grapheditor/Graph.js')
-        this.addWebScript('Format', './mxgraph/grapheditor/grapheditor/Format.js')
-        this.addWebScript('Shapes', './mxgraph/grapheditor/grapheditor/Shapes.js')
-        this.addWebScript('Actions', './mxgraph/grapheditor/grapheditor/Actions.js')
-        this.addWebScript('Menus', './mxgraph/grapheditor/grapheditor/Menus.js')
-        this.addWebScript('Toolbar', './mxgraph/grapheditor/grapheditor/Toolbar.js')
-        this.addWebScript('Dialogs', './mxgraph/grapheditor/grapheditor/Dialogs.js')
+        this.addWebScript('mxClient', './mxgraph/mxClient.js', 3);
+        this.addWebScript('Editor', './mxgraph/grapheditor/grapheditor/Editor.js', 4);
+        this.addWebScript('EditorUi', './mxgraph/grapheditor/grapheditor/EditorUi.js', 5);
+        this.addWebScript('Sidebar', './mxgraph/grapheditor/grapheditor/Sidebar.js', 4);
+        this.addWebScript('Graph', './mxgraph/grapheditor/grapheditor/Graph.js', 4);
+        this.addWebScript('Format', './mxgraph/grapheditor/grapheditor/Format.js', 5);
+        this.addWebScript('Shapes', './mxgraph/grapheditor/grapheditor/Shapes.js', 5);
+        this.addWebScript('Actions', './mxgraph/grapheditor/grapheditor/Actions.js', 4);
+        this.addWebScript('Menus', './mxgraph/grapheditor/grapheditor/Menus.js', 6);
+        this.addWebScript('Toolbar', './mxgraph/grapheditor/grapheditor/Toolbar.js', 4);
+        this.addWebScript('Dialogs', './mxgraph/grapheditor/grapheditor/Dialogs.js', 4);
 
         // Loads main classes
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ActiveDirectory.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Advanced.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AlliedTelesis.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Android.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ArchiMate.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ArchiMate3.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Arrows2.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Atlassian.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS3.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS3D.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS4.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS4b.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Azure.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Azure2.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Basic.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Bootstrap.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-BPMN.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-C4.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cabinet.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cisco.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cisco19.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-CiscoSafe.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Citrix.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cumulus.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-DFD.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-EIP.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Electrical.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ER.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Floorplan.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Flowchart.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-FluidPower.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP2.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP3.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Gmdl.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-IBM.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Infographic.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Ios.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Ios7.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Kubernetes.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-LeanMapping.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Mockup.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-MSCAE.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Network.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Office.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-PID.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Rack.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Signs.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Sitemap.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Sysml.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ThreatModeling.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-UML25.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Veeam.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Veeam2.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-VVD.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-WebIcons.js');
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ActiveDirectory.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Advanced.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AlliedTelesis.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Android.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ArchiMate.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ArchiMate3.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Arrows2.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Atlassian.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS3.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS3D.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS4.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS4b.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Azure.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Azure2.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Basic.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Bootstrap.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-BPMN.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-C4.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cabinet.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cisco.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cisco19.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-CiscoSafe.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Citrix.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cumulus.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-DFD.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-EIP.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Electrical.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ER.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Floorplan.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Flowchart.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-FluidPower.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP2.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP3.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Gmdl.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-IBM.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Infographic.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Ios.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Ios7.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Kubernetes.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-LeanMapping.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Mockup.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-MSCAE.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Network.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Office.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-PID.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Rack.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Signs.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Sitemap.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Sysml.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ThreatModeling.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-UML25.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Veeam.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Veeam2.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-VVD.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-WebIcons.js', 7);
 
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/util/mxJsCanvas.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/util/mxAsyncCanvas.js');
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/util/mxJsCanvas.js', 8);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/util/mxAsyncCanvas.js', 8);
 
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioFile.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/LocalFile.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/LocalLibrary.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/StorageFile.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/StorageLibrary.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/RemoteFile.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/RemoteLibrary.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/EmbedFile.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Dialogs.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Editor.js')
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioFile.js', 8);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/LocalFile.js', 9);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/LocalLibrary.js', 10);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/StorageFile.js', 10);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/StorageLibrary.js', 11);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/RemoteFile.js', 10);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/RemoteLibrary.js', 10);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/EmbedFile.js', 10);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Dialogs.js', 8);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Editor.js', 8);
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/EditorUi.js')
-        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.EditorUi.js')
+        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.EditorUi.js', 9);
 
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DiffSync.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Settings.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioFileSync.js');
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DiffSync.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Settings.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioFileSync.js', 7);
 
-        //Comments
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioComment.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DriveComment.js');
+        // //Comments
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioComment.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DriveComment.js', 8);
 
-        // Excluded in base.min.js
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioClient.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioUser.js');
+        // // Excluded in base.min.js
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioClient.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DrawioUser.js', 7);
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/UrlLibrary.js');
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DriveFile.js');
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DriveLibrary.js');
@@ -396,48 +440,48 @@ export class GraphEditor {
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/NotionLibrary.js');
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/NotionClient.js');
 
-        // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/App.js');
-        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.app.js');
-        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.menu.js');
-        // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Menus.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Pages.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Trees.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Minimal.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DistanceGuides.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/mxRuler.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/mxFreehand.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DevTools.js');
+        // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/App.js', 12);
+        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.app.js', 12);
+        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.menu.js', 12);
+        // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Menus.js', 12);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Pages.js', 12);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Trees.js', 12);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/Minimal.js', 12);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DistanceGuides.js', 12);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/mxRuler.js', 12);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/mxFreehand.js', 12);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/DevTools.js', 12);
 
         // Vsdx/vssx support
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/vsdx/VsdxExport.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/vsdx/mxVsdxCanvas2D.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/vsdx/bmpDecoder.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/vsdx/importer.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/jszip/jszip.min.js');
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/vsdx/VsdxExport.js', 9);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/vsdx/mxVsdxCanvas2D.js', 9);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/vsdx/bmpDecoder.js', 9);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/vsdx/importer.js', 9);
+        this.addWebScript(undefined, './mxgraph/grapheditor/jszip/jszip.min.js', 9);
 
         // GraphMl Import
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/graphml/mxGraphMlCodec.js');
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/graphml/mxGraphMlCodec.js', 9);
 
         // P2P Collab
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/P2PCollab.js');
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/P2PCollab.js', 9);
 
         // Org Chart Layout
         if (config.orgChartDev === true) {
-            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/bridge.min.js');
-            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/bridge.collections.min.js');
-            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/OrgChart.Layout.min.js');
-            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/mxOrgChartLayout.js');
+            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/bridge.min.js', 9);
+            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/bridge.collections.min.js', 9);
+            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/OrgChart.Layout.min.js', 9);
+            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/mxOrgChartLayout.js', 9);
         }
 
-        this.addWebScript(undefined, './mxgraph/grapheditor/shapes-14-6-5.min.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/stencils.min.js');
-        this.addWebScript(undefined, './mxgraph/grapheditor/extensions.min.js');
+        this.addWebScript(undefined, './mxgraph/grapheditor/shapes-14-6-5.min.js', 9);
+        this.addWebScript(undefined, './mxgraph/grapheditor/stencils.min.js', 0);
+        this.addWebScript(undefined, './mxgraph/grapheditor/extensions.min.js', 9);
 
-        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.extension.js');
+        this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.extension.js', 12);
 
 
         // console.log("webpackScripts", webpackScripts)
-        return this.appendScriptAtIndex(0, scriptContainer, config);
+        return this.appendScriptAtIndex(1, scriptContainer, config);
 
     }
 
