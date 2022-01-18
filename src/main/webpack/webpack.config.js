@@ -45,6 +45,14 @@ module.exports = {
       to: 'mxgraph',
       isJsInclude: true
     }, {
+      from: 'images',
+      to: 'mxgraph/images',
+      isJsInclude: true
+    }, {
+      from: 'img',
+      to: 'mxgraph/img',
+      isJsInclude: true
+    }, {
       from: 'js',
       to: 'mxgraph/grapheditor',
       isJsInclude: true
