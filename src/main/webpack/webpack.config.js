@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
 const path = require('path');
 
 module.exports = {
@@ -30,6 +31,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Graph Editor - Draw.io',
       template: './index.html'
+    }),
+    new CompressionPlugin({
+      test: /\.js(\?.*)?$/i,
+      algorithm: "gzip",
     }),
     getCopyConfig([{
       from: './webpackExtensions',

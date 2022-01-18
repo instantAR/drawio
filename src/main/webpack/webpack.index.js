@@ -474,7 +474,7 @@ export class GraphEditor {
         }
 
         this.addWebScript(undefined, './mxgraph/grapheditor/shapes-14-6-5.min.js', 9);
-        this.addWebScript(undefined, './mxgraph/grapheditor/stencils.min.js', 0);
+        this.addWebScript(undefined, './mxgraph/grapheditor/stencils.min.js', 9);
         this.addWebScript(undefined, './mxgraph/grapheditor/extensions.min.js', 9);
 
         this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.extension.js', 12);
