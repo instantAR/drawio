@@ -5,7 +5,7 @@
   "main": "./dist/grapheditor.js",
   "types": "./dist/types/webpack.index.d.ts",
   "scripts": {
-    "start": "rmdir dist /S /Q & npx webpack --mode=development --config webpack.config.js --watch",
+    "start": "rmdir dist /S /Q & npx webpack serve --mode=development --config webpack.config.js",
     "build:types": "rmdir dist\\types /S /Q & tsc -p tsconfig.json",
     "clean": "del out.txt & rmdir dist /S /Q & del *-draw.io-*.tgz",
     "build:prod": "npm run clean & npm run build:types & npx webpack --mode=production --config webpack.config.js --progress --profile & npm pack",
@@ -41,7 +41,8 @@
     "html-webpack-plugin": "^5.5.0",
     "typescript": "^4.4.4",
     "webpack": "^5.64.2",
-    "webpack-cli": "^4.9.1"
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.3"
   },
   "files": [
     "dist"
