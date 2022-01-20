@@ -226,14 +226,15 @@ export class GraphEditor {
      */
     appendScriptAtIndex(scriptGroupIndex, scriptContainer, config) {
         return new Promise((resolve, reject) => {
-            if(scriptGroupIndex == 1 && webpackScripts[0]){
+            let standAloneGroup = (100 + scriptGroupIndex);
+            if (webpackScripts[standAloneGroup] != undefined && webpackScripts[standAloneGroup].length > 0) {
                 let allLoadScripts = [];
-                webpackScripts[0].forEach((script, scriptIndex) => {
+                webpackScripts[standAloneGroup].forEach((script, scriptIndex) => {
                     // console.log('script', script, scriptGroupIndex, ' =>', scriptIndex);
-                    allLoadScripts.push(this.loadScript(0, scriptIndex, scriptContainer))
+                    allLoadScripts.push(this.loadScript(standAloneGroup, scriptIndex, scriptContainer))
                 })
                 Promise.all(allLoadScripts).then(processScripts => {
-                    console.log("all alone scripts loaded ", 0, processScripts);
+                    console.log("all alone scripts loaded ", standAloneGroup, processScripts);
                 })
             }
             if (webpackScripts[scriptGroupIndex] != undefined) {
@@ -243,9 +244,9 @@ export class GraphEditor {
                     allLoadScripts.push(this.loadScript(scriptGroupIndex, scriptIndex, scriptContainer))
                 })
                 Promise.all(allLoadScripts).then(processScripts => {
-                    console.log("all scripts", scriptGroupIndex, processScripts);
+                    // console.log("all scripts", scriptGroupIndex, processScripts);
                     this.appendScriptAtIndex(++scriptGroupIndex, scriptContainer, config).then(solved => {
-                        console.log(`nested:appendScriptAtIndex ${scriptGroupIndex}`, solved);
+                        // console.log(`nested:appendScriptAtIndex ${scriptGroupIndex}`, solved);
                         solved.scriptIndex.push(scriptGroupIndex);
                         resolve(solved)
                     })
@@ -331,63 +332,63 @@ export class GraphEditor {
 
         // Loads main classes
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ActiveDirectory.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Advanced.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AlliedTelesis.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Android.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ArchiMate.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ArchiMate3.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Arrows2.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Atlassian.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS3.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS3D.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS4.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS4b.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Azure.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Azure2.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Basic.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Bootstrap.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-BPMN.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-C4.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cabinet.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cisco.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cisco19.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-CiscoSafe.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Citrix.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cumulus.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-DFD.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-EIP.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Electrical.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ER.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Floorplan.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Flowchart.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-FluidPower.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP2.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP3.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Gmdl.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-IBM.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Infographic.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Ios.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Ios7.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Kubernetes.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-LeanMapping.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Mockup.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-MSCAE.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Network.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Office.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-PID.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Rack.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Signs.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Sitemap.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Sysml.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ThreatModeling.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-UML25.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Veeam.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Veeam2.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-VVD.js', 7);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-WebIcons.js', 7);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ActiveDirectory.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Advanced.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AlliedTelesis.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Android.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ArchiMate.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ArchiMate3.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Arrows2.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Atlassian.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS3.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS3D.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS4.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-AWS4b.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Azure.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Azure2.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Basic.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Bootstrap.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-BPMN.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-C4.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cabinet.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cisco.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cisco19.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-CiscoSafe.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Citrix.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Cumulus.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-DFD.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-EIP.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Electrical.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ER.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Floorplan.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Flowchart.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-FluidPower.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP2.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP3.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Gmdl.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-IBM.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Infographic.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Ios.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Ios7.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Kubernetes.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-LeanMapping.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Mockup.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-MSCAE.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Network.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Office.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-PID.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Rack.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Signs.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Sitemap.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Sysml.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-ThreatModeling.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-UML25.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Veeam.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Veeam2.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-VVD.js', 107);
+        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-WebIcons.js', 107);
 
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/util/mxJsCanvas.js', 8);
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/util/mxAsyncCanvas.js', 8);
@@ -474,8 +475,8 @@ export class GraphEditor {
         }
 
         this.addWebScript(undefined, './mxgraph/grapheditor/shapes-14-6-5.min.js', 9);
-        this.addWebScript(undefined, './mxgraph/grapheditor/stencils.min.js', 9);
-        this.addWebScript(undefined, './mxgraph/grapheditor/extensions.min.js', 10);
+        this.addWebScript(undefined, './mxgraph/grapheditor/stencils.min.js', 104);
+        this.addWebScript(undefined, './mxgraph/grapheditor/extensions.min.js', 109);
 
         this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.extension.js', 12);
 
@@ -506,6 +507,36 @@ export class GraphEditor {
                     })
                 }
             })
+        }
+    }
+
+    activateSideBar() {
+        try {
+            setTimeout(() => {
+                // if (standAloneGroup == 104) { //Stencils Group
+                let mxgraphDiagramContainer = document.getElementById("mxgraph-diagram-container");
+                if (mxgraphDiagramContainer != undefined) {
+                    let geSidebarContainer = mxgraphDiagramContainer.getElementsByClassName("geSidebarContainer")
+                    console.log("mxgraphDiagramContainer", mxgraphDiagramContainer, geSidebarContainer);
+                    if (geSidebarContainer != undefined && geSidebarContainer.length > 0) {
+                        let geSidebarContainerElements = (geSidebarContainer[0]).getElementsByClassName("geTitle");
+                        if (geSidebarContainerElements) {
+                            let geTitleBlocked = Array.from(geSidebarContainerElements).filter(geTitle => geTitle.style.display == 'none');
+                            console.log("geTitleBlocked", geTitleBlocked);
+                            if (geTitleBlocked && geTitleBlocked.length > 0) {
+                                geTitleBlocked.forEach((geTitle, geTitleIndex) => {
+                                    geTitle.style.display = "block";
+                                })
+                            }
+                        }
+                        geSidebarContainer[0].children[3].style.display = "block"
+                        geSidebarContainer[0].children[3].children[0].style.display = "block"
+                    }
+                }
+                // }
+            }, 25);
+        } catch (e) {
+            console.log(e);
         }
     }
 
@@ -718,6 +749,7 @@ export class GraphEditor {
                         DrawIOExtension.prototype.subMenuList = [...Object.keys(ui.actions.actions)];
                     }
                     // console.log("menuList", DrawIOExtension.prototype.menuList.sort(), DrawIOExtension.prototype.subMenuList.sort());
+                    this.activateSideBar();
                     resolve({
                         status: 'Initialized',
                         graphEditorObj: ui,
@@ -777,6 +809,7 @@ if (typeof isWebpack !== 'undefined') {
     // grapheditor(document.getElementById('mxgraph-diagram-container'), document.getElementById('mxgraph-scripts-container'));
     // let xmlData = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guides=\"1\" tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" pageWidth=\"850\" pageHeight=\"1100\"><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/><mxCell id=\"4\" value=\"\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"3\"><mxGeometry relative=\"1\" as=\"geometry\"/></mxCell><mxCell id=\"6\" style=\"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;\" edge=\"1\" parent=\"1\" source=\"2\" target=\"5\"><mxGeometry relative=\"1\" as=\"geometry\"><Array as=\"points\"><mxPoint x=\"440\" y=\"210\"/><mxPoint x=\"590\" y=\"210\"/></Array></mxGeometry></mxCell><mxCell id=\"2\" value=\"Actor\" style=\"shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"410\" y=\"170\" width=\"30\" height=\"60\" as=\"geometry\"/></mxCell><mxCell id=\"3\" value=\"\" style=\"swimlane;startSize=0;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"120\" y=\"80\" width=\"200\" height=\"200\" as=\"geometry\"/></mxCell><mxCell id=\"5\" value=\"\" style=\"shape=tape;whiteSpace=wrap;html=1;\" vertex=\"1\" parent=\"1\"><mxGeometry x=\"530\" y=\"60\" width=\"120\" height=\"100\" as=\"geometry\"/></mxCell></root></mxGraphModel>";
     // let xmlData = '<mxfile host="app.diagrams.net" modified="2021-12-01T19:48:16.875Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36" etag="HP6KexOF3TBy4hIKSY8U" version="15.8.8" type="device"><diagram id="AyI7jbf7Y4loTYQYZaz9" name="Page-1">xVbBcpswEP0aju1ggWP3GttpDunUM55pk6NstiBXsIwsAvTrK2CFTKldO/FMLzb7pIXV27cPvGCRVp8Vz5MvGIH0mB9VXrD0GJvfzcxvA9QdMAsJiJWIOmjigI34BQT6hBYigsNgo0aUWuRDcIdZBjs9wLhSWA63/UA5fGrOYxgBmx2XY/S7iHRCx5r6Dn8EESf2yROfVlJuNxNwSHiE5REUrLxgoRB1d5VWC5ANd5aXLu/hxGpfmIJMX5Kw/7pms23+c7+WjwzjtT8Psg8h1aZre2CIzPkpRKUTjDHjcuXQe4VFFkFzV99Ebs8TYm7AiQH3oHVNzeSFRgMlOpW0agpW9TPlt8FLE3yc2nBZHS8ua4q6WpsCT1JA0AELtYMz57ZS4ioGfWZf0DfKCBwwBVOPyVMguRavwzo4SS3u9/WpaxSmQubTVISfSBM0FIHViL1FVxdluZ6ai6MyHNR2+oquU8GvXBZ0hJEMjFrz5jLCXZG29N6XidCwyXlLbGmmfdjVbSeLp60F6CGgNFTnGzYm2CbcDYlidu5KN4sTS15yNIdz/3RPBmxeSx27nDrd/v2Lthuw1FsMsRSGF7LUm9XNaZr+F1+phH52TmKil6MVZypNYD2l96LJdV7URmtQwvAF6vYGFVxoUOydBvWuLgejYfhmdCzM29OgC8w0F5khZzQgpUglz+A26g//9Ag2Vj/z/6J+9gb1m9C9sTs7dp89weo3</diagram></mxfile>';
+    // let xmlData = '<mxfile host=\"\" modified=\"2021-12-06T19:31:46.338Z\" agent=\"5.0 (Windows)\" etag=\"pzJbhBRwLw9TT0dpwoMQ\" version=\"@DRAWIO-VERSION@\" type=\"device\" pages=\"3\"><diagram id=\"AyI7jbf7Y4loTYQYZaz9\" name=\"Page-1\">xVbBjpswEP0ajq3AkDa9bpLdPWxVpEjt7tGBKTg1DHJMgH59DdgYliZNupFWihTmeQzjN28eOP4qqx8ELdKvGAN3iBvXjr92CPECQpz258ZNj/hB0AOJYLFOssCW/QYNuhotWQyHSaJE5JIVUzDCPIdITjAqBFbTtJ/Ip08taAIzYBtRPkd/sFimPbpcuBZ/BJak5smeq1cyapI1cEhpjNUI8jeOvxKIsr/K6hXwljzDS7/v/sTqUJiAXF6yYf8tJJ93xa99yB8JJqG79PMPuhkH2ZgDQ6zOr0MUMsUEc8o3Fr0TWOYxtHd1VWRznhALBXoK3IOUjW4mLSUqKJUZ16uqYNE86/1d8NIGHxcmXNfjxXWjo/mJNQkHLEUEZ45plENFAvJMnt/ntRyMHqD5fADMQNWjEgRwKtlxqhGqpZYMecPWEJkqmbh6LIIvWhNmKIxGzC36QvUu21N1MSrDQl2nr+i6LvhIeamPMJOBUmvRXsYYlVnH912VMgnbgnZMV2rcp13d9bJ42hngZLuOICTUZwk2q5+mRBEzd5WdRc+Ql47mcOme7smEzWupI5dTJ7u/f9F2A5YGi9EsBcGFLA1mdXOaFu/iKzWTz9ZJVPQyWrGm0gbGUwYv8q7zoi4KQTDFF4g3G5R/oUGRWxvUm7rsz4bhuxItU29Pha4wl5TlipzZgFQs4zSH26g/eO0RZK5+4v5F/eQ/1K9C+8bu7dh+9/ibPw==</diagram><diagram id=\"rl1k0B-hDyAjVCUa-9g7\" name=\"Page-2\">rZPbToQwEIafhksTStF4LeDhQhODh+uGjm21UNLtCuzTW5YpB/fCbGJCwszX6ZT+/xDRrO7vLGvlo+GgoyTmfUTzKElImiTR+MR8mAhN0wkIqzgWLaBUB0AYI90rDrtNoTNGO9VuYWWaBiq3Ycxa023LPozentoyASegrJg+pe+KOznR68t44feghAwnkxhXahaKEewk46ZbIVpENLPGuCmq+wz0KF7Q5fnhxbwWw5P4fDsUeS6UJF8XU7Pbc7bMV7DQuP9tjeZ+M71HvfCubggC+mu3Y+iOr5tOKgdly6qRdX5mPJOu1j4jPsR+YB30vwz44+vJLKmfRTA1ODv4fdiFXqELOIaEYt4tppLglFwbGvxkOEhi7r2I5QPUK6SLrce11c9Bix8=</diagram><diagram id=\"qJsf2gRpfi9BWSCdwc7R\" name=\"Page-3\">rZNNb4MwDIZ/DcdKQNjGuR/rpGmHiUnVdouIS6IFglJTYL9+oThQ1sM0aRIH+4njyO9rArYpu73ltXwxAnQQh6IL2DaI4yiJ42D4QtGPhCXJCAqrBBXNIFNfQDAk2igBp0UhGqNR1UuYm6qCHBeMW2vaZdnR6OWrNS/gBmQ517f0oATKkaZ34cyfQBXSvxyFdFJyX0zgJLkw7RViu4BtrDE4RmW3AT2I53X5ODev5fs2Odh0df8M67do/7kamz3+5co0goUK/7c1mXvmuiG9aFbsvYBu7HoIBUeeobEXvdetVAhZzfPhqHWr45jEUrsscuFRdeCXYcjpGbAI3Q9ffhkqmpR2KwqmBLS9u0dd2AOZ0/t9pbydvZ4clVc+p8Q4rVcxtZ4ldAGp6NPZ7MvZ1S/Ddt8=</diagram></mxfile>';
     let xmlData = '<mxfile host=\"\" modified=\"2021-12-06T19:31:46.338Z\" agent=\"5.0 (Windows)\" etag=\"pzJbhBRwLw9TT0dpwoMQ\" version=\"@DRAWIO-VERSION@\" type=\"device\" pages=\"3\"><diagram id=\"AyI7jbf7Y4loTYQYZaz9\" name=\"Page-1\">xVbBjpswEP0ajq3AkDa9bpLdPWxVpEjt7tGBKTg1DHJMgH59DdgYliZNupFWihTmeQzjN28eOP4qqx8ELdKvGAN3iBvXjr92CPECQpz258ZNj/hB0AOJYLFOssCW/QYNuhotWQyHSaJE5JIVUzDCPIdITjAqBFbTtJ/Ip08taAIzYBtRPkd/sFimPbpcuBZ/BJak5smeq1cyapI1cEhpjNUI8jeOvxKIsr/K6hXwljzDS7/v/sTqUJiAXF6yYf8tJJ93xa99yB8JJqG79PMPuhkH2ZgDQ6zOr0MUMsUEc8o3Fr0TWOYxtHd1VWRznhALBXoK3IOUjW4mLSUqKJUZ16uqYNE86/1d8NIGHxcmXNfjxXWjo/mJNQkHLEUEZ45plENFAvJMnt/ntRyMHqD5fADMQNWjEgRwKtlxqhGqpZYMecPWEJkqmbh6LIIvWhNmKIxGzC36QvUu21N1MSrDQl2nr+i6LvhIeamPMJOBUmvRXsYYlVnH912VMgnbgnZMV2rcp13d9bJ42hngZLuOICTUZwk2q5+mRBEzd5WdRc+Ql47mcOme7smEzWupI5dTJ7u/f9F2A5YGi9EsBcGFLA1mdXOaFu/iKzWTz9ZJVPQyWrGm0gbGUwYv8q7zoi4KQTDFF4g3G5R/oUGRWxvUm7rsz4bhuxItU29Pha4wl5TlipzZgFQs4zSH26g/eO0RZK5+4v5F/eQ/1K9C+8bu7dh+9/ibPw==</diagram><diagram id=\"rl1k0B-hDyAjVCUa-9g7\" name=\"Page-2\">rZPbToQwEIafhksTStF4LeDhQhODh+uGjm21UNLtCuzTW5YpB/fCbGJCwszX6ZT+/xDRrO7vLGvlo+GgoyTmfUTzKElImiTR+MR8mAhN0wkIqzgWLaBUB0AYI90rDrtNoTNGO9VuYWWaBiq3Ycxa023LPozentoyASegrJg+pe+KOznR68t44feghAwnkxhXahaKEewk46ZbIVpENLPGuCmq+wz0KF7Q5fnhxbwWw5P4fDsUeS6UJF8XU7Pbc7bMV7DQuP9tjeZ+M71HvfCubggC+mu3Y+iOr5tOKgdly6qRdX5mPJOu1j4jPsR+YB30vwz44+vJLKmfRTA1ODv4fdiFXqELOIaEYt4tppLglFwbGvxkOEhi7r2I5QPUK6SLrce11c9Bix8=</diagram><diagram id=\"qJsf2gRpfi9BWSCdwc7R\" name=\"Page-3\">rZNNb4MwDIZ/DcdKQNjGuR/rpGmHiUnVdouIS6IFglJTYL9+oThQ1sM0aRIH+4njyO9rArYpu73ltXwxAnQQh6IL2DaI4yiJ42D4QtGPhCXJCAqrBBXNIFNfQDAk2igBp0UhGqNR1UuYm6qCHBeMW2vaZdnR6OWrNS/gBmQ517f0oATKkaZ34cyfQBXSvxyFdFJyX0zgJLkw7RViu4BtrDE4RmW3AT2I53X5ODev5fs2Odh0df8M67do/7kamz3+5co0goUK/7c1mXvmuiG9aFbsvYBu7HoIBUeeobEXvdetVAhZzfPhqHWr45jEUrsscuFRdeCXYcjpGbAI3Q9ffhkqmpR2KwqmBLS9u0dd2AOZ0/t9pbydvZ4clVc+p8Q4rVcxtZ4ldAGp6NPZ7MvZ1S/Ddt8=</diagram></mxfile>';
     let graphEditor = new GraphEditor();
 

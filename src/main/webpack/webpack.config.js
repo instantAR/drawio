@@ -4,6 +4,13 @@ const CompressionPlugin = require("compression-webpack-plugin");
 const path = require('path');
 
 module.exports = {
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'dist'),
+    },
+    compress: true,
+    port: 9000,
+  },
   entry: ['./webpack.index.js'],
   stats: 'errors-warnings',
   output: {
@@ -31,10 +38,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Graph Editor - Draw.io',
       template: './index.html'
-    }),
-    new CompressionPlugin({
-      test: /\.js(\?.*)?$/i,
-      algorithm: "gzip",
     }),
     getCopyConfig([{
       from: './webpackExtensions',
