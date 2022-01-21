@@ -513,44 +513,18 @@ export class GraphEditor {
 
     activateSideBar(editorUi) {
         try {
-            //misc, advance
             var activateSiderBarAfterLoad = ['general', 'basic', 'uml', 'er', 'arrows2', 'flowchart', 'misc', 'advanced']
             setTimeout(() => {
-                // editorUi.sidebar.addGeneralPalette(true); // it will add new General section :-) which is wrong
-                console.log("entries", editorUi.sidebar.entries, editorUi.sidebar.palettes)
+                // console.log("entries", editorUi.sidebar.entries, editorUi.sidebar.palettes)
                 activateSiderBarAfterLoad.forEach((id, index) => {
                     var config = editorUi.sidebar.palettes[id]; // comment me
-                    var isChecked = config && config[0] && config[0].style.display != "none"; // comment me
-                    console.log("entry status", id, isChecked, config, config[1].children[0]); // comment me
-
+                    // var isChecked = config && config[0] && config[0].style.display != "none"; // comment me
+                    // console.log("entry status", id, isChecked, config, config[1].children[0]); // comment me
                     config && config[0] && config[0].style.display == "none" && (config[0].style.display = "block");
                     config && config[1] && config[1].style.display == "none" && (config[1].style.display = "block");
                     index == 0 && config && config[1] && config[1].children[0].style.display == "none" && (config[1].children[0].style.display = "block");
-
                 })
-
-                // if (standAloneGroup == 104) { //Stencils Group
-                let mxgraphDiagramContainer = document.getElementById("mxgraph-diagram-container");
-                if (mxgraphDiagramContainer != undefined) {
-                    let geSidebarContainer = mxgraphDiagramContainer.getElementsByClassName("geSidebarContainer")
-                    console.log("mxgraphDiagramContainer", mxgraphDiagramContainer, geSidebarContainer);
-                    // if (geSidebarContainer != undefined && geSidebarContainer.length > 0) {
-                    //     let geSidebarContainerElements = (geSidebarContainer[0]).getElementsByClassName("geTitle");
-                    //     if (geSidebarContainerElements) {
-                    //         let geTitleBlocked = Array.from(geSidebarContainerElements).filter(geTitle => geTitle.style.display == 'none');
-                    //         console.log("geTitleBlocked", geTitleBlocked);
-                    //         if (geTitleBlocked && geTitleBlocked.length > 0) {
-                    //             geTitleBlocked.forEach((geTitle, geTitleIndex) => {
-                    //                 geTitle.style.display = "block";
-                    //             })
-                    //         }
-                    //     }
-                    //     geSidebarContainer[0].children[3].style.display = "block"
-                    //     geSidebarContainer[0].children[3].children[0].style.display = "block"
-                    // }
-                }
-                // }
-            }, 25);
+            }, 15);
         } catch (e) {
             console.log(e);
         }
