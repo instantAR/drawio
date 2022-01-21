@@ -99,7 +99,7 @@ export function getImageSrc(mimeType, base64Encoded) {
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any }} MenuActionType
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any, 
  *              title?: string, style?:CSSStyleDeclaration, className?:string }} ButtonActionType
- * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, svgStyle: SvgStyle,
+ * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, svgStyle?: SvgStyle,
  *      actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
  *      actionsButtons?: {[key:string]: ButtonActionType},
  *      extraActions?: {[key:string]: 
