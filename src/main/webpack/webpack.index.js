@@ -95,10 +95,11 @@ export function getImageSrc(mimeType, base64Encoded) {
 // graphSize?: GraphSize, printSetting?: {isPrint:boolean},
 /**
  * @typedef {{ width: number, height: number }} GraphSize
+ * @typedef {{ fillColor?: string, strokeColor?: string, fontColor?: string }} SvgStyle
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any }} MenuActionType
  * @typedef {{ actionType:ActionType, callback: OptOut | OptIn, callbackOnFinish?:OptOut, callbackOnError?:OptOut|any, 
  *              title?: string, style?:CSSStyleDeclaration, className?:string }} ButtonActionType
- * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string,  
+ * @typedef {{ orgChartDev?: boolean, navitgateToUrl?:string, svgStyle: SvgStyle,
  *      actions?: {menu?:{help?:boolean} subMenu? : {save?: OptOut, saveAs?: OptOut, open?: OptIn}}, 
  *      actionsButtons?: {[key:string]: ButtonActionType},
  *      extraActions?: {[key:string]: 
@@ -510,28 +511,43 @@ export class GraphEditor {
         }
     }
 
-    activateSideBar() {
+    activateSideBar(editorUi) {
         try {
+            //misc, advance
+            var activateSiderBarAfterLoad = ['general', 'basic', 'uml', 'er', 'arrows2', 'flowchart', 'misc', 'advanced']
             setTimeout(() => {
+                // editorUi.sidebar.addGeneralPalette(true); // it will add new General section :-) which is wrong
+                console.log("entries", editorUi.sidebar.entries, editorUi.sidebar.palettes)
+                activateSiderBarAfterLoad.forEach((id, index) => {
+                    var config = editorUi.sidebar.palettes[id]; // comment me
+                    var isChecked = config && config[0] && config[0].style.display != "none"; // comment me
+                    console.log("entry status", id, isChecked, config, config[1].children[0]); // comment me
+
+                    config && config[0] && config[0].style.display == "none" && (config[0].style.display = "block");
+                    config && config[1] && config[1].style.display == "none" && (config[1].style.display = "block");
+                    index == 0 && config && config[1] && config[1].children[0].style.display == "none" && (config[1].children[0].style.display = "block");
+
+                })
+
                 // if (standAloneGroup == 104) { //Stencils Group
                 let mxgraphDiagramContainer = document.getElementById("mxgraph-diagram-container");
                 if (mxgraphDiagramContainer != undefined) {
                     let geSidebarContainer = mxgraphDiagramContainer.getElementsByClassName("geSidebarContainer")
                     console.log("mxgraphDiagramContainer", mxgraphDiagramContainer, geSidebarContainer);
-                    if (geSidebarContainer != undefined && geSidebarContainer.length > 0) {
-                        let geSidebarContainerElements = (geSidebarContainer[0]).getElementsByClassName("geTitle");
-                        if (geSidebarContainerElements) {
-                            let geTitleBlocked = Array.from(geSidebarContainerElements).filter(geTitle => geTitle.style.display == 'none');
-                            console.log("geTitleBlocked", geTitleBlocked);
-                            if (geTitleBlocked && geTitleBlocked.length > 0) {
-                                geTitleBlocked.forEach((geTitle, geTitleIndex) => {
-                                    geTitle.style.display = "block";
-                                })
-                            }
-                        }
-                        geSidebarContainer[0].children[3].style.display = "block"
-                        geSidebarContainer[0].children[3].children[0].style.display = "block"
-                    }
+                    // if (geSidebarContainer != undefined && geSidebarContainer.length > 0) {
+                    //     let geSidebarContainerElements = (geSidebarContainer[0]).getElementsByClassName("geTitle");
+                    //     if (geSidebarContainerElements) {
+                    //         let geTitleBlocked = Array.from(geSidebarContainerElements).filter(geTitle => geTitle.style.display == 'none');
+                    //         console.log("geTitleBlocked", geTitleBlocked);
+                    //         if (geTitleBlocked && geTitleBlocked.length > 0) {
+                    //             geTitleBlocked.forEach((geTitle, geTitleIndex) => {
+                    //                 geTitle.style.display = "block";
+                    //             })
+                    //         }
+                    //     }
+                    //     geSidebarContainer[0].children[3].style.display = "block"
+                    //     geSidebarContainer[0].children[3].children[0].style.display = "block"
+                    // }
                 }
                 // }
             }, 25);
@@ -749,7 +765,7 @@ export class GraphEditor {
                         DrawIOExtension.prototype.subMenuList = [...Object.keys(ui.actions.actions)];
                     }
                     // console.log("menuList", DrawIOExtension.prototype.menuList.sort(), DrawIOExtension.prototype.subMenuList.sort());
-                    this.activateSideBar();
+                    this.activateSideBar(ui);
                     resolve({
                         status: 'Initialized',
                         graphEditorObj: ui,
@@ -819,6 +835,10 @@ if (typeof isWebpack !== 'undefined') {
                 navitgateToUrl: "https://public_url/route/path",
                 printSetting: {
                     isPrint: false
+                },
+                svgStyle: {
+                    fillColor: "rgb(255, 255, 255)",
+                    strokeColor: "rgb(0, 0, 0)"
                 },
                 actionsButtons: {
                     'Export Library': {

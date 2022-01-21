@@ -2,11 +2,10 @@
  * Add embed dialog option.
  */
 EmbedDialog.showPreviewOption = false;
-
 /**
  * @param {GraphInitConfig} [config] - Grapheditor Configuration.
  */
- DrawIOExtension = function (config) {
+DrawIOExtension = function (config) {
 	if (config !== undefined && config['extraActions'] !== undefined) {
 		Object.keys(config['extraActions']).forEach((menuName) => {
 
@@ -79,7 +78,18 @@ EmbedDialog.showPreviewOption = false;
 			}
 		}
 	}
-
+	// console.log(mxStylesheet.prototype.createDefaultVertexStyle.toString());
+	// mxStylesheet.prototype.createDefaultVertexStyle = function () {
+	// 	var a = {};
+	// 	a[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_RECTANGLE;
+	// 	a[mxConstants.STYLE_PERIMETER] = mxPerimeter.RectanglePerimeter;
+	// 	a[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_MIDDLE;
+	// 	a[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
+	// 	a[mxConstants.STYLE_FILLCOLOR] = config.svgStyle && config.svgStyle.fillColor ? config.svgStyle.fillColor : "#C3D9FF";
+	// 	a[mxConstants.STYLE_STROKECOLOR] = config.svgStyle && config.svgStyle.strokeColor ? config.svgStyle.strokeColor : "#6482B9";
+	// 	a[mxConstants.STYLE_FONTCOLOR] = config.svgStyle && config.svgStyle.fontColor ? config.svgStyle.fontColor : "#774400";
+	// 	return a
+	// }
 }
 
 DrawIOExtension.prototype.menuList = [];
@@ -137,7 +147,7 @@ DrawIOOverridExport = function (config, ui) {
 		shareButton.style.cssFloat = 'right';
 
 		config.actionsButtons[btnKey].style && (Object.assign(shareButton.style, config.actionsButtons[btnKey].style));
-		config.actionsButtons[btnKey].className && (shareButton.className += ' '+config.actionsButtons[btnKey].className);
+		config.actionsButtons[btnKey].className && (shareButton.className += ' ' + config.actionsButtons[btnKey].className);
 		config.actionsButtons[btnKey].title !== undefined && shareButton.setAttribute('title', config.actionsButtons[btnKey].title);
 
 		mxUtils.write(shareButton, btnKey);
