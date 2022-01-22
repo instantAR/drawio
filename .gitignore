@@ -3,3 +3,6 @@ build
 classes
 node_modules
 .vscode/settings.json
+src/main/webpack/zklogic-draw.io-15.7.2-rc1.tgz
+src/main/webpack/out.txt
+src/main/webpack/package-lock.json
