@@ -323,8 +323,8 @@ export class GraphEditor {
         this.addWebScript('Editor', './mxgraph/grapheditor/grapheditor/Editor.js', 4);
         this.addWebScript('EditorUi', './mxgraph/grapheditor/grapheditor/EditorUi.js', 5);
         this.addWebScript('Sidebar', './mxgraph/grapheditor/grapheditor/Sidebar.js', 4);
-        this.addWebScript('Graph', './mxgraph/grapheditor/grapheditor/Graph.js', 4);
-        this.addWebScript('Format', './mxgraph/grapheditor/grapheditor/Format.js', 5);
+        this.addWebScript('Graph', './mxgraph/grapheditor/grapheditor/Graph.js', 5);
+        this.addWebScript('Format', './mxgraph/grapheditor/grapheditor/Format.js', 6);
         this.addWebScript('Shapes', './mxgraph/grapheditor/grapheditor/Shapes.js', 5);
         this.addWebScript('Actions', './mxgraph/grapheditor/grapheditor/Actions.js', 4);
         this.addWebScript('Menus', './mxgraph/grapheditor/grapheditor/Menus.js', 6);
@@ -470,14 +470,14 @@ export class GraphEditor {
         // Org Chart Layout
         if (config.orgChartDev === true) {
             this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/bridge.min.js', 9);
-            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/bridge.collections.min.js', 9);
-            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/OrgChart.Layout.min.js', 9);
-            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/mxOrgChartLayout.js', 9);
+            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/bridge.collections.min.js', 110);
+            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/OrgChart.Layout.min.js', 110);
+            this.addWebScript(undefined, './mxgraph/grapheditor/orgchart/mxOrgChartLayout.js', 110);
         }
 
         this.addWebScript(undefined, './mxgraph/grapheditor/shapes-14-6-5.min.js', 9);
         this.addWebScript(undefined, './mxgraph/grapheditor/stencils.min.js', 104);
-        this.addWebScript(undefined, './mxgraph/grapheditor/extensions.min.js', 109);
+        this.addWebScript(undefined, './mxgraph/grapheditor/extensions.min.js', 111);
 
         this.addWebScript(undefined, './mxgraph/webpackExtensions/draw.io.extension.js', 12);
 
@@ -807,6 +807,7 @@ if (typeof isWebpack !== 'undefined') {
             document.getElementById('mxgraph-diagram-container'),
             document.getElementById('mxgraph-scripts-container'), {
                 navitgateToUrl: "https://public_url/route/path",
+                orgChartDev: false,
                 printSetting: {
                     isPrint: false
                 },
