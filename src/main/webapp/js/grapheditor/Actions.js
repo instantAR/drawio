@@ -485,7 +485,7 @@ Actions.prototype.init = function()
 
 		graph.turnShapes(graph.getResizableCells(graph.getSelectionCells()),
 			(evt != null) ? mxEvent.isShiftDown(evt) : false);
-	}, null, null, Editor.ctrlKey + '+R'));
+	}, null, null, (mxClient.IS_SF) ? null : Editor.ctrlKey + '+R'));
 	this.put('selectConnections', new Action(mxResources.get('selectEdges'), function(evt)
 	{
 		var cell = graph.getSelectionCell();
@@ -1547,7 +1547,7 @@ Actions.prototype.init = function()
 						var geo = graph.getCellGeometry(cell);
 			
 						// Resets fixed connection point
-						if (mxEvent.isShiftDown(evt))
+						if (trigger != null && mxEvent.isShiftDown(evt))
 						{
 							graph.setCellStyles(mxConstants.STYLE_EXIT_X, null, [cell]);
 							graph.setCellStyles(mxConstants.STYLE_EXIT_Y, null, [cell]);

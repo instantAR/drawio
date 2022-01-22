@@ -7,3 +7,6 @@ dist
 src/main/webpack/package-lock.json
 src/main/webpack/*-draw.io-*.tgz
 src/main/webpack/out.txt
+src/main/webpack/zklogic-draw.io-15.7.2-rc1.tgz
+src/main/webpack/out.txt
+src/main/webpack/package-lock.json

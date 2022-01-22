@@ -26,12 +26,21 @@ autoUpdater.logger = log
 autoUpdater.logger.transports.file.level = 'info'
 autoUpdater.autoDownload = false
 
+//Command option to disable hardware acceleration
+if (process.argv.indexOf('--disable-acceleration') !== -1)
+{
+	app.disableHardwareAcceleration();
+}
+
 const __DEV__ = process.env.DRAWIO_ENV === 'dev'
 		
 let windowsRegistry = []
 let cmdQPressed = false
 let firstWinLoaded = false
 let firstWinFilePath = null
+let isMac = process.platform === 'darwin'
+let enableSpellCheck = store.get('enableSpellCheck');
+enableSpellCheck = enableSpellCheck != null? enableSpellCheck : isMac;
 
 //Read config file
 var queryObj = {
@@ -47,7 +56,9 @@ var queryObj = {
 	'picker': 0,
 	'mode': 'device',
 	'export': 'https://convert.diagrams.net/node/export',
-	'disableUpdate': disableUpdate? 1 : 0
+	'disableUpdate': disableUpdate? 1 : 0,
+	'winCtrls': isMac? 0 : 1,
+	'enableSpellCheck': enableSpellCheck? 1 : 0
 };
 
 try
@@ -71,7 +82,7 @@ function createWindow (opt = {})
 {
 	let options = Object.assign(
 	{
-		frame: false,
+		frame: isMac,
 		backgroundColor: '#FFF',
 		width: 1600,
 		height: 1200,
@@ -81,7 +92,7 @@ function createWindow (opt = {})
 			// preload: path.resolve('./preload.js'),
 			nodeIntegration: true,
 			nodeIntegrationInWorker: true,
-			spellcheck: (os.platform() == "darwin" ? true : false),
+			spellcheck: enableSpellCheck,
 			contextIsolation: false,
 			nativeWindowOpen: true
 		}
@@ -147,6 +158,8 @@ function createWindow (opt = {})
 							
 						if (choice === 1)
 						{
+							//If user chose not to save, remove the draft
+							contents.executeJavaScript('global.__emt_removeDraft()', true);
 							win.destroy()
 						}
 						else
@@ -656,6 +669,14 @@ app.on('ready', e =>
 		loadFinished();
     });
 	
+	function toggleSpellCheck()
+	{
+		enableSpellCheck = !enableSpellCheck;
+		store.set('enableSpellCheck', enableSpellCheck);
+	};
+
+	ipcMain.on('toggleSpellCheck', toggleSpellCheck);
+
     let updateNoAvailAdded = false;
     
 	function checkForUpdatesFn() 
@@ -684,7 +705,7 @@ app.on('ready', e =>
 
 	ipcMain.on('checkForUpdates', checkForUpdatesFn);
 
-	if (process.platform === 'darwin')
+	if (isMac)
 	{
 	    let template = [{
 	      label: app.name,
@@ -745,7 +766,7 @@ app.on('ready', e =>
 })
 
 //Quit from the dock context menu should quit the application directly
-if (process.platform === 'darwin') 
+if (isMac) 
 {
 	app.on('before-quit', function() {
 		cmdQPressed = true;
@@ -762,7 +783,7 @@ app.on('window-all-closed', function ()
 	
 	// On OS X it is common for applications and their menu bar
 	// to stay active until the user quits explicitly with Cmd + Q
-	if (cmdQPressed || process.platform !== 'darwin')
+	if (cmdQPressed || !isMac)
 	{
 		app.quit()
 	}

@@ -22,7 +22,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 //This servlet is an interface between draw.io and CloudConverter.
 //For EMF files, it detect its size and resize the huge images such that max dimension is MAX_DIM
@@ -35,7 +36,7 @@ public class ConverterServlet  extends HttpServlet
 	
 	private static final int MAX_DIM = 5000;
 	private static final double EMF_10thMM2PXL = 26.458;
-	private static final String API_KEY_FILE_PATH = "/WEB-INF/cloud_convert_api_key";
+	private static final String API_KEY_FILE_PATH = "/WEB-INF/cloud_convert_api_key"; // Not migrated to new pattern, since will not be used on diagrams.net
 	private static final String CONVERT_SERVICE_URL = "https://api.cloudconvert.com/convert";
 	private static final String CRLF = "\r\n";
 	private static final String TWO_HYPHENS = "--";
@@ -102,7 +103,8 @@ public class ConverterServlet  extends HttpServlet
 	            else
 	            {
 	            	//We expect only one file
-	                fileName = FilenameUtils.getName(item.getName());
+	                Path file = Paths.get(item.getName());
+	                fileName = file.getFileName().toString();
 	                fileContent = item.getInputStream();
 	            }
 	        }
