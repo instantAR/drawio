@@ -104,7 +104,7 @@ export function getImageSrc(mimeType, base64Encoded) {
  *      actionsButtons?: {[key:string]: ButtonActionType},
  *      extraActions?: {[key:string]: 
  *          { [key:string]:MenuActionType | {[key:string]: MenuActionType }}
- *      }, loadAsync: boolean 
+ *      }, loadAsync?: boolean 
  * }} GraphInitConfig
  * @typedef {{ xml: string, name: string }} GraphXmlData
  * @typedef {{ status: string, reason?: any}} GraphEditorNew

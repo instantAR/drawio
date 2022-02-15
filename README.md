@@ -55,9 +55,23 @@ npm install --save @zklogic/draw.io
     </div>
 </div>
 ```
+**component.scss**
+```shell
+:host ::ng-deep {
+    #mxgraph-diagram-container {
+      .geDialog {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        table {
+          left : unset !important;
+        }
+      }
+    }
+  }
+```
 **component.ts**
 ```shell
-import { GraphEditor, GraphInitConfig, GraphXmlData } from '@zklogic/draw.io';
+import { GraphEditor, GraphEditorIn, GraphEditorOut, GraphInitConfig, GraphXmlData, ActionType, GraphEditorSVG, ButtonActionType }from '@zklogic/draw.io';
 ...
 @ViewChild('container', { static: true }) container: ElementRef<HTMLElement>;
 @ViewChild('mxgraphScriptsContainer', { static: true }) mxgraphScriptsContainer: ElementRef<HTMLElement>;
@@ -71,75 +85,60 @@ let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guide
     this.graphEditor.initialized(this.container.nativeElement, this.mxgraphScriptsContainer.nativeElement, {
       actions: {
         subMenu: {
-          open: (): Promise<GraphEditorIn> => {
+          save: (xml: GraphXmlData | GraphEditorSVG): Promise<GraphEditorOut> => {
             return new Promise((resolve, reject) => {
+              //save data here
               resolve({
-                status: "Open From TS",
-                graphData: { xml: xml, name: "ts name" }
-              })
-            })
-          },
-          save: (xml): Promise<GraphEditorOut> => {
-            return new Promise((resolve, reject) => {
-              resolve({
-                status: "From TS",
+                status: "Data Saved",
                 graphData: xml
-              })
-            })
+              } as GraphEditorOut)
+            });
           }
         }
+      },
+      actionsButtons: {
+        'Export Library': {
+          title: "Export To App Library",
+          actionType: ActionType.EXPORTSVG,
+          callback: this.graphEditorLibraryExportEvent,
+          callbackOnError: this.graphEditorActionsErrorEvent,
+          style: {
+            backgroundColor: '#4d90fe',
+            border: '1px solid #3079ed',
+            backgroundImage: 'linear-gradient(#4d90fe 0,#4787ed 100%)',
+            height: '29px',
+            lineHeight: '25px'
+          }
+        } as ButtonActionType,
+        'Import Library': {
+          title: "Import From App Library",
+          actionType: ActionType.OPEN,
+          callback: this.graphEditorLibraryImportEvent,
+          callbackOnFinish: this.graphEditorLibraryImportFinishEvent,
+          style: {
+            backgroundColor: '#4d90fe',
+            border: '1px solid #3079ed',
+            backgroundImage: 'linear-gradient(#4d90fe 0,#4787ed 100%)',
+            height: '29px',
+            lineHeight: '25px'
+          }
+        } as ButtonActionType
       },
       extraActions: {
         file: {
           exportAs: {
-            'TS Library': (graphData) => {
-              return new Promise((resolve, reject) => {
-                resolve({
-                  status: "TS Library Implementation required",
-                  graphData: graphData
-                })
-              })
+            'App Library': {
+              actionType: ActionType.EXPORTSVG,
+              callback: this.graphEditorLibraryExportEvent,
+              callbackOnError: this.graphEditorActionsErrorEvent
             }
           },
           importFrom: {
-            'TS Library': (graphData) => {
-              return new Promise((resolve, reject) => {
-                resolve({
-                  status: "TS Library Implementation required",
-                  graphData: graphData
-                })
-              })
+            'App Library': {
+              actionType: ActionType.OPEN,
+              callback: this.graphEditorLibraryImportEvent,
+              callbackOnFinish: this.graphEditorLibraryImportFinishEvent
             }
-          },
-          openFrom: {
-            'TS Library': (graphData) => {
-              return new Promise((resolve, reject) => {
-                resolve({
-                  status: "TS Library Implementation required",
-                  graphData: graphData
-                })
-              })
-            }
-          }
-        },
-        Setting: {
-          'Setting Opt from TS': (graphData) => {
-            return new Promise((resolve, reject) => {
-              resolve({
-                status: "Setting Opt from TS Implementation required",
-                graphData: graphData
-              })
-            })
-          }
-        },
-        Ex: {
-          test2: (graphData) => {
-            return new Promise((resolve, reject) => {
-              resolve({
-                status: "ex test2 Implementation required",
-                graphData: graphData
-              })
-            })
           }
         }
       }
@@ -158,6 +157,48 @@ let xml = "<mxGraphModel dx=\"1038\" dy=\"381\" grid=\"1\" gridSize=\"10\" guide
     console.log(reject);
   })
 }
+
+graphEditorLibraryImportFinishEvent = (graphData): Promise<GraphEditorOut> => {
+    return new Promise((resolve, reject) => {
+      console.log('graphEditorLibraryImportFinishEvent', graphData);
+      resolve({
+        status: "Import App Library Implementation required",
+        graphData: graphData
+      })
+    })
+  }
+
+  graphEditorLibraryImportEvent = (): Promise<GraphEditorIn> => {
+    return new Promise((resolve, reject) => {
+      this.drawioImport.showDialog((data) => {
+        console.log("callback:data", data);
+        resolve({
+          status: (data && data.drawio_data ? "Okay" : "cancel"),
+          graphData: (data && data.drawio_data ? { xml: data.drawio_data.graphXmlData.xml, name: data.legal_name } : null)
+        })
+      })
+    })
+  }
+
+  graphEditorActionsErrorEvent = (graphData): Promise<GraphEditorOut> => {
+    return new Promise((resolve, reject) => {
+      console.log('graphEditorActionsErrorEvent', graphData);
+      resolve({
+        status: "Export App Library Implementation required",
+        graphData: graphData
+      })
+    })
+  }
+
+  graphEditorLibraryExportEvent = (graphData: GraphEditorSVG): Promise<GraphEditorOut> => {
+    return new Promise((resolve, reject) => {
+      console.log("graphData", graphData);
+      resolve({
+        status: "TS Export App Library Implementation required",
+        graphData: (graphData && graphData.xml ? { xml: graphData.xml, name: graphData.name } : null)
+      })
+    })
+  }
 ```
 License
 -------
@@ -204,3 +245,4 @@ We are grateful for community involvement, bug reports, & feature requests. We d
 not wish to come off as anything but welcoming, however, we've
 made the decision to keep this project closed to contributions for 
 the long term viability of the project.
+@zklogic/draw.io/dist/mxgraph
