@@ -1,6 +1,6 @@
 {
-  "name": "@zklogic/draw.io",
-  "version": "15.7.2-rc1",
+  "name": "draw.io-angular-new",
+  "version": "1.7.0",
   "description": "Draw.IO - Graph Editor integration in Angular-cli",
   "main": "./dist/grapheditor.js",
   "types": "./dist/types/webpack.index.d.ts",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ArfanMirza/drawio.git"
+    "url": "git+https://github.com/bhavinmatariya/drawio.git"
   },
   "keywords": [
     "draw.io",
@@ -28,12 +28,13 @@
   "bugs": {
     "url": "https://github.com/jgraph/drawio-desktop/issues"
   },
-  "homepage": "https://github.com/ArfanMirza/drawio",
+  "homepage": "https://github.com/bhavinmatariya/drawio",
   "dependencies": {
     "pdf-lib": "^1.16.0"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
     "@babel/preset-env": "^7.16.4",
     "babel-loader": "^8.2.3",
     "compression-webpack-plugin": "^9.2.0",

@@ -4882,7 +4882,7 @@ EditorUi.prototype.updateActionStates = function()
 		graph.isValidRoot(ss.cells[0]));
 	this.actions.get('copyData').setEnabled(ss.cells.length == 1);
 	this.actions.get('editLink').setEnabled(ss.cells.length == 1);
-	this.actions.get('editStyle').setEnabled(ss.cells.length == 1);
+	this.actions.get('editStyle')?.setEnabled(ss.cells.length == 1);
 	this.actions.get('editTooltip').setEnabled(ss.cells.length == 1);
 	this.actions.get('openLink').setEnabled(ss.cells.length == 1 &&
 		graph.getLinkForCell(ss.cells[0]) != null);

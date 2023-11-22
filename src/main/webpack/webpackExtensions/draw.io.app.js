@@ -1655,7 +1655,9 @@
          this.formatContainer.style.visibility = 'hidden';
          this.hsplit.style.display = 'none';
          this.sidebarContainer.style.display = 'none';
-         this.sidebarFooterContainer.style.display = 'none';
+         if(this.sidebarFooterContainer?.style?.display) {
+             this.sidebarFooterContainer.style.display = 'none';
+         }
  
          // Sets the initial mode
          if (urlParams['local'] == '1')

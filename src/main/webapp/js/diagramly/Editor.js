@@ -4422,9 +4422,11 @@
 			concat(mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties).
 			concat(mxCellRenderer.defaultShapes['partialRectangle'].prototype.customProperties);
 
-		mxCellRenderer.defaultShapes['tableRow'].prototype.customProperties =
-			mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties.
-			concat(mxCellRenderer.defaultShapes['partialRectangle'].prototype.customProperties);
+			if(mxCellRenderer?.defaultShapes['tableRow']?.prototype?.customProperties) {
+				mxCellRenderer.defaultShapes['tableRow'].prototype.customProperties =
+					mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties.
+					concat(mxCellRenderer.defaultShapes['partialRectangle'].prototype.customProperties);
+			}
 		
 		mxCellRenderer.defaultShapes['doubleEllipse'].prototype.customProperties = [
 	        {name: 'margin', dispName: 'Indent', type: 'float', min:0, defVal:4}

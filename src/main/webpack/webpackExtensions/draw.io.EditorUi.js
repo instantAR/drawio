@@ -11503,7 +11503,9 @@
      {
          this.diagramContainer.style.visibility = (enabled) ? '' : 'hidden';
          this.formatContainer.style.visibility = (enabled) ? '' : 'hidden';
-         this.sidebarFooterContainer.style.display = (enabled) ? '' : 'none';
+         if(this.sidebarFooterContainer?.style?.display) {
+             this.sidebarFooterContainer.style.display = (enabled) ? '' : 'none';
+         }
          this.sidebarContainer.style.display = (enabled) ? '' : 'none';
          this.hsplit.style.display = (enabled) ? '' : 'none';
          this.editor.graph.setEnabled(enabled);

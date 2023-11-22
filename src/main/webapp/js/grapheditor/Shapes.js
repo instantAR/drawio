@@ -6763,19 +6763,21 @@
 
 	 mxStyleRegistry.putValue('isometricEdgeStyle', mxEdgeStyle.IsometricConnector);
 	
-	 var graphCreateEdgeHandler = Graph.prototype.createEdgeHandler;
-	 Graph.prototype.createEdgeHandler = function(state, edgeStyle)
-	 {
-	 	if (edgeStyle == mxEdgeStyle.IsometricConnector)
-	 	{
-	 		var handler = new mxElbowEdgeHandler(state);
-	 		handler.snapToTerminals = false;
-	 		
-	 		return handler;
-	 	}
-	 	
-	 	return graphCreateEdgeHandler.apply(this, arguments);
-	 };
+	 var graphCreateEdgeHandler = Graph.prototype?.createEdgeHandler;
+	 if(Graph.prototype?.createEdgeHandler) {
+		 Graph.prototype.createEdgeHandler = function(state, edgeStyle)
+		 {
+			 if (edgeStyle == mxEdgeStyle.IsometricConnector)
+			 {
+				 var handler = new mxElbowEdgeHandler(state);
+				 handler.snapToTerminals = false;
+				 
+				 return handler;
+			 }
+			 
+			 return graphCreateEdgeHandler.apply(this, arguments);
+		 };
+	 }
 
 	// Defines connection points for all shapes
 	IsoRectangleShape.prototype.constraints = [];
