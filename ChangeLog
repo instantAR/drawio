@@ -1,3 +1,1639 @@
+17-NOV-2023: 22.1.3
+
+- Updates archimate icons [drawio-3863]
+
+15-NOV-2023: 22.1.2
+
+- Fixes move of child cells in groups [drawio-3967]
+- [conf cloud] Fixes bugs in rendering diagrams with pageInfo param [DFCC-64]
+
+13-NOV-2023: 22.1.1
+
+- Reverts part of e6ea9f to restore child cell dragging behaviour [drawio-3967]
+
+08-Nov-2023: 22.1.0
+
+- [conf cloud] Added confluence-content parameter support [DFCC-64]
+- Updates AWS icons to Q3 23 set [drawio-3945]
+
+25-OCT-2023: 22.0.8
+
+- [conf cloud] Excludes old editor from duplicate macros fix [DID-9751]
+
+24-OCT-2023: 22.0.7
+
+- [conf cloud] Fixed math in the viewer [DID-9794]
+
+19-OCT-2023: 22.0.6
+
+- [conf cloud] Fixes Gliffy import hanging when import API fails [DID-9752]
+- [conf cloud] Adds support for importing short links with special characters [DID-9687]
+
+18-OCT-2023: 22.0.5
+
+- [conf cloud] Adds support for importing short links less than 6 characters [DID-9687]
+- [conf cloud] Fixes direct editing in blogposts [DID-9702]
+- [conf cloud] Fixes fullscreen (lightbox) view of diagrams in page templates [DID-9690]
+
+06-OCT-2023: 22.0.4
+
+- Adds Emoji shape support
+
+05-OCT-2023: 22.0.3
+
+- Fixes possible NPE in clonePages error handler
+- [vsdx] Stops using default theme when theme index not found [DID-9622]
+- Fixes tags dialog icons in dark mode [drawio-3910]
+
+03-OCT-2023: 22.0.2
+
+- Fixes new save dialog for SharePoint [drawio-3900]
+- Fixes copy/paste after dialog was shown [drawio-3903]
+
+02-OCT-2023: 22.0.1
+
+- Ignores selection for nested cells with part style
+- Adds salesforce icons [drawio-2793]
+
+28-SEP-2023: 22.0.0
+
+- Adds DRAWIO_SERVER_URL as an additional URL to DRAWIO_BASE_URL. BASE_URL used to indicate
+	the URL both the back-end and static code were delivered on. SERVER_URL now provides a 
+	way to delivery on one URL and server the back-end functions on a different URL. 
+	By default the server URL value is blank.
+- Fixes search for uncompressed shapes, result order
+- Fixes dialog stack order [drawio-3883]
+
+24-SEP-2023: 21.8.2
+
+- Confirm escape key for insert layout [drawio-3880]
+- Scrolls cell to visible after remove from group
+
+22-SEP-2023: 21.8.1
+
+- Attempt to fix NPE in GraphViewer
+- [conf cloud] Fixed custom templates loading in the editor [DID-9482]
+- [conf cloud] Prevent calling theme callback multiple times for the same event [DID-9505]
+- Fixes independent drag of cell with part=1 [DS-950]
+
+20-SEP-2023: 21.8.0
+
+- Ports Cache servlet to AWS Lambda [TI-11]
+- Fixes possible tab scrolling [drawio-desktop-1411]
+- Fixes default parent after root change [drawio-3868]
+- Adds inverse dark filter for iframes [drawio-3869]
+- Inserts overlapping connector on top [drawio-3853]
+- Fixes collapsed details viewer in FF [drawio-3292]
+- Adds spacing, alignment to default style [drawio-3307]
+- Fixes shape search on Android with Chromium [3321]
+- Adds width and height placeholders [drawio-3327]
+- Add allowed domain [DID-9475]
+- Adds length placeholder for edges [drawio-3327]
+- Fixes constrained collapsed resize [drawio-3274]
+- Adds edge meta data in CSV import [drawio-3324]
+- Adds support for same height as width in CSV import
+
+12-SEP-2023: 21.7.5
+
+- Adds CSS styles for Latex SVG export [drawio-3839]
+- Removes invalid flow plugin UI entry [drawio-3840]
+- Fixes child edge bounding box offset [drawio-3844]
+- Fixes saving changes in Notion plugin [drawio-3846]
+- Shows shapes panel only after loading custom libs
+- [conf cloud] Improved error message for 413 HTTP error (file too large) [DID-9113]
+- Fixes contentLength header for UTF16 [drawio-3847]
+
+08-SEP-2023: 21.7.4
+
+- AWS shapes update to Q2 2023 [drawio-3677]
+
+08-SEP-2023: 21.7.3
+
+- Adds title attribute support for custom links
+- Adds Ctrl+Alt+X for copy as image [drawio-3754]
+- Changed app name in shortcuts edit link to draw.io
+- Uses pre-line for newlines in tooltips [DID-9327]
+- Adds WebP image export [drawio-553]
+- Enables text selection in lightbox [drawio-3732]
+- [conf cloud] Added support for custom templates in page IDs import [DID-9320]
+- [conf cloud] Showing actual filename in viewer title tooltip when displayName is different [DID-9241]
+- Handles possible JSON parsing error in DriveClient
+
+01-SEP-2023: 21.7.2
+
+- Fixes library item zoom on label select [DID-9295]
+- [conf cloud]] Added support for diagram names with spaces (untrimmed) [DID-9038]
+
+30-AUG-2023: 21.7.1
+
+- Refreshes after showing/hiding cells [drawio-9263]
+- Fixes moving multiple cells on touch devices
+- Fixes anchors and edge style for sequence diagrams [drawio-desktop-1370]
+- Fixes replace shape for UML lifeline drop targets
+- Enables new save dialog
+
+28-AUG-2023: 21.7.0
+
+- Adds page names in viewer tooltips [drawio-3763]
+- Adds README for Crypto JS library [CSP-2255]
+- Fixes canvas state after redrawShape [drawio-3806]
+- Adds checkbox for current layer with multiple cells
+- Fixes connect/select in locked layer [drawio-3760]
+- Adds Alt+C/V for copy-/pasteStyle [drawio-3632]
+- Adds initial API for custom links on context cells
+- Fixes possible cropping, reduces link dialog width
+- Adds Embed button to convert image URL to data URI
+
+22-AUG-2023: 21.6.9
+
+- Shows sidebar when libraries are loaded [drawio-3744]
+- Fixes toggle shapes panel ignores current state
+- Uses center of shapes for swap action
+- Remembers include diagram state for SVG/PNG export
+- Fixes CSS for exported dark mode SVG [drawio-3768]
+- Fixes printing of background images in CSS dark mode
+
+10-AUG-2023: 21.6.8
+
+- Fixes possible background image error [DID-9099]
+
+07-AUG-2023: 21.6.7
+
+- Fixes offset after page selection [drawio-desktop-1411]
+
+28-JUL-2023: 21.6.6
+
+- Adds improve contrast, fixes CSS for old dark mode
+- [conf cloud] Added config option to generate SVG preview when a diagram is published (generateSVGs: true) [DID-8942]
+- [vsdx] Split EMF conversion into chunks to reduce the chance of timeout and reduce + retries on error
+
+20-JUL-2023: 21.6.5
+
+- Fixes mxIsElectron undefined error in editor.js
+
+20-JUL-2023: 21.6.4
+
+- Uses URL hashtag for embed in Notion [drawio-3376]
+- [conf cloud] Removes draw.io support menu item from Confluence help menu [DID-8934]
+- [desktop] Changes default dark mode to classic [drawio-desktop-1391]
+- Adds html tags check/filteration to i18n parser [CSP-2113]
+- [conf cloud] Fixes Go to Containing Page button in embed diagrams viewer [DID-8704]
+
+18-JUL-2023: 21.6.3
+
+- Shift+Alt+Drag moves selection cells [drawio-3726]
+- Fixes grouping of shapes with table [drawio-3725]
+- Updates DOMPurify from 3.0.3 to 3.0.5
+- Fixes update of page tabs after import [DID-8891]
+- [conf cloud] Load main file diagram if draft unchanged and old version in macro
+- Fixes Grid option in pdf export
+- [jira cloud] Added support for server zip format [DFJC-18]
+- [vsdx] Added support for rotated edge labels [DID-8697]
+- Fixes getBoundingBoxFromGeometry for nested groups
+- Fixes initial scrollbar for demo mode in simple UI
+- Removes voice plugin [CSP-2113]
+- Use Ctrl+Y and Ctrl+Shift+Z for redo [drawio-3733]
+- Sanitizes HTML markup in labels [CSP-2113]
+
+11-JUL-2023: 21.6.2
+
+- Fixes application icon background color
+- Adds swap for two selected vertices in Arrange tab
+- [conf cloud] Adds Gliffy non-mapped shapes to mass import report [DID-8704]
+- Fixes inverted background page colors [drawio-desktop-1375]
+- Hides explore for unconnected cells [drawio-3716]
+- Fixes move cells on fold in lightbox [DID-8763]
+- Fixes handling of UTF-8 in SVG images [drawio-506]
+
+05-JUL-2023: 21.6.1
+
+- Fixes special cases in replace shape [drawio-3686]
+- Enables new dark mode in production [drawio-3701]
+- [conf cloud]] Adds back dark theme [drawio-3698]
+- [jira cloud]] Adds back dark theme [drawio-3697]
+- [vsdx] Fixed edge labels [DID-8697]
+- Fixes blue guides remaining in view [drawio-3695]
+- Uses new dark mode in Notion extension [#3701]
+
+04-JUL-2023: 21.6.0
+
+- Release rejected
+
+28-JUN-2023: 21.5.2
+
+- Fixes text contrast in right sidebar [drawio-3691]
+- Fixes clipping of library symbol icons [DID-8634]
+- Replacing shape replaces all styles [drawio-3686]
+- Disables dark mode in jira and conf cloud [drawio-3692]
+
+26-JUN-2023: 21.5.1
+
+- Adds tolerance for edge handles, click on terminal
+- Shift+alt+drag moves shapes, fixes inconsistencies
+- Shift+alt+drag on resize and terminal handle moves
+- Fixes highlight of connecting edges for shift+drag
+- Fixes update of table handlers, inconsistent code
+- Changes replace behavior to match find logic [drawio-3616]
+- Improves replace in html labels to cover more cases
+- Fixes status not clickable on icon [drawio-3688]
+- Fixes zoom in edit connection points [drawio-3684]
+- Adds grid in connection points dialog [drawio-3685]
+- Changes allowBrowser to an argument in LibraryDialog [DID-8641]
+- [desktop] Fixes stencils and shapes in export due to CSP restrictions
+
+17-JUN-2023: 21.5.0
+
+- Moves electron.js out of drawio project into desktop
+
+16-JUN-2023: 21.4.1
+
+- Fixes misalignment of arrow labels [drawio-3668]
+- [conf cloud] Fixes NPE in theming code 
+- Updates stage sub domain to preprod
+- Adds click handler for preview in new save dialog
+- Ctrl+Drag of active anchor point starts move cell
+- Toggle selection drag starts move of selection
+- Fixes virtual bends for custom edge handlers
+- Ctrl/shift and selected state forces move on edges
+- Reviews innerHTML usage in dialogs.js
+
+14-JUN-2023: 21.4.0
+
+- [jira cloud] Uses dark mode status from host in editor
+- [conf cloud] Uses dark mode status from host in editor
+- [conf cloud] Adds drawio-sketch macro support for page IDs import and re-indexing
+- Fixes possible NPE in fitDiagramToWindow
+- Fixes reset of view state after creating new files
+- [conf cloud] Hide support link in anon views
+- [conf cloud] Fixes link fixing of page IDs import [DID-5141]
+- Adds pass-through for user request error in GitHub
+- Fixes paste of HTML-formatted text [drawio-3666]
+- Fixes https://huntr.dev/bounties/ce75aa04-e4d6-4e0a-9db0-ae84c46ae9e2/
+
+13-JUN-2023: 21.3.9
+
+- Release rejected, failed to deploy to stage
+
+08-JUN-2023: 21.3.8
+
+- [conf cloud] Fixed page anchor of imported pages when it has spaces [DID-8417]
+- Fixes auto dark mode option after dark mode change
+- Fixes editing for Mermaid declaration with comment
+- Fixes ignored selection in fitWindow [drawio-3647]
+- Adds edit and remove for links in labels [drawio-3654]
+- Pick folder for GitHub and GitLab in new save dialog
+- Fixes lost error message for GitLab return code 400
+
+01-JUN-2023: 21.3.7
+
+- [conf cloud] Keeping trailing spaces in attachment name [DID-8309]
+- [conf cloud] Fixed space filter in new page IDs import [DID-8048]
+
+30-MAY-2023: 21.3.6
+
+- [conf cloud] Improved Import Page IDs performance [DID-8048]
+
+27-MAY-2023: 21.3.5
+
+- Fixes tabs converted to spaces in labels [drawio-3540]
+
+24-MAY-2023: 21.3.4
+
+- Adds support for MermaidJS timelines [drawio-3613]
+- Keeps MermaidJS styling after update [drawio-3417]
+- [conf cloud] Count errors of each kind in pageID import, Gliffy/Lucid import, and re-indexing and display summary at bottom of file. Add FAQ text for common fixes.
+- Forces direct load in browser to download PlantUML diagrams
+- [conf cloud] Added page IDs logging - partial [DID-8048]
+- Improves replace shapes [drawio-3505]
+- Removes hard-coded image base path [drawio-3171]
+- Adds titles to shape tags, normalizes search terms [drawio-3618]
+
+23-MAY-2023: 21.3.3
+
+- Allows http and localhost in services (OAuth) [drawio-3079]
+- Fixes nth-check dependencies vulnerability by removing react-scripts and using vite [drawio-dev-dependabot-144]
+- [desktop] Fixed page-index and page-rage CLI export arguments [drawio-3597]
+- [desktop] Fixed svg export scale [drawio-desktop-1165]
+- Fixes Trello power-up repeated auth [DND-1015]
+- Fixes possible NPE in VSDX export [drawio-3608]
+- Fixes automatic dark mode in viewer [drawio-3614]
+- Fixes patch and in-place change of local view state
+- Improves AI prompt for smart template generation
+- Fixes timeout and adds callback in synchronizeFile
+- Adds plain text tooltips to SVG export [drawio-3610]
+- Uses noopener,noreferrer to open links in viewer
+
+15-MAY-2023: 21.3.2
+
+- Fixes NPE added in 21.3.1
+
+15-MAY-2023: 21.3.1
+
+- Removes animation for lightbox in all viewers
+- Shows error for possible NPE in print preview
+- Fixes restoring scrollbars after page selection
+- Fixes view after undo, restore and for blank pages
+- Escapes HTML in embed dialog preview title and body
+- Handles possible missing child in row [drawio-3592]
+- Fixes removed text between < and > with pasteHere
+- Fixes blank PDF export [drawio-3596]
+- Adds shortcut for in-/decrease font [drawio-3585]
+
+12-MAY-2023: 21.3.0
+
+- Updates DOMPurify from 3.0.2 to 3.0.3
+- Fixes in-place change of graph bounds in fitWindow
+- Restores sidebar on dark mode change [drawio-3577]
+- Fixes page scroll while editing text [drawio-3523]
+- [conf cloud] Fixed embed diagram macro when context lack the contentType [DID-8214]
+- Preserves tabs in pasted text from text editors
+- Uses simple theme on iPadOS, iOS and Android
+- [desktop]] Potential fix for spawn errors [drawio-desktop-1122]
+- Resets scrollbar state after inserting new pages
+- Fixes reset of scrollbars after deleting last page
+
+04-MAY-2023: 21.2.9
+
+- Fixes scrolling of iframe parents [drawio-3563]
+
+04-MAY-2023: 21.2.8
+
+- [jira cloud] Uses issueContext instead of the deprecated issueGlance
+- Fixes invalidation for filenames, sanitized labels [CSP-1852]
+
+03-MAY-2023: 21.2.7
+
+- Fixes possible NPE in validate
+
+02-MAY-2023: 21.2.6
+
+- Fixes setting x0 and y0 in graph.sizeDidChange [DS-949]
+
+02-MAY-2023: 21.2.5
+
+- Re-release of 21.2.4 for caching issues
+
+02-MAY-2023: 21.2.4
+
+- Adds wrapper container for view node hierarchy
+- Removes view validation for document title changes
+- Adds less strict search matching [drawio-655]
+- Improves performance for page selection
+- Adds threshhold for reset view check
+- [conf cloud] Adds space filter to pagesIds import [DID-8048]
+
+26-APR-2023: 21.2.3
+
+- Uses move cursor CSS style for table row handle
+- Adds current selected page ID to URL [drawio-3128]
+- Adds lazy ResizeObserver and blocks possible loops [DFCC-61]
+- Fixes fitWindow in page view, refactors common code
+- Fixes syntax for check of property with value of 0
+- [conf cloud] Fix uncompressed custom libraries preview [DID-8096]
+
+25-APR-2023: 21.2.2
+
+- Improves performance for window resize event handlers
+- Fixes handles for zoom and large selection changes
+- Improves performance for GraphViewer [drawio-2766]
+- Ignores invalid numbers in bounding box [DID-8051]
+- Fixes possible divide by zero in router [DID-8051]
+
+19-APR-2023: 21.2.1
+
+- Skips sanitizeHtml for unchanged labels [drawio-3530]
+- Uses cssText property to set CSS in foreignObjects
+- Adds submenu to enable and change diagram language
+
+19-APR-2023: 21.2.0
+
+- Defers bounding box update until after DOM changes [DID-7902]
+
+18-APR-2023: 21.1.9
+
+- Edit connection points in popup menu [drawio-2984]
+- [vsdx] Fixes image cropping [drawio-3518]
+- Updates DOMPurify from 2.4.3 to 3.0.2
+- Fixes image export if inside group [drawio-3516]
+- Increases maximum image size to 1200 pixels and 2 MB
+- Removes Theme submenu from MS Teams app and Confluence DC [drawio-3517]
+
+14-APR-2023: 21.1.8
+
+- Adds headless editor UI class that sets chromeless
+- Fixes line jumps crossing waypoints [drawio-2664]
+- Fixes possible NPE for VSDX import [drawio-3507]
+- Fixes remove group with drag and drop [drawio-3510]
+- Fixes moving vertical label position [drawio-3512]
+- Updates AWS icons [drawio-3336]
+
+12-APR-2023: 21.1.7
+
+- [vsdx] Fixes text overflow of zero width/height labels [DID-7950]
+- Uses Alt+Shift+R for clear waypoints [drawio-3501]
+- Allow blank replace string in dialog [drawio-3502]
+- Handles dark theme change in trees plugin [drawio-3496]
+- Adds smart-template-type, -generate URL parameters
+
+11-APR-2023: 21.1.6
+
+- [conf cloud] Fixes large instances page IDs export and import and using new API [DID-7895]
+- Fixes safari bug with embed mode (calling App.main twice) [drawio-nextcloud-37]
+- Adds support for links to pages in print preview [drawio-722]
+- Blocks direct links to plantUML images generator and from other domains [CSP-1717]
+- Fixes OneDrive saving large files with non-Ascii characters [drawio-3481]
+- Prevents mermaid insertion errors when mxMermaidToDrawio is not available [drawio-3488]
+
+06-APR-2023: 21.1.5
+
+- Fixes asynchronous MathJax rendering [drawio-2876]
+- Added mermaid insertion as draw.io diagram to Atlassian [drawio-3488]
+- [conf cloud] Adds support for importing Gliffy macros with no diagram name (only attachment ID) [DID-7470]
+- [conf cloud] Fixed space filter search when key has "-" [DID-7470]
+- [conf cloud] Added support for Historical revisions of imported pages [DID-7233]
+
+04-APR-2023: 21.1.4
+
+- Remerge and release of dev branch
+
+03-APR-2023: 21.1.3
+
+- Adds zoom and border properties for XML+SVG files
+- Adds Clear Formatting button in Text style panel
+- Removes fontSource cell styles in clear formatting
+- Fixes possible resolving of defaults in stylesheet
+- Conf Cloud: Support proper versioning for embed -> upload [DID-7828]
+- Enables compression with compressXml [drawio-3484]
+
+29-MAR-2023: 21.1.2
+
+- Fixes handling of ctrl+shift+v on Mac [drawio-291]
+- Fixes properties cannot be named id [drawio-3460]
+- [vsdx]] Adds overflow=width to improve support label alignment [DID-7420]
+- Fixes change of title size in tables [drawio-3468]
+- Adds live preview for change of swimlane title size
+
+23-MAR-2023: 21.1.1
+
+- Fixes possible f.replace is not a function
+- Fixes detection for Firefox browser [drawio-3456]
+- Fixes OutlineWindow is not defined in viewer
+- Fixes block layout in link info for multiple links
+
+23-MAR-2023: 21.1.0
+
+- Updates Pako compression library to 2.1.0
+- Fixes inconsistent file opening in app and desktop
+- Disables file compression [drawio-1724]
+- Removes compression in libraries and embedded PDFs [drawio-1724]
+- Fixes change of page ID [drawio-3397]
+
+21-MAR-2023: 21.0.10
+
+- Removes P1 plugin
+
+21-MAR-2023: 21.0.9 Build not released nor tested
+
+- Fixes dialog after resize in viewer and embed mode
+
+18-MAR-2023: 21.0.8
+
+- Fixes sequence diagram generation from mermaid
+
+17-MAR-2023: 21.0.7
+
+- Fixes order of image class in styles [drawio-3432]
+- Fixes update of global edge style [drawio-3429]
+- Connector split clones marker and spacing [DS-946]
+- VSDX import: Fixed some cases of incorrect text alignment [DID-7420]
+
+09-MAR-2023: 21.0.6
+
+- Fixes preview for smart template
+
+09-MAR-2023: 21.0.5 Build Rejected on test
+
+- Fixes e not a function error for arrow [DID-7677]
+- Fixes 404 for sign out from GitLab [drawio-3416]
+
+08-MAR-2023: 21.0.4
+
+- Enables smart templates in production [DS-942]
+
+08-MAR-2023: 21.0.3 Build Rejected on test
+
+- Updates to Mermaid v10 [DS-945]
+- Adds rack shape with vertical size determining number of units.
+- Fixes HTML entities in format change [drawio-3403]
+- [conf cloud] Shows message when conf diagram is edited from Jira Service Desk [DID-7647]
+- Fixes default for container property [drawio-3406]
+
+03-MAR-2023: 21.0.2
+
+- Fixes BPMN event attachment [draw-3342]
+- Removes testing code for no branches [drawio-3396]
+
+02-MAR-2023: 21.0.1
+
+- Changes behaviour of default styling [drawio-3312]
+
+02-MAR-2023: 21.0.0 Build Rejected on test
+
+- Build rejected, failed testing on stage
+
+01-MAR-2023: 20.8.24
+
+- Fixes tolerance and logic for shape picker [drawio-3256]
+- Updates sequence diagram styles in UML 2.5 library
+- Fixes possible clipping of help icon in save dialog
+- Using Mermaid v10 ESM in dev mode [DS-945]
+- Fixed jscompiler error due to dynamic module import.
+- Disables all diagram exports via configuration [drawio-3374]
+- Improves error messages in git clients [drawio-3185]
+- Fixes tooltip for elbow edge styles [drawio-3343]
+- Fixes NPE when "more shapes" is clicked and configured libraries are incorrect
+- [conf cloud] Sorts custom libraries alphabetically [DID-7590, drawio-1287]
+- Fixes possible NPE in ArrangePanel
+
+22-FEB-2023: 20.8.23
+
+- Fixes file extension for .drawio.pdf files [drawio-3368]
+- [conf cloud] Workaround for invalid JSON response from getContentProperty API [DID-7519]
+
+20-FEB-2023: 20.8.22
+
+- Internal release to update hidden flag template functionality [DS-942]
+
+20-FEB-2023: 20.8.21
+
+- [vsdx] Adds special case of text field esc(0) format [DID-7420]
+- Avoids NPE with bad libraries configurations [DID-7439]
+- [conf cloud] Improved Gliffy mass import logs (page links start end time) [DID-7470]
+
+10-FEB-2023: 20.8.20
+
+- Fixes rubberband, links for cells in locked layers [drawio-3343]
+
+09-FEB-2023: 20.8.19
+
+- Disables object selection in locked layers [drawio-3343] 
+
+07-FEB-2023: 20.8.18
+
+- Fixes locked is not defined in read-only diagrams [DS-944]
+- Fixes offset of terminal point after drag and drop
+- Fixes special cases for drag and drop from sidebar
+- Fixes parents for adding edges in cell hierarchies
+- Fixes point offsets for duplicated edges in groups
+
+06-FEB-2023: 20.8.17
+
+- Fixes connection points dialog, adds help button
+- Fixed connection points losing dx, dy on edit (DS-943)
+- Improves UX for UML sequence diagrams [DID-7338]
+- Fixes initial embedded inline editor position
+- Fixes default fill color on UML frame label
+- Fixes inconsistent font color for condition shape
+
+02-FEB-2023: 20.8.16
+
+- Fixes overriden CSS for buttons and button states [drawio-3326]
+- Uses manifest version 3 in Notion Chrome extension
+- Fixes possible NPE in async resize handler
+- Clear default style action disables sketch mode [drawio-3331]
+- View sketch option no longer updates existing cells[drawio-3331]
+
+01-FEB-2023: 20.8.15
+
+- Adds debug output, improves UX in Notion extension
+- Fixes clipping of start screen checkbox in dialog
+- Fixes vertical alignment of show start screen item
+- Fixes CSS for default action button [drawio-desktop-1219]
+
+31-JAN-2023: 20.8.14
+
+- Updates in-place editor after scroll and UI change
+- Fixes CSS specificity and global styles [DID-7294]
+- Limit convert labels to SVG option to online draw.io only
+- [conf cloud] Adds config option to disable the automatic generation of the preview images from the page view ["disableEmbedAutoImgGen": true] [DID-7251]
+- Ignore events on selection border and parent shape
+- Fixes library save, improves error handling [drawio-3323]
+
+26-JAN-2023: 20.8.13
+
+- Fixes NPE when changing colors from toolbar [drawio-3315]
+
+26-JAN-2023: 20.8.12
+
+- Updates CSP and script check for new JS index.html
+- Fixes setDefaultStyle if updateDefaultStyle is false
+- Updated express dependency of nodeImport (vsd server) [CSP-1246]
+- Prevent XSS due to unsanitized input [CSP-1267]
+- Attempt to fix NPE in mxVertexHandler.redrawHandles
+- Error message links to Notion and diagram template
+- Fixes picker and background in inline embed mode
+- Adds links to templates, minimum size for editor
+- Fixes initial view state for inline embed editing
+- Adds viewer entry to CSP generation
+
+24-JAN-2023: 20.8.11
+
+- Simplifies error logging code for parser in MSEdge
+- Adds orgchart to PWA, fixes orgchart in CSV [2028]
+- Adds Custom Orgchart button and handling in dialog
+- Fixes keyboard input in native color dialog [3291]
+- Improves error handling in Notion extension [3284]
+- Adds updateDefaultStyle for tracking style changes
+- Fixes possible NPE in StyleFormatPanel.addStyles
+
+20-JAN-2023: 20.8.10
+
+- [conf cloud] Handles some common errors in initializing viewer
+- [desktop] Updates internal filename in desktop after save as
+
+20-JAN-2023: 20.8.9
+
+- Handles possible errors in custom links
+- Adds paste data in style tab for multiple cells
+- Improves error logging in P2PCollab [drawio-nextcloud-27]
+
+19-JAN-2023: 20.8.8
+
+- Updates actions after undo history events [drawio-3294]
+- Adds navigation items to context menu in simple UI
+- Mermaid Updated to v9.3.0
+- Updates express dependency of nodeImport (vsd server) [CSP-1246]
+- [conf cloud] Removes auth dialog in Safari with anonymous access [DID-7219]
+
+19-JAN-2023: 20.8.7
+
+- Fixes initial page ID and name when creating files [DS-941]
+- [vsdx] Fixed edge/vertex detection [DID-7208]
+- Fixes log of ignored anoymous and extension errors
+
+18-JAN-2023: 20.8.6
+
+- Returns trash URL for trashed Google Drive files
+- Moves refresh icon to header in GitHub file dialog
+- Shift+click in shape picker updates selected cells
+- Fixes refresh icon for OneDrive picker in dark mode
+- Fixes default stroke color applied in UML subshape
+- Applies basic text styles to cells with text class
+- Updates DOMPurify from 2.3.6 to 2.4.3
+- Fixes possible NPE in mxGraph.cloneCells
+- Ignores errors in <anonymous> script source files
+- Shows paste style button for multiple selected cells
+- Calls auth fallback on parse error in Google Drive
+- Handles invalid JSON in P2PCollab message listener
+- Improves error handling for pasting cells
+- Improves error handling for firing mouse events
+- Executes layouts in min and simple layout submenu
+- Fixes center, rounds waypoint for parallel routing
+- Fixes possible NPE for adding SVG with no viewBox
+- Fixes possible NPE in shape picker
+- Hides button to add custom plugins if not allowed
+- Fixes possible NPE in hideDialog
+- Fixes possible NPE in OneDriveClient
+
+12-JAN-2023: 20.8.5
+
+- Fixes possible NPE [DID-7061]
+- Shows spinner while authorizing with Google Drive
+- Conf & Jira Cloud: Added error check to JSON.parse in multiple locations [DID-7101]
+- Lucid import: Added support for notes [DID-7053]
+- Retries saving after invalid response from Google
+- Fixes possible NPE in mxCellEditor
+- Fixes hidden Format option in view menu [DID-7133]
+- About shift+click prints window and app to console
+- Fixes possible NPE in Lucid import extension
+
+11-JAN-2023: 20.8.4
+
+- Fixes evt is not defined in selectSiblings action
+- Adds sharp, rounded, curved option for wire shapes
+- Fixes drawing of markers and shadows in wire shape
+- Fixes sidebar triggers autosave, scale for preview
+- Fixed OneDrive share link [3273]
+- Fixes clientId in checksum error fallback logging
+- Fixes preview graph state, drag preview background
+- Shift+Click on About menu item shows console
+- [conf cloud] Adds viewerCanExceedPageWidth settings to allow increasing the viewer size above the allowed width [DID-7094]
+- Adds fallback for missing translations to show key
+- Fixes specificity for gePrimaryBtn dark mode style
+- Fixes possible NPE for missing resource in confirm
+- Saves file to Google Drive if sharing unavailable
+- Fixes draft dialog shape background for dark mode
+- Adds merge/unmerge to context menu for table cells
+- Fixes reset of view state after initial file save
+- Fixes change stroke color for table cells and rows
+- Removes span with cell styles after paste of text
+
+06-JAN-2023: 20.8.3
+
+- Adds logging for merge fallback success or failure
+- Fires consumeMouseEvent event in consumeMouseEvent
+- Removes edge URL parameter
+- Fixes mouse cursors for direct edge event handling
+
+06-JAN-2023: 20.8.2
+
+- Fixes possible NPE, missing update of page tabs
+- Fallback to mergeFile after checksum error in sync [DS-940]
+- Fixes scrollbars after reset view on empty diagram
+- [jira cloud] license compliance improvements [DFJC-17]
+- Fixes empty edge label handle disables moving edge
+
+03-JAN-2023: 20.8.1
+
+- Fixes substring not a function for invalid pattern
+- Paints grid in fast zoom preview with no page view
+- Shows shapes before freehand in responsive toolbar
+- Fixes CSS for template dialog in dark mode
+- Fixes possible NPE in format panel
+
+02-JAN-2023: 20.8.0
+
+- Fixes possible NPE for window widths below 360px
+- Fixes NPE [DS-935]
+- Shows keyboard shortcuts as tooltips when disabled
+- Decreases tap and hold delay for marquee selection
+- Fixes keyboard shortcuts conflicts
+- Hides no unread notification icon in simple theme
+- Adds background color, shadow, sketch view options
+- Add selection count in simple UI delete popup menu
+- Adds dashed wire shape [3249]
+- Fixes Cloudflare workers deployment scripts to prevent removing KV bindings and dashboard configurations [DS-938]
+- Fixes ignored dark UI theme in embed mode [3172]
+- Fixes edge styles in Advanced sidebar containers
+- Fixes order after split edge and size of waypoint
+- Fixes direct moving of segment edge end points
+- Fixes moving edge segments with segment connector
+- Fixes drag from sidebar and popup on touch devices
+- Fixes ignored final rounding for fast zoom preview
+- Updates zoom label in UI during fast zoom preview
+- Enables line jump format option for wire shapes
+- Fixes dash pattern dropdown for current selection
+- Changes default edge style in simple theme
+- Fixes sketch URL parameter default and host checks
+- Removes redirect for drive button in splash [3260]
+- Fixes possible DOM error in obsolete plugin
+- Attempt to fix possible NPE in TextFormatPanel
+- Moves page actions to submenu in pages menu
+- Adds animation for sidebar and shape picker items
+- Adds live preview for drag and drop from sidebar
+- Fixes hardcoded title font color for process bar
+- Fixes scratchpad and entry background in dark mode
+- Adds native scrolling for page tabs [3265]
+- Fixes preview for edge cases where height is 0
+- Fixes sidebar live preview item count check
+- Adds select option in tags dialog
+- Fixes focus handling with props plugin [3264]
+- Fixes NPE in vsdx import, hiddenTags is null
+- Removes undo/redo from context menu in simple UI
+- Fixes border for predefined colors in dark mode
+- Fixes height for inserted SQL table shapes
+- Adds outline for zoom menu in min and sketch UI
+
+16-DEC-2022: 20.7.4
+
+- Fixes notification icon CSS styles 
+- Fixes vertical offset of bell icon in classic UI 
+- Fixes app icon and comments button in Conf Cloud 
+- Smaller notification count icon
+- Removes shadow for notification icon
+- Shows Classic menu item only in kennedy theme 
+- Darker menu highlight CSS style
+- Improves network status updates and error handling
+- Uses status box styling for collaboration updates
+
+15-DEC-2022: 20.7.3
+
+- Hides empty button container in standalone app 
+- Fixes inconsistent network status icon and message
+- Fixes direct moving of unconnected edge end points
+- Fixes NPE with disabled libs in embed mode [3247]
+- Adds order for multiple cells in popup menu [3248]
+- Adds page CSS in print preview output
+- Fixes possible NPE [DS-933] 
+- Fixes possible NPE in pages menu [DS-934]
+- Fixes print preview dialog in Safari
+- Fixes remove background color in background dialog 
+
+14-DEC-2022: 20.7.2
+
+- Fixes undefined function error when switching to simple UI
+- Adds missing network status and icon in simple UI
+
+13-DEC-2022: 20.7.1
+
+- Restores original default jiggle value for sketch
+- Fixes position of inserted edges with shape picker
+- Fixes user element CSS display after window resize
+- Moves Close item to Diagram menu in modern themes
+
+12-DEC-2022: 20.7.0
+
+- Fixes cell selection while using cursor [DID-6906]
+- VSDX import: Fixed layers (replaced with tags to support multiple layers per cell) and cancelled considering group edges as vertexes. [DID-6874]
+- Refactors simple UI [DRAWIO-DEV-13]
+
+08-DEC-2022: 20.6.2
+
+- Enabled native window frame on Windows and Linux [DESK-784]
+- Adds button container in atlassian sketch mode [DFCS-314]
+- Conf Cloud: Added configuration to auto crop the viewer [DID-6866]
+
+08-DEC-2022: 20.6.1
+
+- Adds API to get cloud storage folder and file URL 
+- Restores edit link menu option in sketch mode 
+- Added support for OneDrive Single Tenant apps [3203]
+- [conf cloud] Copy diagram attachment on Page Editor Copy/paste [DID-6797]
+- Fixes label editing on older iOS versions [3214]
+- Fixes handling of nested cells with negative child
+
+22-NOV-2022: 20.6.0
+
+- Adds search, scratchpad in simple UI shapes dialog
+- Removes tooltip for removed click event handler
+- Supports reading uncompressed library entries [DS-929]
+- Adds AWS lambda authenication replication [DS-930]
+- Fixes ignored locked table and row styles [3174]
+- Adds lock/unlock option in arrange tab
+- Fixes mouse selection bugs on iOS [2758,3055,3056]
+- Handles change of search query via clipboard event
+- [desktop] Added CLI csv export [202]
+- [desktop] Added layers selection support to CLI export [143]
+- Blocks functions from being overwritten with values [DID-6750]
+- Improves visibility of more shapes item in sidebar [DS-931]
+- Checks url parameters before using them [CSP-1035]
+- Removes potential ReDoS code that is not used [CSP-1036]
+- Escapes url parameters used in output [CSP-1037]
+- Fixes link to app folder in Dropbox [2843]
+- Fixes restoring from mxGraphModel files [DID-6788]
+- Fixes hover shape picker ignores container [3199]
+
+06-NOV-2022: 20.5.3
+
+- Uses static Graph.sanitizeHtml
+- Sanitizes status bar content
+- Fixes icon stroke width
+- Shows crop option only if image style is used
+
+04-NOV-2022: 20.5.2
+
+- Fixes infinite redirection in embed + proxy (https://huntr.dev/bounties/28d79d99-81a4-46f3-9455-89658bca424b/)
+- Updates autosize for text insert with keyboard
+- Removes Cloud Fortified program metric API calls
+- getPublicUrl checks for private GitHub repository
+- Limits default simple mode for small window sizes
+- Updates Azure stencils
+- [conf cloud] Fixed getProperty as Atlassian sometimes returns duplicates [DID-6520]
+- [conf cloud] Improved export/import/mass import/re-indexing error logging [DID-6646]
+- Fixes possible CSS and CSP bypass in tickets plugin
+- [conf cloud] Workaround for cases where API returns duplicate entries for unique items [DID-6501]
+
+22-OCT-2022: 20.5.1
+
+- Restores original CSS selector for links in footer
+- Fixes possible NPE for tagsWindow, style in viewer
+- Fixes gray background in Conf Cloud [DID-6578]
+- Fixes find/replace window size in sketch/simple UI
+- Hides all tool windows when diagram is closed
+- Disables themes in viewer
+- Ignores possible missing method for auto dark mode
+
+21-OCT-2022: 20.5.0
+
+- Enables live UI switching between sketch and default themes [DS-909]
+- Replaces old tables in the Threat Modeling library [3019]
+- Shows download banner for own domains only [3119]
+- Consistent select in export, handle auto dark mode
+- Changes label of background image button to image
+- Adds page move menu in sketch theme
+- Fixes ignored movable style for cursor keys [3110]
+- Fixes exit flag for save button in embed mode
+- Adds drag and drop to shape picker
+- Updates autosize for text insert with shape picker (edited) 
+- Fixes proxy infinite redirection loop by a malicious site (https://huntr.dev/bounties/d383a6b8-b12a-4893-9b8f-8df18ec679c3/)
+- [conf cloud] Adds "Edit Owning Page" button to embed diagram editor [DID-6482]
+- [conf cloud] Fixes NPE when publishing a diagram in a page with no draft
+
+19-OCT-2022: 20.4.2
+
+- Fixes draggable elements problem in Chrome [3112]
+
+13-OCT-2022: 20.4.1
+
+- Adds Gliffy file size error message [DS-920]
+- Only hides current menu for mouse down event types [DS-921]
+- Fixes possible #ERROR fill for invalid fillStyles [DS-922]
+- Bugfixes for Rack Cabinet shape [3052]
+- Fixes DOM for empty status message
+- Fixes status alert style in dark mode- 
+- Fixes spaces, missing HTML tag in C4 shapes [3082]
+- Uses data attribute for status event handling code [DS-923]
+- Uses svg icons, fixes revisions dialog for mobile
+- Adds new port shape to the SysML library [3015]
+- Inverts order of toolbar items in revision dialog
+- Adds editing for relative positions in Arrange tab
+- Fixes possible overflow of library preview [3080]
+- Handles data-effect attribute for status bar items
+- Fixes key insert position if mouse outside diagram [DS-924]
+
+29-SEP-2022: 20.4.0
+
+- [conf cloud] Fixed bug that instances without configuration store diagrams as compressed XML [DID-6387]
+- Applies fill=stroke for some stencils [DS-918]
+- Fixed image export text shift in lightbox [DID-6374]
+
+27-SEP-2022: 20.3.7
+
+- [conf cloud] Fixes conf pdf export of diagrams with () in their name
+- Prevents loading compatible files (png, svg...) as local files in embed mode and on-prem [DID-6193]
+- Fixes call to fadeNodes in animation plugin [3070]
+- Added Spacing option to distribute to have equal spacing between cells [736]
+
+22-SEP-2022: 20.3.6
+
+- Fixes possible NPE in viewer lightbox [DS-917]
+
+22-SEP-2022: 20.3.5
+
+- Ignores OS setting for default dark mode [DS-916]
+
+22-SEP-2022: 20.3.4 - BUILD FAILED AT STAGE TESTING - https://github.com/jgraph/drawio-dev/commit/1bb7a0fc531d68ff85653534e4f11774914bcc30
+
+- Changes proxy 500 returns to 400 [DS-915]
+- Disables dark mode with UI in embed mode [DS-6350]
+- Fixes embed button offset and padding in sketch UI
+
+19-SEP-2022: 20.3.3
+
+- Replaces CSS classname in live UI refresh to avoid extension clash [DS-909]
+
+16-SEP-2022: 20.3.2
+
+- Keep SVG content attribute in DOMPurify [DID-6193]
+
+15-SEP-2022: 20.3.1
+
+- Multiple commits preparing for live UI switch [DS-909]
+- Disables java proxy by default [DS-912]
+- Removes click to stop drawing freehand [1109]
+- NPE fix [DS-913]
+- NPE fix [DS-914]
+- [conf cloud] Diagram count restrictions on free tier [DFCC-57]
+- Fixes scroll issue for CMD key in Safari 16 [3017]
+- Enables autosize for multiple vertices [1116]
+- Adds ui/safe to fix possible XSS in math [CSP-733]
+
+07-SEP-2022: 20.3.0
+
+- Uses organic as default layout to fix possible NPE in CSV import [DS-910]
+- Removes storage.googleapis.com from CSP as no longer needed for PWA [CSP-673]
+- Adds ALLOW_CUSTOM_PLUGINS for third party plugins [CSP-676]
+- Limits plugins to built-in or same domain [CSP-676]
+- Hides connect arrows while freehand drawing [1107]
+- Removes yarn.lock file as we removed package.json from this project [DS-911]
+- Fixes possible XSS in viewer back/refresh buttons [CSP-677]
+- Checks href attribute with no namespace in use tag [CSP-678]
+
+01-SEP-2022: 20.2.8
+
+- Fixes importing plain SVG images by drag and drop [DS-902]
+- Adds createToolbarButton helper function [3007]
+- Sets current stroke color and width independently [DS-903]
+- Fixes layout for CSV import in lightbox mode [DS-904]
+- Fixes repeated set default style not working [DS-905]
+- [conf cloud] Catches errors in diagram text extraction to not break re-indexing process [DS-908]
+- Applies fillColor=strokeColor for shapes where appropriate [DS-903]
+- Makes format window closable in min ui [DS-906]
+- Fixes file pattern for workbox [2977]
+- Smaller stencils.min, uses built-in base64 encoder [DS-907]
+- Allows for close icon in minimized format window [DS-906]
+- Adds support for stroke and fill color in stencils [DS-903]
+- Restricts proxy servlet, java disabled by default, all errors are 500 (not distinguishable), allow ports only by config [CSP-633]
+- Conf Cloud: Fixed error of renaming/changing view settings not published if no modification done to the diagram [DID-6141]
+- Adds custom starting unit number to Rack Cabinet shape [2967]
+
+22-AUG-2022: 20.2.7
+
+- Reduces cursor update frequency to reduce DO request count [DS-899]
+- Creates Github app specific to confluence cloud [DS-900]
+- Adds enumeration state in image export [2900]
+- Updates freehand library to fix security dependency issue
+- Fixes highlight for drag over AWS subnet [2966]
+
+21-AUG-2022: 20.2.6
+
+- Updates to latest GCP icon set [DS-898]
+- Changes language menu icon to SVG [DS-897]
+- Use relative URL for service worker [2740]
+
+18-AUG-2022: 20.2.5
+
+- [conf cloud] Adds support for anon users by using display name instead of email [DS-895]
+- [conf cloud] Adds private repository support to embed diagram github option  [DID-5931]
+- [conf cloud] Fixes hi res preview setting in viewer [DID-5978]
+
+15-AUG-2022: 20.2.4
+
+- [conf cloud] Adds support for legacy diagramly macros [DID-5823]
+
+03-AUG-2022: 20.2.3
+
+- [conf cloud] Fixes adding diagrams to unsaved global templates [DID-5761]
+
+26-JUL-2022: 20.2.2
+
+- Uses proxy for loading from template URL [DND-629]
+- [conf cloud] Fixes issue in page update of pageIDs import [DID-5641]
+
+26-JUL-2022: 20.2.1
+
+- Adds statistics to realtime CF worker
+- Adds checksums for merge(File) error logging
+
+22-JUL-2022: 20.2.0
+
+- Changes real-time collaboration CF worker to use the same DO for multiple files
+
+21-JUL-2022: 20.1.4
+
+- Fixes dark mode switch overlaps embed buttons
+- Fixes embed button styles in dark mode
+- Uses proxy for CSV descriptor URL if CSP is used
+
+20-JUL-2022: 20.1.3
+
+- Fixes curved/rounded checkbox in diagram style tab
+- Restores update of default curved/rounded style
+- Adds border width and type for color scheme [2924]
+- Fixes ignored expand style for image change [2921]
+
+19-JUL-2022: 20.1.2
+
+- Update mermaid to v9.1.3
+- Removes Advanced PDF export when printPdfExport is true
+- Adds A/S/D/F/X/C, moves Ctrl+(Shift)+K/X shortcuts
+- Fixes page background if ui URL parameter is used
+- Adds label in dialog/tooltip if diagram translated
+- Uses default browser language for online app
+
+12-JUL-2022: 20.1.1
+
+- Closes secret manager resources
+
+11-JUL-2022: 20.1.0
+
+- [conf cloud] Trial to add archived spaces support to Gliffy mass import
+- Improves performance for CSV parsing (RFC 4180)
+- Uses gcloud secret manager
+- [conf cloud] Changed page IDs export name to draw.io Export
+- [conf cloud] Using Page IDs import/export in cloud/server
+- [conf cloud] Added archived spaces support to Gliffy mass import
+- Changes  pusher.properties to pusher_properties
+
+29-JUN-2022: 20.0.4
+
+- [conf cloud] Adds tags to viewer/lightbox toolbar
+- Adds initial miro import (non-production)
+- Disables math typesetting for plain text [2899]
+
+22-JUN-2022: 20.0.3
+
+- Fixes ignored error codes for loading templates
+- Fixes new tab for insert from template URL [2891]
+- Validates dialog size after window resize [2883]
+- Fixes page tabs overflow after format panel toggle
+- Adds Lithuanian and Latvian translations
+
+21-JUN-2022: 20.0.2
+
+- Fixes autosize and text editor with spacing [2732]
+- Fixes embed mode with math typesetting [2879]
+- Fixes math rendering in embed code for html files
+
+12-JUN-2022: 20.0.1
+
+- Fixes bold math in print output for Chrome [2873]
+- Disables MathJax for Internet Explorer
+- Adds MathJax callback, fixes math in PDF export
+- Fixes style changes override default style [2164]
+
+11-JUN-2022: 20.0.0
+
+- Fixes font style button state before typing [2398]
+- Fixes overwritten style for new cell in CSV import
+- Updates to MathJax 3
+
+08-JUN-2022: 19.0.3
+
+- Adds allowlist for allowed constructors in mxCodec
+- Fixes possible NPE with no local storage [2850]
+- Handles service worker permission error in promise
+- Adds fixedWidth to limit autosize to height [2732]
+
+07-JUN-2022: 19.0.2
+
+- Fixes isNode check, handling of HTML in node names
+- Fixes cell value Element type check in mxCellCodec
+- Changes mxStylesheetCodec.allowEval to false
+
+06-JUN-2022: 19.0.1
+
+- Fixes handling of cell ID in CSV import [DID-5225]
+
+03-JUN-2022: 19.0.0
+
+- Removes IE 11 support
+- Updates mermaid.js to 9.1.1
+- Fixes updating existing cells in CSV import [2796]
+
+02-JUN-2022: 18.2.1
+
+- Updates JSZip to 3.10.0
+- Ignores only cells with hidden state in layouts
+- Fixes reset of document overflow in viewer [2822]
+- Adds support for orgchart layouts in CSV import
+- Updates AWS
+
+31-MAY-2022: 18.2.0
+
+- Fixes inconsistent menus in sketch theme
+- Fixes ignored XML data for importing embedded SVG
+- Fixes ignored double arrow marker selection [2839]
+- Fixes NPE with regex in find/replace dialog [2833]
+- Fixes link icons in dark mode
+- Fixes main button hover state in conf sketch macro
+
+26-MAY-2022: 18.1.3
+
+- Adds spacing dialog for parallels layout
+- Adds allowlist for layout constructor names
+- Adds JSON values for childLayout styles
+- Adds size check for fetched connection data
+- Allows custom protocols in links
+
+23-MAY-2022: 18.1.2
+
+- Limits export proxy URL
+
+20-MAY-2022: 18.1.1
+
+- [VSDX import] Fixes case when theme index is incorrect
+- Checks stencil name parameter in embed servlet
+- Adds DOM_PURIFY_CONFIG global variable
+- Check env var is set in ExportProxy
+
+19-MAY-2022: 18.0.8
+
+- Deletes unused ExportProxyServlet
+
+17-MAY-2022: 18.0.7
+
+- Sets setInstanceFollowRedirects(false) in proxyservlet
+- Fixes issue in state redirect of AbsAuth
+- Changes regex for CORS check
+
+16-MAY-2022: 18.0.6
+
+- Moves sanitize URL to Utils, adds extra IPv6 check
+- Adds additional checks for hyperlinks
+
+15-MAY-2022: 18.0.5
+
+- Adds isLinkLocalAddress() to address checks
+- Limits well known servlet to serving single file
+
+14-MAY-2022: 18.0.4
+
+- Fixes type error for diffsync with overlays [2808]
+- Handles possible error 400 in OneDrive auth flow
+- Fixes update of cell metadata in CSV import [2796]
+- Applies URL filtering checks to location header in java proxy
+- Resolves URL parameters in java proxy before filtering
+
+11-MAY-2022: 18.0.3
+
+- Removes remote cursor options from context menu
+- Fixes patch checking for entry with no secret
+- Updates closure compiler to v20220502
+- Fixes check for text/plain transfer data
+- Fixes replace all ignoring the first match
+
+07-MAY-2022: 18.0.2
+
+- Handles Element fields in object cloning [DND-477]
+- Fixes lost changes for preview while editing
+- Forbids use of form tags in labels
+- Fixes CSS issues in print dialog for lightbox
+
+05-MAY-2022: 18.0.1
+
+- Adds support for windows line break in CSV files
+- [conf cloud] Fixes trailing space in diagram name during page IDs import
+- FIxes timestamp check in watchFile [819] [DND-487]
+- Hides menus and dropdowns if clicked again [2745]
+- Fixes cursor handling for composite cells [2756]
+- [desktop] Adds strict CSP after loading plugins (disabling unsafe-inline scripts)
+
+04-MAY-2022: 18.0.0
+
+- Replaces sanitizer with DOMpurify
+
+04-MAY-2022: 17.5.1
+
+- [conf cloud] Adds saving delay for specific timing case [DID-4851]
+- Adds "shareCursorPosition": true/false configuration
+- [conf cloud] Prevent publishing without changes creating new version
+- Fixes alt+shift for floating connection [DID-4550]
+- Changes default for shareCursorPosition to true
+- Hides non-applicable sketch options for edges
+- Fixes handling of invalid background page images
+- Adds showRemoteCursors option
+- Fixes LocalFile ctor arguments
+- Fixes lazy shadow pages, stale local draft files
+- Fixes conflict handling for writing electron files
+
+28-APR-2022: 17.5.0
+
+- Refactors GCP2 shapes
+- [conf cloud] Improves page IDs import
+
+20-APR-2022: 17.4.6
+
+- Internal release testing whiteboard app changes
+
+11-APR-2022: 17.4.5
+
+- Internal release testing whiteboard app changes
+
+11-APR-2022: 17.4.4
+
+- Internal release testing whiteboard app changes
+
+11-APR-2022: 17.4.3
+
+- Avoids null string in unused token key
+
+09-APR-2022: 17.4.2
+
+- Fixes height of zero height groups in vsdx import
+- Adds connection points support in vsdx import
+- Adds isolation for caches, logs reading non-latest
+
+06-APR-2022: 17.4.1
+
+- Fixes OneDrive inline picker in Link dialog and show all files
+- Extracts text from selection if cells selected
+- Returns indexable text in model cell order
+- Fixes minimum stroke width for image export https://github.com/jgraph/drawio/issues/2723
+- Fixes PDF printing of background images
+- [conf cloud] Fixes NPE in viewer
+- [jira cloud] Adds delete button for cases of removed embed diagrams
+
+31-MAR-2022: 17.4.0
+
+- Disables text selection in OneDrive inline picker
+- [jira cloud] Fixes re-indexing of old diagrams
+- Fixes NPE for OneDrive file in LinkDialog https://github.com/jgraph/drawio/issues/2721
+- Fixes modal sync status in embed with sketch theme
+- GAE API SDK update to 1.9.95
+
+30-MAR-2022: 17.3.0
+
+- [conf cloud] Enables RT on all domains
+- [jira cloud] Fixes conf auth when multiple sites are allowed
+- Adds enableHtmlEditOption in EditorUi [DID-4610]
+
+30-MAR-2022: 17.2.6
+
+- [jira cloud] Adds Configuration page with re-indexing functionality
+
+29-MAR-2022: 17.2.5
+
+- Adds lazy parsing of file data for shadow pages
+- Adds selection option in print dialog for one page
+- Changes token generation to use SecureRandom
+- [conf cloud] Increases timeout after successful write to next write
+
+25-MAR-2022: 17.2.4
+
+- Fixes replace is not a function
+- Fixes Sharepoint saving to site root drives in new picker
+
+25-MAR-2022: 17.2.3
+
+- Fixes custom links in duplicated page for realtime
+- Uses same domain for realtime in production
+
+24-MAR-2022: 17.2.2
+
+- Adds Shift+Alt for floating connections [DID-4550]
+
+23-MAR-2022: 17.2.1
+
+- Fixes realtime for optimistic sync in OneDrive
+
+23-MAR-2022: 17.2.0
+
+- Improves performance issues on real time mechanism
+
+22-MAR-2022: 17.1.5
+
+- [conf cloud] Gliffy import case, containerId wrong, but diagram on current page
+
+22-MAR-2022: 17.1.4
+
+- [conf cloud] Fixed gliffy mass import, incorrect macro type imported
+
+15-MAR-2022: 17.1.3
+
+- Adds image clipPath support to mxLabel and mxSwimlane
+- [jira Cloud] Updates embed conf scopes
+
+11-MAR-2022: 17.1.2
+
+- Skips sort and merge in RT for single receive data
+- Reduces flickering, simplified RT code
+
+10-MAR-2022: 17.1.1
+
+- Uses tab key for nesting in list elements https://github.com/jgraph/drawio/issues/2673
+- Adds protocol and editor version to p2p message
+- Replaces consensus with improved consistency check
+- Fixes Gliffy DnD import
+
+09-MAR-2022: 17.1.0
+
+- Changes freehand drawing to filled path
+- Ignores pageNotFound in background image dialog
+- Fixes handling of default colors in style targets
+- Adds selection only option to print output
+- Fixes background image offset in print output
+- Fixes dark mode and background pages in print output
+
+08-MAR-2022: 17.0.0
+
+- Enables real time collaborative editing
+
+08-MAR-2022: 16.6.8
+
+- [conf cloud] Fixes toolbar showing in page editor in FF
+
+07-MAR-2022: 16.6.7
+
+- Adds MathJax Safe-mode to fix XSS vulnerability when viewer is used with CSP
+
+04-MAR-2022: 16.6.6
+
+- Fixed cropped images of sub shapes not showing
+
+02-MAR-2022: 16.6.5
+
+- Handles drag and drop of .drawio.png image files
+- Improves error handling when loading files
+- Adds i18n for realtime collaboration
+
+24-FEB-2022: 16.6.4
+
+- Make consistency check independent of return value
+- Fixes cropping in background image dialog
+- Adds click handler for status error message
+- [conf cloud] Adds clean draft files to draw.io re-indexing
+- Disables fast sync by default in OneDrive
+
+23-FEB-2022: 16.6.3
+
+- Enables Google Drive on PC in Office addon
+- Enables fast RT for OneDrive
+- Selects URL input after drag and drop
+
+21-FEB-2022: 16.6.2
+
+- Fixes snap to terminal tolerance
+- Fixes import of bitmap images into blank diagrams
+- Fixes dialog title for checksum error [DID-4314]
+- Handles remote page name changes in sketch theme
+
+17-FEB-2022: 16.6.1
+
+- Adds P2PCollab to build
+
+17-FEB-2022: 16.6.0
+
+- Mode URL parameter forces splash
+- Adds pass-through arguments
+- Disables auth check for external editing
+- Fixes parsing of keywords in SQL plugin https://github.com/jgraph/drawio/issues/2631
+
+10-FEB-2022: 16.5.6
+
+- Opens file after drag and drop on blank diagram
+- Shift+drop forces open file in new tab
+- Fixes pinch to zoom in lightbox
+- Moves multitouch event filtering to mxGraph
+
+09-FEB-2022: 16.5.5
+
+- Updates AWS stencils
+
+08-FEB-2022: 16.5.4
+
+- Removes font CSS links with embedded fonts
+- Adds Cmd+Shift+Alt+Drag
+- Allow connection points for vertices only excluding groups
+- Fixed export to pdf error of empty pages
+- Fixes ctrl+resize for groups
+
+02-FEB-2022: 16.5.3
+
+- Fixes sketch font path
+- [conf cloud] Adds linkAdjustment configuration to viewer
+- [Conf Cloud] Fixes issue in linkAdjustment of tooltips
+- Adds shift+drag to swap shapes
+- Adds missing background for SVG files in dark mode
+
+28-JAN-2022: 16.5.2
+
+- Disables iOS scroll workaround in viewer
+
+28-JAN-2022: 16.5.1
+
+- Adds isExternalDataComms flag
+
+28-JAN-2022: 16.5.0
+
+- Keeps windows in viewport for inline embed mode
+- Sets default scrollbars to true
+- [desktop] Removes setting offline to true
+
+27-JAN-2022: 16.4.11
+
+- Fixes build process to deploy teams.html
+
+27-JAN-2022: 16.4.8
+
+- [desktop] Fixes draft files removal when auto-save is enabled
+- Edit connection points dialog can now only be closed via the dialog button
+- [conf cloud] Disables editing if confluence page is opened inside another service (e.g, Jira project pages)
+- Shows label in edit connection points dialog https://github.com/jgraph/drawio/issues/864
+- Fixes touch event handling on Android https://github.com/jgraph/drawio/issues/2579
+- [desktop] Sets offline and offlineApp true
+- [desktop] Display meaningful error when content is imported that requires server
+	https://github.com/jgraph/drawio/issues/2117
+- Fixes drag from picker for Chrome on touch devices
+
+25-JAN-2022: 16.4.7
+
+- Improves output validation of AbsAuthServlet [DND-371]
+- Improves redirect url validation [DND-370]
+- Changes child-src from none to self
+- Fixes two windows with disabled start screen https://github.com/jgraph/drawio-desktop/issues/883
+- Fixes handling of hidden stroke in RoughCanvas
+- Fixes order and start point for circle layout
+- Removes tags and layers icon in sketch footer
+- [conf cloud] Replaces deprecated dialog.on('close', ...)
+- [conf cloud] Forces sketch mode even when config sets ui
+- Improves connection points dialog
+
+24-JAN-2022: 16.4.6
+
+- Fixes border for waypoint shape with sketch style
+- [conf cloud] Added support for "new line" in page name in PageIds Export
+- Fixes configurations not saving https://github.com/jgraph/drawio-desktop/issues/873
+
+21-JAN-2022: 16.4.5
+
+- Corrects SHA for bootstrap
+
+21-JAN-2022: 16.4.4
+
+- Fixes undeclared variable idx
+- Adds a confirmation step to public Github deployment
+- Enables reverse action for edges https://github.com/jgraph/drawio/issues/2569
+- Switches to dev branch of i18n submodule
+- [conf cloud] Uses content.id instead of the deprecated page.id
+- [conf cloud] Fixes errors of spaces in diagram name and NPE in GraphViewer
+
+20-JAN-2022: 16.4.3
+
+- [jira cloud] Adds refresh button to diagram search page
+- Fixes duplicate flipEdge function
+- Adds unknownStyle option for CSV import
+- Uses new app path in Dropbox
+
+19-JAN-2022: 16.4.2
+
+- Fixes NPE on destroyParentHighlight
+
+19-JAN-2022: 16.4.1
+
+- Fixes NPE in CropImageDialog
+- Expands format window on large screens in sketch
+- Fixes parent highlight after change of parent
+
+19-JAN-2022: 16.4.0
+
+- Adds helper function for tree layouts
+- Fixes inkscape svg export size
+- Adds support for special characters and html entities in string properties
+- Adds sketch default font to PWA cache
+- Fixes crop button state
+- Adds insert menu in sketch sidepanel
+- Bypasses proxy for Google fonts, adds font mapping
+- Fixes local folder for Google font in cell style
+- Adds mapping from font CSS URLs to font-face CSS
+
+18-JAN-2022: 16.3.0
+
+- Fixes hardcoded textarea dialog size
+- Adds snapToGrid action
+- Adds flip for groups and edges https://github.com/jgraph/drawio/issues/1895 /1139
+- Fixes copySize enabled state for edges
+- Embeds sketch default font (Architects Daughter)
+- Clears background image with background color
+- Fixes mouse wheel zoom in Brave for Windows https://github.com/jgraph/drawio/issues/2528
+- Adds support for enumerating edges
+
+14-JAN-2022: 16.2.7
+
+- Adds enumerateValue property
+- Adds peristent scratchpad and search in sketch
+- Updated for modified inline CSS
+- Fixes realtime zoom on iPad with sketch https://github.com/jgraph/drawio/issues/2545
+
+12-JAN-2022: 16.2.6
+
+- Fixes NPE
+
+12-JAN-2022: 16.2.5
+
+- Fixes reset of grid color
+- Adds File submenu, windows=0 test URL parameter
+- Adds enumerate property to replace number plugin
+- Adds non-destructive image cropping https://github.com/jgraph/drawio/issues/73
+- Adds Advanced submenu in Import from
+- Adds mailto for short text sharing
+- Adds ellipsis for Comments menu item
+- Fixes broken background page links after import
+
+07-JAN-2022: 16.2.4
+
+- Fixes duplicate edges in CVS import
+- Adds Convert labels to SVG option to SVG export
+
+07-JAN-2022: 16.2.3
+
+- Uses tableRow in ERD shapes
+- Handles special title sizes in table
+- Adds labels checkbox in More Shapes dialog
+
+05-JAN-2022: 16.2.2
+
+- Disables merging for merged cells
+- [conf cloud] Adds support for anchor importing from server + support for adding links to anchors in old editor
+- Adds precedence for alt on mouse down
+- Adds Shift+Click for table range selection
+- Fixes insertRow/Column for selected cell range
+
+04-JAN-2022: 16.2.1
+
+- Fixes cell divider event handling
+
+04-JAN-2022: 16.2.0
+
+- Fixes MathJax anti-aliasing in CLI export https://github.com/jgraph/drawio/issues/2253
+
+03-JAN-2022: 16.1.4
+
+- Fixes possible NPE
+
+03-JAN-2022: 16.1.3
+
+- Fixes highlight for table shapes
+
+30-DEC-2021: 16.1.2
+
+- Adds fillStyle dropdown for image background
+
+29-DEC-2021: 16.1.1
+
+- Avoids creating Blob for parseFile
+- Fixes dimension shape with large stroke size https://github.com/jgraph/drawio/issues/271
+- Hides foreign object warnings in background pages
+- Fixes overflows in minimal and sketch theme https://github.com/jgraph/drawio/issues/2509
+- Fixes freehand mode for Apple pencil on iOS https://github.com/jgraph/drawio/issues/2510
+- Adds tableRow shape, fixes events for merged cells
+- Uses clip path attribute for SVG image clipping
+- Fixes default label background for imported images
+- Fits image to clipPath bounding box
+- Fixes collapsed table foreground https://github.com/jgraph/drawio/issues/2512
+- Fixes overflow in LinkDialog
+- Disables child layout for collapsed cells
+
 23-DEC-2021: 16.1.0
 
 - Fixes inconsistent event cursors on table lines

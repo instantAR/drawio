@@ -35,8 +35,8 @@ DriveFile.prototype.getSize = function()
  */
 DriveFile.prototype.isRestricted = function()
 {
-	return this.desc.userPermission != null && this.desc.labels != null &&
-		this.desc.userPermission.role == 'reader' && this.desc.labels.restricted;
+	return DrawioFile.RESTRICT_EXPORT || (this.desc.userPermission != null && this.desc.labels != null &&
+		this.desc.userPermission.role == 'reader' && this.desc.labels.restricted);
 };
 
 /**
@@ -64,6 +64,31 @@ DriveFile.prototype.getCurrentUser = function()
 DriveFile.prototype.getMode = function()
 {
 	return App.MODE_GOOGLE;
+};
+
+/**
+ * Returns true if copy, export and print are not allowed for this file.
+ */
+DriveFile.prototype.getFileUrl = function()
+{
+	return 'https://drive.google.com/open?authuser=0&id=' + this.getId();
+};
+
+/**
+ * Returns true if copy, export and print are not allowed for this file.
+ */
+DriveFile.prototype.getFolderUrl = function()
+{
+	if (this.desc.labels != null && this.desc.labels.trashed)
+	{
+		return 'https://drive.google.com/drive/trash';
+	}
+	else
+	{
+		return (this.desc.parents != null && this.desc.parents.length > 0) ?
+			'https://drive.google.com/drive/folders/' +
+			this.desc.parents[0].id : null;
+	}
 };
 
 /**
@@ -184,8 +209,13 @@ DriveFile.prototype.saveFile = function(title, revision, success, error, unloadi
 					try
 					{
 						var lastDesc = this.desc;
+						
+						if (this.sync != null)
+						{
+							this.sync.fileSaving();
+						}
 	
-						this.ui.drive.saveFile(this, realRevision, mxUtils.bind(this, function(resp, savedData)
+						this.ui.drive.saveFile(this, realRevision, mxUtils.bind(this, function(resp, savedData, pages, checksum)
 						{
 							try
 							{
@@ -211,7 +241,7 @@ DriveFile.prototype.saveFile = function(title, revision, success, error, unloadi
 									
 									// Shows possible errors but keeps the modified flag as the
 									// file was saved but the cache entry could not be written
-									if (token != null)
+									if (token != null || !Editor.enableRealtimeCache)
 									{
 										this.fileSaved(savedData, lastDesc, mxUtils.bind(this, function()
 										{
@@ -221,10 +251,11 @@ DriveFile.prototype.saveFile = function(title, revision, success, error, unloadi
 											{
 												success(resp);
 											}
-										}), error, token);
+										}), error, token, pages, checksum);
 									}
 									else if (success != null)
 									{
+										// TODO: Fix possible saving state never being reset
 										success(resp);
 									}
 								}
@@ -417,7 +448,7 @@ DriveFile.prototype.saveAs = function(filename, success, error)
  */
 DriveFile.prototype.rename = function(title, success, error)
 {
-	var etag = this.getCurrentEtag();
+	var rev = this.getCurrentRevisionId();
 	
 	this.ui.drive.renameFile(this.getId(), title, mxUtils.bind(this, function(desc)
 	{
@@ -427,7 +458,7 @@ DriveFile.prototype.rename = function(title, success, error)
 
 			if (this.sync != null)
 			{
-				this.sync.descriptorChanged(etag);
+				this.sync.descriptorChanged(rev);
 			}
 			
 			this.save(true, success, error);
@@ -439,7 +470,7 @@ DriveFile.prototype.rename = function(title, success, error)
 			
 			if (this.sync != null)
 			{
-				this.sync.descriptorChanged(etag);
+				this.sync.descriptorChanged(rev);
 			}
 			
 			if (success != null)
@@ -532,6 +563,73 @@ DriveFile.prototype.isEditable = function()
 DriveFile.prototype.isSyncSupported = function()
 {
 	return true;
+};
+
+/**
+ * Hook for subclassers.
+ */
+DriveFile.prototype.isRealtimeSupported = function()
+{
+	return true;
+};
+
+/**
+ * Returns true if all changes should be sent out immediately.
+ */
+DriveFile.prototype.isRealtimeOptional = function()
+{
+	return this.sync != null && this.sync.isConnected();
+};
+
+/**
+ * Returns true if all changes should be sent out immediately.
+ */
+DriveFile.prototype.setRealtimeEnabled = function(value, success, error)
+{
+	if (this.sync != null)
+	{
+		this.ui.drive.executeRequest({
+			'url': '/files/' + this.getId() + '/properties?alt=json&supportsAllDrives=true',
+			'method': 'POST',
+			'contentType': 'application/json; charset=UTF-8',
+			'params': {
+				'key': 'collaboration',
+				'value': (value) ? 'enabled' :
+					((urlParams['fast-sync'] != '0') ?
+						'disabled' : '')
+			}
+		}, mxUtils.bind(this, function()
+		{
+			this.loadDescriptor(mxUtils.bind(this, function(desc)
+			{
+				if (desc != null)
+				{
+					this.sync.descriptorChanged(this.getCurrentEtag());
+					this.sync.updateDescriptor(desc);
+					success();
+				}
+				else
+				{
+					error();
+				}
+			}), error);
+		}), error);
+	}
+	else
+	{
+		error();
+	}
+};
+
+/**
+ * Returns true if all changes should be sent out immediately.
+ */
+DriveFile.prototype.isRealtimeEnabled = function()
+{
+	var collab = this.ui.drive.getCustomProperty(this.desc, 'collaboration');
+
+	return (DrawioFile.prototype.isRealtimeEnabled.apply(this, arguments) &&
+		collab != 'disabled') || (Editor.enableRealtime && collab == 'enabled');
 };
 
 /**
@@ -638,7 +736,30 @@ DriveFile.prototype.setDescriptor = function(desc)
 };
 
 /**
- * Returns the etag from the given descriptor.
+ * Returns the checksum from the given descriptor.
+ */
+DriveFile.prototype.getDescriptorChecksum = function(desc)
+{
+	var value = this.ui.drive.getCustomProperty(desc, 'checksum');
+	var secret = this.getDescriptorSecret(desc);
+	var result = null;
+
+	if (value != null && secret != null)
+	{
+		tokens = value.split(':');
+
+		// Checks if checksum matches current secret
+		if (tokens.length == 2 && tokens[0] == secret)
+		{
+			result = tokens[1];
+		}
+	}
+
+	return result;
+};
+
+/**
+ * Returns the secret from the given descriptor.
  */
 DriveFile.prototype.getDescriptorSecret = function(desc)
 {

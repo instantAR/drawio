@@ -38,7 +38,7 @@ var com;
                      */
                     this.parentsMap = ({});
                     
-                    this.layersMap = ({});
+                    this.layerNames = [];
                     /**
                      * Set to true if you want to display spline debug data
                      */
@@ -288,6 +288,89 @@ var com;
 	                    	}
                     };
                     
+                    var emfChunkSize = window.EMF_CHUNK_SIZE || 10;
+                    
+                    function handleEmfEntriesPartition(emfEntries, index, mediaData)
+                    {
+                        var limit = Math.min(index + emfChunkSize, emfEntries.length);
+
+                        function done()
+                        {
+                            processedFiles++;
+                            doneCheck();
+                            index++;
+
+                            if (index == limit)
+                            {
+                                handleEmfEntriesPartition(emfEntries, index, mediaData);
+                            }
+                        }
+
+                        for (var i = index; i < limit; i++)
+                        {
+                            (function (zipEntry)
+                            {
+                                var retries = 0;
+
+                                function convertEmf(emfBlob)
+                                {
+                                    //send to emf conversion service
+                                    var formData = new FormData();
+                                    formData.append('img', emfBlob, zipEntry.name);
+                                    formData.append('inputformat', 'emf');
+                                    formData.append('outputformat', 'png');
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open('POST', EMF_CONVERT_URL);
+                                    xhr.responseType = 'blob';
+                                    _this.editorUi.addRemoteServiceSecurityCheck(xhr);
+                                    
+                                    xhr.onreadystatechange = mxUtils.bind(this, function()
+                                    {
+                                        if (xhr.readyState == 4)
+                                        {	
+                                            if (xhr.status >= 200 && xhr.status <= 299)
+                                            {
+                                                try
+                                                {
+                                                    var reader = new FileReader();
+                                                    reader.readAsDataURL(xhr.response); 
+                                                    reader.onloadend = function() 
+                                                    {
+                                                        var dataPos = reader.result.indexOf(',') + 1;
+                                                        mediaData[zipEntry.name] = reader.result.substr(dataPos);
+                                                        done();
+                                                    }
+                                                }
+                                                catch (e)
+                                                {
+                                                    console.log(e);
+                                                    done();
+                                                }
+                                            }
+                                            else
+                                            {
+                                                retries++;
+
+                                                if (retries < 3)
+                                                {
+                                                    convertEmf(emfBlob);
+                                                }
+                                                else
+                                                {
+                                                    done();
+                                                }
+                                            }
+                                        }
+                                    });
+                                    
+                                    xhr.send(formData);
+                                };
+
+                                zipEntry.async("blob").then(convertEmf);
+                            })(emfEntries[i]);
+                        }
+                    };
+
                     JSZip.loadAsync(file)                                   
                     .then(function(zip) 
                     {
@@ -302,6 +385,7 @@ var com;
                     	{
 	                        var dateAfter = new Date();
 	                       	//console.log(" (loaded in " + (dateAfter - dateBefore) + "ms)");
+                            var emfEntries = [];
 	                       	
 	                        zip.forEach(function (relativePath, zipEntry) 
 	                        {  
@@ -360,60 +444,9 @@ var com;
 	                            	filesCount++;
 	                            	if ((function (str, searchString) { var pos = str.length - searchString.length; var lastIndex = str.indexOf(searchString, pos); return lastIndex !== -1 && lastIndex === pos; })(name, ".emf")) 
 	                            	{
-                            			var emfDone = function()
-                            			{
-                            				processedFiles++;
-                            				
-		        	                    	doneCheck();
-                            			}
-                            			
 	                            		if (JSZip.support.blob && window.EMF_CONVERT_URL) 
 	                            		{
-	                            			zipEntry.async("blob").then(function (emfBlob)
-			           	                  	{
-	                            				//send to emf conversion service
-	                        					var formData = new FormData();
-	                        					formData.append('img', emfBlob, name);
-	                        					formData.append('inputformat', 'emf');
-	                        					formData.append('outputformat', 'png');
-	                        					
-	                        					var xhr = new XMLHttpRequest();
-	                        					xhr.open('POST', EMF_CONVERT_URL);
-	                        					xhr.responseType = 'blob';
-	                        					_this.editorUi.addRemoteServiceSecurityCheck(xhr);
-	                        					
-	                        					xhr.onreadystatechange = mxUtils.bind(this, function()
-	                        					{
-	                        						if (xhr.readyState == 4)
-	                        						{	
-	                        							if (xhr.status >= 200 && xhr.status <= 299)
-	                        							{
-	                        								try
-	                        								{
-	                        									var reader = new FileReader();
-	                        									reader.readAsDataURL(xhr.response); 
-	                        									reader.onloadend = function() 
-	                        									{
-	                        										var dataPos = reader.result.indexOf(',') + 1;
-	                        									    mediaData[filename] = reader.result.substr(dataPos);
-		                        									emfDone();
-	                        									}
-	                        								}
-	                        								catch (e)
-	                        								{
-	                        									console.log(e);
-	                        									emfDone();
-	                        								}
-	                        							}
-	                        							else
-	                        							{
-	                        								emfDone();
-	                        							}
-	                        						}
-	                        					});
-	                        					
-	                        					xhr.send(formData);
-			           	                  	});
+                                            emfEntries.push(zipEntry);
 	                            		}
 	                            		else
                             			{
@@ -479,6 +512,8 @@ var com;
 	                            	}
 	                           	}
 	                        });
+
+                            handleEmfEntriesPartition(emfEntries, 0, mediaData);
                     	}
                     }, function (e) {
                     		//console.log("Error!" + e.message);
@@ -611,6 +646,27 @@ var com;
                     }
                     ;
                 };
+
+                mxVsdxCodec.prototype.layerIndexToNames = function (indexes)
+                {
+                    var names = [];
+                    
+                    if (indexes)
+                    {
+                        for (var i = 0; i < indexes.length; i++)
+                        {
+                            var layer = parseInt(indexes[i]);
+
+                            if (layer < this.layerNames.length)
+                            {
+                                names.push(this.layerNames[layer]);
+                            }
+                        }
+                    }
+
+                    return names.length > 0? names : [mxResources.get('background')]; // Add all non-layer members to Background tag
+                };
+
                 /**
                  * Imports a page of the document with the actual pageHeight.<br/>
                  * In .vdx, the Y-coordinate grows upward from the bottom of the page.<br/>
@@ -640,78 +696,51 @@ var com;
                 	
                 	//add page layers
                 	var layers = page.getLayers();
-                	this.layersMap[0] = graph.getDefaultParent();
-                	var layersOrder = {}, lastOrder = 0, lastLayer = null;
                     var shapes = page.getShapes();
+                    var hiddenTags = [];
+
+                    //console.log('layers', layers);
 					
-					try
-					{
-						//Trying to determine layers order
-						for (var k = 0; shapes.entries != null && k < shapes.entries.length; k++)
-						{
-							var layer = shapes.entries[k].getValue().layerMember;
-							
-							if (layer != null)
-							{
-								if (lastLayer == null)
-								{
-									layersOrder[layer] = lastOrder;
-									lastLayer = layer;
-								}
-								else if (lastLayer != layer && layersOrder[layer] == null)
-								{
-									lastOrder++;
-									layersOrder[layer] = lastOrder;
-									lastLayer = layer;
-								}
-							}
-						}
-					}
-					catch(e)
-					{
-						console.log('VSDX Import: Failed to detect layers order');
-					}
+                    for (var k = 0; k < layers.length; k++)
+                    {
+                        var layer = layers[k];
+                        // Tags cannot have spaces
+                        var layerName = layer.Name.replace(/\s/g, '_');
+                        this.layerNames.push(layerName);
 
-            		for (var k = 0; k < layers.length; k++)
-            		{
-            			var layer = layers[k];
-            			var layerIndex = layersOrder[k] != null? layersOrder[k] : k;
+                        if (layer.Visible == 0)
+                        {
+                            hiddenTags.push(layerName);
+                        }
 
-            			if (layerIndex == 0)
-            			{
-            				var layerCell = graph.getDefaultParent();
-            			}
-            			else
-            			{
-            				var layerCell = new mxCell();
-            				graph.addCell(layerCell, graph.model.root, layerIndex);
-            			}
-            			
-            			layerCell.setVisible(layer.Visible == 1);
-
-            			if (layer.Lock == 1)
-            			{
-            				layerCell.setStyle("locked=1;");
-            			}
-            			
-            			//TODO handlle color and other properties
-            			layerCell.setValue(layer.Name);
-            			
-            			this.layersMap[k] = layerCell;
-            		}
+                        // Lock is not supported for tags
+                        if (layer.Lock == 1)
+                        {
+                            //layerCell.setStyle("locked=1;");
+                        }
+                    }
 
                 	//add shapes
                     var entries = (function (a) { var i = 0; return { next: function () { return i < a.length ? a[i++] : null; }, hasNext: function () { return i < a.length; } }; })(/* entrySet */ (function (m) { if (m.entries == null)
                         m.entries = []; return m.entries; })(shapes));
                     var pageHeight = page.getPageDimensions().y;
                     var pageId = page.getId();
-                    while ((entries.hasNext())) {
+
+                    while ((entries.hasNext())) 
+                    {
                         var entry = entries.next();
                         var shape = entry.getValue();
-                        var p = this.layersMap[shape.layerMember];
-                        this.addShape(graph, shape, p? p : parent, pageId, pageHeight);
-                    }
-                    ;
+                        var newCell = this.addShape(graph, shape, parent, pageId, pageHeight);
+                        // Map layers to draw.io tags which allows muliple layers(tags) per cell
+                        var layers = this.layerIndexToNames(shape.layerMember);
+
+                        // Edges are not available here yet
+                        if (newCell != null && layers != null)
+                        {
+                            graph.addTagsForCells([newCell], layers);
+                        }
+                    };
+
                     var connects = page.getConnects();
                     var entries2 = (function (a) { var i = 0; return { next: function () { return i < a.length ? a[i++] : null; }, hasNext: function () { return i < a.length; } }; })(/* entrySet */ (function (m) { if (m.entries == null)
                         m.entries = []; return m.entries; })(connects));
@@ -732,14 +761,47 @@ var com;
                     while ((it.hasNext())) {
                         var edgeShapeEntry = it.next();
                         if (edgeShapeEntry.getKey().getPageNumber() === pageId) {
-                            this.addUnconnectedEdge(graph, /* get */ (function (m, k) { if (m.entries == null)
+                            var edge = this.addUnconnectedEdge(graph, /* get */ (function (m, k) { if (m.entries == null)
                                 m.entries = []; for (var i = 0; i < m.entries.length; i++)
                                 if (m.entries[i].key.equals != null && m.entries[i].key.equals(k) || m.entries[i].key === k) {
                                     return m.entries[i].value;
                                 } return null; })(this.parentsMap, edgeShapeEntry.getKey()), edgeShapeEntry.getValue(), pageHeight);
+                            
+                            var layers = this.layerIndexToNames(edgeShapeEntry.getValue().layerMember);
+                            
+                            if (layers != null)
+                            {
+                                graph.addTagsForCells([edge], layers);
+                            }
                         }
+                    };
+
+                    // Now after all used tags are found, add remaining ones and set visibility
+                    if (this.layerNames.length > 0)
+                    {
+                        var tags = graph.getAllTags();
+                        var emptyTags = false;
+	
+                        for (var i = 0; i < this.layerNames.length; i++)
+                        {
+                            if (mxUtils.indexOf(tags, this.layerNames[i]) < 0)
+                            {
+                                emptyTags = true;
+                                break;
+                            }
+                        }
+
+                        // Cannot add tags without cells. Add a dummy cell
+                        if (emptyTags)
+                        {
+                            var dummyCell = graph.insertVertex(parent, null, null, 0, 0, 0, 0);
+                            graph.addTagsForCells([dummyCell], this.layerNames);
+                            dummyCell.setVisible(false);
+                        }
+                        
+                        graph.setHiddenTags(hiddenTags);
                     }
-                    ;
+
                     if (!noSanitize)
                     {
                         this.sanitiseGraph(graph);
@@ -757,18 +819,29 @@ var com;
                 	{
                 		var me = this;
                 		var toCropImgs = [];
-	                	var shapes = page.getShapes().entries || [];
 	                	
-	                	for (var i = 0; i < shapes.length; i++)
-	            		{
-	                		var shape = shapes[i].value || {};
-	                		
-	                		if (shape.toBeCroppedImg)
-	                		{
-	                			toCropImgs.push(shape);
-	                		}
-	            		}
-	                	
+                        function checkShapes(shapes)
+                        {
+                            if (shapes != null)
+                            {
+                                shapes = shapes.entries || [];
+
+                                for (var i = 0; i < shapes.length; i++)
+                                {
+                                    var shape = shapes[i].value || {};
+                                    
+                                    if (shape.toBeCroppedImg)
+                                    {
+                                        toCropImgs.push(shape);
+                                    }
+
+                                    checkShapes(shape.getChildShapes());
+                                }
+                            }
+                        }
+
+                        checkShapes(page.getShapes());
+
 	                	if (toCropImgs.length > 0)
                 		{
 	                		function cropImage(index, callback)
@@ -981,6 +1054,7 @@ var com;
                         var textLabel = shape.getTextLabel();
                         group = graph.insertVertex(parent, null, textLabel, Math.floor(Math.round(o.x * 100) / 100), Math.floor(Math.round(o.y * 100) / 100), Math.floor(Math.round(d.x * 100) / 100), Math.floor(Math.round(d.y * 100) / 100), style);
                     }
+                    var potH = group.geometry.height;
                     var entries = (function (a) { var i = 0; return { next: function () { return i < a.length ? a[i++] : null; }, hasNext: function () { return i < a.length; } }; })(/* entrySet */ (function (m) { if (m.entries == null)
                         m.entries = []; return m.entries; })(children));
                     while ((entries.hasNext())) {
@@ -1007,11 +1081,17 @@ var com;
                             } })(type, com.mxgraph.io.vsdx.mxVsdxConstants.FOREIGN))) {
                                 if (subShape.isVertex()) {
                                     subShape.propagateRotation(shape.getRotation());
+                                    var tmpV;
                                     if (subShape.isGroup()) {
-                                        this.addGroup(graph, subShape, group, pageId, d.y);
+                                        tmpV = this.addGroup(graph, subShape, group, pageId, d.y);
                                     }
                                     else {
-                                        this.addVertex(graph, subShape, group, pageId, d.y);
+                                        tmpV = this.addVertex(graph, subShape, group, pageId, d.y);
+                                    }
+
+                                    if (tmpV && tmpV.geometry)
+                                    {
+                                        potH = Math.max(tmpV.geometry.height, potH);
                                     }
                                 }
                             }
@@ -1045,6 +1125,19 @@ var com;
                         }
                     }
                     ;
+                    if (group.children && group.geometry.height == 0 && potH > 0) 
+                    {
+                        group.geometry.height = potH;
+
+                        for (var i = 0; i < group.children.length; i++)
+                        {
+                            var child = group.children[i];
+                            if (child.geometry)
+                            {
+                                child.geometry.y += potH;
+                            }
+                        }
+                    }
                     if (subLabel) {
                         shape.createLabelSubShape(graph, group);
                     }
@@ -1182,6 +1275,33 @@ var com;
 					catch(e){} //Ignore
 				};
 				
+                function addEdgeSublabel(graph, edge, edgeShape, rotation, lblOffset)
+                {
+                    var label = edgeShape.createLabelSubShape(graph, edge);
+
+                    if (label != null)
+                    {
+                        if (rotation !== 0) 
+                        {
+                            var lblRot = label.getStyle().match(/;rotation=(\d+\.*\d+)/);
+                            
+                            if (lblRot != null)
+                            {
+                                rotation += parseFloat(lblRot[1]);
+                            }
+
+                            label.setStyle(label.getStyle().replace(/;rotation=(\d+\.*\d+)/, '') + ";rotation=" + (rotation > 60 && rotation < 240 ? (rotation + 180) % 360 : rotation));
+                        }
+
+                        var geo = label.getGeometry();
+                        geo.x = (0);
+                        geo.y = (0);
+                        geo.relative = (true);
+                        lblOffset = lblOffset || new mxPoint(0, 0);
+                        geo.offset = (new mxPoint(lblOffset.x - geo.width / 2, lblOffset.y - geo.height / 2));
+                    }
+                };
+
                 /**
                  * Adds a connected edge to the graph.
                  * These edged are the referenced in one Connect element at least.
@@ -1283,46 +1403,49 @@ var com;
                     var styleMap = edgeShape.getStyleFromEdgeShape(parentHeight);
                     var edge;
                     var rotation = edgeShape.getRotation();
-                    if (rotation !== 0) {
-                        edge = graph.insertEdge(parent, null, null, source, target, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
-                        var label = edgeShape.createLabelSubShape(graph, edge);
-                        if (label != null) {
-                            label.setStyle(label.getStyle() + ";rotation=" + (rotation > 60 && rotation < 240 ? (rotation + 180) % 360 : rotation));
-                            var geo = label.getGeometry();
-                            geo.x = (0);
-                            geo.y = (0);
-                            geo.relative = (true);
-                            geo.offset = (new mxPoint(-geo.width / 2, -geo.height / 2));
-                        }
+                    var textLabel = "";
+                    var hasSubLabel = edgeShape.isDisplacedLabel() || edgeShape.isRotatedLabel() || rotation !== 0;
+                    var lblOffset = edgeShape.getLblEdgeOffset(graph.getView(), points);
+
+                    if (!hasSubLabel) 
+                    {
+                        textLabel = edgeShape.getTextLabel(true);
                     }
-                    else {
-                        edge = graph.insertEdge(parent, null, edgeShape.getTextLabel(), source, target, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
-                        var lblOffset = edgeShape.getLblEdgeOffset(graph.getView(), points);
-                        edge.getGeometry().offset = (lblOffset);
-                        
-                        //add entry/exit points when edge, src, and trg are not rotated
-                        if (fromConstraint != null)
-            			{
-            				graph.setConnectionConstraint(edge, source, true,
-            						new mxConnectionConstraint(fromConstraint, false));
-            			}
-                        
-                        if (removeFirstPt)
-                    	{
-	                        points.shift();
-                    	}
-                        
-            			if (toConstraint != null)
-            			{
-            				graph.setConnectionConstraint(edge, target, false,
-            						new mxConnectionConstraint(toConstraint, false));
-            			}
-            			
-            			if (removeLastPt)
-        				{
-	        				points.pop();
-                        }
+
+                    edge = graph.insertEdge(parent, null, textLabel, source, target, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
+                    
+                    if (hasSubLabel) 
+                    {
+                        addEdgeSublabel(graph, edge, edgeShape, rotation, lblOffset);
                     }
+                    else
+                    {
+                        edge.getGeometry().offset = lblOffset;
+                    }
+
+                    //add entry/exit points when edge, src, and trg are not rotated
+                    if (fromConstraint != null)
+                    {
+                        graph.setConnectionConstraint(edge, source, true,
+                                new mxConnectionConstraint(fromConstraint, false));
+                    }
+                    
+                    if (removeFirstPt)
+                    {
+                        points.shift();
+                    }
+                    
+                    if (toConstraint != null)
+                    {
+                        graph.setConnectionConstraint(edge, target, false,
+                                new mxConnectionConstraint(toConstraint, false));
+                    }
+                    
+                    if (removeLastPt)
+                    {
+                        points.pop();
+                    }
+                    
                     var edgeGeometry = graph.getModel().getGeometry(edge);
                     
                     //when source.parent != target.parent the front end will change the edge parent to parent 1 but waypoints are not corrected
@@ -1369,6 +1492,13 @@ var com;
 
 					this.processEdgeGeo(edgeShape, edge) ;
 
+                    var layers = this.layerIndexToNames(edgeShape.layerMember);
+                            
+                    if (layers != null)
+                    {
+                        graph.addTagsForCells([edge], layers);
+                    }
+
                     return edgeId;
                 };
                 /**
@@ -1393,35 +1523,32 @@ var com;
                     var edge;
                     var points = edgeShape.getRoutingPoints(parentHeight, beginXY, edgeShape.getRotation());
                     var rotation = edgeShape.getRotation();
-                    if (rotation !== 0) {
-                        if (edgeShape.getShapeIndex() === 0) {
-                            edge = graph.insertEdge(parent, null, null, null, null, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
-                        }
-                        else {
-                            edge = graph.createEdge(parent, null, null, null, null, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
-                            edge = graph.addEdge(edge, parent, null, null, edgeShape.getShapeIndex() + this.shapeIndexShift++);
-                        }
-                        var label = edgeShape.createLabelSubShape(graph, edge);
-                        if (label != null) {
-                            label.setStyle(label.getStyle() + ";rotation=" + (rotation > 60 && rotation < 240 ? (rotation + 180) % 360 : rotation));
-                            var geo = label.getGeometry();
-                            geo.x = (0);
-                            geo.y = (0);
-                            geo.relative = (true);
-                            geo.offset = (new mxPoint(-geo.width / 2, -geo.height / 2));
-                        }
+                    var textLabel = "";
+                    var hasSubLabel = edgeShape.isDisplacedLabel() || edgeShape.isRotatedLabel() || rotation !== 0;
+                    var lblOffset = edgeShape.getLblEdgeOffset(graph.getView(), points);
+                    
+                    if (!hasSubLabel) 
+                    {
+                        textLabel = edgeShape.getTextLabel(true);
+                    }
+
+                    if (edgeShape.getShapeIndex() === 0) {
+                        edge = graph.insertEdge(parent, null, textLabel, null, null, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
                     }
                     else {
-                        if (edgeShape.getShapeIndex() === 0) {
-                            edge = graph.insertEdge(parent, null, edgeShape.getTextLabel(), null, null, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
-                        }
-                        else {
-                            edge = graph.createEdge(parent, null, edgeShape.getTextLabel(), null, null, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
-                            edge = graph.addEdge(edge, parent, null, null, edgeShape.getShapeIndex() + this.shapeIndexShift++);
-                        }
-                        var lblOffset = edgeShape.getLblEdgeOffset(graph.getView(), points);
-                        edge.getGeometry().offset = (lblOffset);
+                        edge = graph.createEdge(parent, null, textLabel, null, null, com.mxgraph.io.vsdx.mxVsdxUtils.getStyleString(styleMap, "="));
+                        edge = graph.addEdge(edge, parent, null, null, edgeShape.getShapeIndex() + this.shapeIndexShift++);
                     }
+
+                    if (hasSubLabel) 
+                    {
+                        addEdgeSublabel(graph, edge, edgeShape, rotation, lblOffset);
+                    }
+                    else
+                    {
+                        edge.getGeometry().offset = lblOffset;
+                    }
+
                     this.rotateChildEdge(graph.getModel(), parent, beginXY, endXY, points);
                     var edgeGeometry = graph.getModel().getGeometry(edge);
                     //remove begin/end points from points array
@@ -3441,6 +3568,17 @@ var com;
                     mxVsdxModel.prototype.getThemes = function () {
                         return this.themes;
                     };
+                    
+                    mxVsdxModel.prototype.getDefaultTheme = function () 
+                    {
+                        if (this.defaultTheme == null && this.themes.entries != null && this.themes.entries.length > 0)
+                        {
+                            this.defaultTheme = this.themes.entries[0].getValue();
+                        }
+
+                        return this.defaultTheme;
+                    };
+                    
                     mxVsdxModel.prototype.getRelationship = function (rid, path) {
                         var relsDoc = (function (m, k) { return m[k] ? m[k] : null; })(this.xmlDocs, path);
                         if (relsDoc == null || rid == null || (rid.length === 0)) {
@@ -3527,6 +3665,7 @@ var com;
                         this.model = null;
                         this.shapes = ({});
                         this.connects = ({});
+                        this.connectsMap = {};
                         this.cellElements = ({});
                         this.model = model;
                         this.pageElement = pageElem;
@@ -3577,6 +3716,12 @@ var com;
                             			 {
                             				 layerObj[layerAtts[i136].getAttribute("N")] = layerAtts[i136].getAttribute("V");
                             			 }
+
+                                         if (layerObj.Name == null)
+                                         {
+                                            layerObj.Name = 'Layer ' + i135;
+                                         }
+                                         
                             			 this.layers[parseInt(layers[i135].getAttribute("IX"))] = layerObj;
                         			 }
                         		}
@@ -3592,27 +3737,12 @@ var com;
                      */
                     mxVsdxPage.prototype.parseNodes = function (pageElem, model, pageName) {
                         var pageChild = pageElem.firstChild;
+                        // Parse connects first as it is needed in shapes types
                         while ((pageChild != null)) {
                             if (pageChild != null && (pageChild.nodeType == 1)) {
                                 var pageChildElem = pageChild;
                                 var childName = pageChildElem.nodeName;
                                 if ((function (o1, o2) { if (o1 && o1.equals) {
-                                    return o1.equals(o2);
-                                }
-                                else {
-                                    return o1 === o2;
-                                } })(childName, "Rel")) {
-                                    this.resolveRel(pageChildElem, model, pageName);
-                                }
-                                else if ((function (o1, o2) { if (o1 && o1.equals) {
-                                    return o1.equals(o2);
-                                }
-                                else {
-                                    return o1 === o2;
-                                } })(childName, "Shapes")) {
-                                    this.shapes = this.parseShapes(pageChildElem, null, false);
-                                }
-                                else if ((function (o1, o2) { if (o1 && o1.equals) {
                                     return o1.equals(o2);
                                 }
                                 else {
@@ -3625,6 +3755,7 @@ var com;
                                             var connectElem = connectNode;
                                             var connect = new com.mxgraph.io.vsdx.mxVsdxConnect(connectElem);
                                             var fromSheet = connect.getFromSheet();
+                                            this.connectsMap[fromSheet] = true;
                                             var previousConnect = (fromSheet != null && fromSheet > -1) ? (function (m, k) { if (m.entries == null)
                                                 m.entries = []; for (var i = 0; i < m.entries.length; i++)
                                                 if (m.entries[i].key.equals != null && m.entries[i].key.equals(k) || m.entries[i].key === k) {
@@ -3645,6 +3776,32 @@ var com;
                                         connectNode = connectNode.nextSibling;
                                     }
                                     ;
+                                }
+                            }
+                            pageChild = pageChild.nextSibling;
+                        }
+                        ;
+
+                        pageChild = pageElem.firstChild;
+                        while ((pageChild != null)) {
+                            if (pageChild != null && (pageChild.nodeType == 1)) {
+                                var pageChildElem = pageChild;
+                                var childName = pageChildElem.nodeName;
+                                if ((function (o1, o2) { if (o1 && o1.equals) {
+                                    return o1.equals(o2);
+                                }
+                                else {
+                                    return o1 === o2;
+                                } })(childName, "Rel")) {
+                                    this.resolveRel(pageChildElem, model, pageName);
+                                }
+                                else if ((function (o1, o2) { if (o1 && o1.equals) {
+                                    return o1.equals(o2);
+                                }
+                                else {
+                                    return o1 === o2;
+                                } })(childName, "Shapes")) {
+                                    this.shapes = this.parseShapes(pageChildElem, null, false);
                                 }
                                 else if ((function (o1, o2) { if (o1 && o1.equals) {
                                     return o1.equals(o2);
@@ -4164,7 +4321,7 @@ var com;
                             ;
                         }
                         catch (e) {
-                            console.error(e.message, e);
+                           // console.error(e.message, e);
                         }
                         ;
                         this.isProcessed = true;
@@ -4993,7 +5150,7 @@ var com;
                                     style = style + key + asig;
                                 }
                                 catch (e) {
-                                	console.error("mxVsdxUtils.getStyleString," + e + ",style.length=" + style.length + ",key.length=" + key.length + ",asig.length=" + asig.length);
+                                	//console.error("mxVsdxUtils.getStyleString," + e + ",style.length=" + style.length + ",key.length=" + key.length + ",asig.length=" + asig.length);
                                 }
                                 ;
                             }
@@ -7774,7 +7931,7 @@ var com;
                                     return Math.round(parsedValue * 100.0) / 100.0;
                                 }
                                 catch (e) {
-                                    console.error(e.message, e);
+                                    //console.error(e.message, e);
                                 }
                                 ;
                             }
@@ -7790,7 +7947,7 @@ var com;
                                     return this.getScreenNumericalValue$double(parsedValue);
                                 }
                                 catch (e) {
-                                    console.error(e.message, e);
+                                    //console.error(e.message, e);
                                 }
                                 ;
                             }
@@ -9208,7 +9365,11 @@ var com;
                                                 }
                                             }
                                         }
-                                        if (!(value.length === 0)) {
+                                        if (format == 'esc(0)')
+                                        {
+                                            this.fields[ix] = value;
+                                        }
+                                        else if (!(value.length === 0)) {
                                             try {
                                             	//Date can be in string date format or a number
                                             	var date = isNaN(value)? new Date(value) : new Date(Shape.VSDX_START_TIME + Math.floor((parseFloat(value) * 24 * 60 * 60 * 1000)));
@@ -9290,6 +9451,19 @@ var com;
                      * @return {number} Numerical value of the width element.
                      */
                     Shape.prototype.getWidth = function () {
+                        if (this.width < 1 && this.childShapes != null)
+                        {
+                            try
+                            {
+                                for (var i = 0; i < this.childShapes.entries.length; i++)
+                                {
+                                    var c = this.childShapes.entries[i].value;
+                                    this.width = Math.max(c.width, this.width);
+                                }
+                            }
+                            catch(e){}
+                        }
+
                         return this.width === 0 && this.height > 0 ? 1 : this.width;
                     };
                     /**
@@ -9297,6 +9471,19 @@ var com;
                      * @return {number} Numerical value of the height element.
                      */
                     Shape.prototype.getHeight = function () {
+                        if (this.height < 1 && this.childShapes != null)
+                        {
+                            try
+                            {
+                                for (var i = 0; i < this.childShapes.entries.length; i++)
+                                {
+                                    var c = this.childShapes.entries[i].value;
+                                    this.height = Math.max(c.height, this.height);
+                                }
+                            }
+                            catch(e){}
+                        }
+
                         return this.height === 0 && this.width > 0 ? 1 : this.height;
                     };
                     /**
@@ -9360,13 +9547,13 @@ var com;
                     Shape.prototype.getTextParagraphFormated = function (para) {
                         var ret = "";
                         var styleMap = ({});
-                        /* put */ (styleMap["align"] = this.getHorizontalAlign(this.pp, true));
+                        /* put */ (styleMap["text-align"] = this.getHorizontalAlign(this.pp, true));
                         /* put */ (styleMap["margin-left"] = this.getIndentLeft(this.pp));
                         /* put */ (styleMap["margin-right"] = this.getIndentRight(this.pp));
                         /* put */ (styleMap["margin-top"] = this.getSpBefore(this.pp) + "px");
                         /* put */ (styleMap["margin-bottom"] = this.getSpAfter(this.pp) + "px");
                         /* put */ (styleMap["text-indent"] = this.getIndentFirst(this.pp));
-                        /* put */ (styleMap["valign"] = this.getAlignVertical());
+                        /* put */ (styleMap["vertical-align"] = this.getAlignVertical());
                         /* put */ (styleMap["direction"] = this.getTextDirection(this.pp));
                         ret += this.insertAttributes(para, styleMap);
                         return ret;
@@ -9735,6 +9922,52 @@ var com;
                     Shape.prototype.setLastKnot = function (lastKnot) {
                         this.lastKnot = lastKnot;
                     };
+
+                    Shape.prototype.getConnections = function () 
+                    {
+						var connections = [];
+
+                    	if (this.sections && this.sections['Connection'])
+                    	{
+                            var h = this.getHeight(), w = this.getWidth();
+	                    	var rows = com.mxgraph.io.vsdx.mxVsdxUtils.getDirectChildNamedElements(this.sections['Connection'].elem, "Row");
+
+	                    	for (var i = 0; i < rows.length; i++)
+	                    	{
+								var cells = com.mxgraph.io.vsdx.mxVsdxUtils.getDirectChildElements(rows[i]);
+                                var x, y;
+
+                        		for (var j = 0; j < cells.length; j++)
+                    			{
+                            		var cell = cells[j];
+									var cn = cell.getAttribute("N");
+                                    var val = this.getScreenNumericalValue$org_w3c_dom_Element$double(cell, 0);
+                        			
+                        			if (cn == 'X')
+                        			{
+                            			x = mxUtils.format(val / w);
+                        			}
+                                    else if (cn == 'Y')
+                                    {
+                                        y = mxUtils.format(1 - val / h);
+                                    }
+                        		}
+
+                                if (x != null && y != null)
+                                {
+                                    connections.push({x: x, y: y});
+                                }
+		                    }
+                    	}
+
+                        if (connections.length == 0 && this.master && this.master.masterShape)
+                        {
+                            connections = this.master.masterShape.getConnections();
+                        }
+
+						return connections;
+                    };
+
                     return Shape;
                 }(com.mxgraph.io.vsdx.Style));
                 Shape.VSDX_START_TIME = new Date('1899-12-30T00:00:00Z').getTime();
@@ -9838,6 +10071,14 @@ var com;
                             if (m.entries[i].key.equals != null && m.entries[i].key.equals(k) || m.entries[i].key === k) {
                                 return m.entries[i].value;
                             } return null; })(model.getThemes(), themeIndex);
+                        if (theme == null) {
+                            if (urlParams['dev'] == '1')
+                            {
+                                console.log('No theme found for index ' + themeIndex);
+                            }
+                            // Using a default theme doesn't work well with all cases. Maybe give users an option to choose a default theme?
+                            // theme = model.getDefaultTheme();
+                        }
                         var variant = page.getCellIntValue("VariationColorIndex", 0);
                         _this.setThemeAndVariant(theme, variant);
                         {
@@ -9866,14 +10107,16 @@ var com;
                         else {
                             _this.processGeomList(null);
                         }
-                        _this.vertex = vertex || (_this.childShapes != null && !(function (m) { if (m.entries == null)
-                            m.entries = []; return m.entries.length == 0; })(_this.childShapes)) || (_this.geomList != null && (!_this.geomList.isNoFill()  || _this.geomList.getGeoCount() > 1));
+
+                        // TODO It's hard to detect edges that should be treated like vertexes whhen they are groups and have child shapes.
+                        // TODO Check this again if more complains are received or if we can have an edge group
+                        _this.vertex = vertex || (!page.connectsMap[_this.Id] && (_this.childShapes != null && !(function (m) { if (m.entries == null)
+                            m.entries = []; return m.entries.length == 0; })(_this.childShapes)) || (_this.geomList != null && (!_this.geomList.isNoFill()  || _this.geomList.getGeoCount() > 1)));
                         _this.layerMember = _this.getValue(_this.getCellElement$java_lang_String("LayerMember"));
                         
-                        //We don't have a cell belongs to multiple layers
-                        if (_this.layerMember && _this.layerMember.indexOf('0;') == 0)
+                        if (_this.layerMember)
                     	{
-                        	 _this.layerMember =  _this.layerMember.substr(2);
+                        	 _this.layerMember =  _this.layerMember.split(';');
                     	}
                         
                         return _this;
@@ -10193,7 +10436,7 @@ var com;
                      * If the shape has no text, it is obtained from the master shape.
                      * @return {string} Text label of the shape.
                      */
-                    VsdxShape.prototype.getTextLabel = function () {
+                    VsdxShape.prototype.getTextLabel = function (noOverflow) {
                         var hideText = this.getValue(this.getCellElement$java_lang_String(com.mxgraph.io.vsdx.mxVsdxConstants.HIDE_TEXT), "0");
                         if ((function (o1, o2) { if (o1 && o1.equals) {
                             return o1.equals(o2);
@@ -10211,6 +10454,10 @@ var com;
                             if (txtChildren != null) {
                                 /* put */ (this.styleMap[mxConstants.STYLE_VERTICAL_ALIGN] = this.getAlignVertical());
                                 /* put */ (this.styleMap[mxConstants.STYLE_ALIGN] = this.getHorizontalAlign("0", false));
+                                if (!noOverflow)
+                                {
+                                    this.styleMap['overflow'] = 'width';
+                                }
                                 return this.getHtmlTextContent(txtChildren);
                             }
                         }
@@ -10944,6 +11191,26 @@ var com;
                         } })("1", flibY)) {
                             /* put */ (this.styleMap[mxConstants.STYLE_FLIPV] = "1");
                         }
+
+                        //Connection points
+                        try
+                        {
+                            var connections = this.getConnections();
+                            var cPoints = [];
+
+                            for (var i = 0; i < connections.length; i++)
+                            {
+                                //TODO Does vsdx connections points needs dx/dy?
+                                cPoints.push('[' + connections[i].x + ',' + connections[i].y + ',0]');
+                            }
+
+                            this.styleMap['points'] = '[' + cPoints.join(',') + ']';
+                        }
+                        catch(e)
+                        {
+                            console.log(e);
+                        }
+
                         this.resolveCommonStyles();
                         return this.styleMap;
                     };
@@ -11466,7 +11733,8 @@ var com;
                                     var width = parseFloat(this.getValue(this.getCellElement$java_lang_String('Width'), "0"));
                                     var height = parseFloat(this.getValue(this.getCellElement$java_lang_String('Height'), "0"));
                                     
-                                    if (imgOffsetX != 0 || imgOffsetY != 0)
+                                    if (imgOffsetX != 0 || imgOffsetY != 0 ||
+                                        imgWidth != width || imgHeight != height)
                                 	{
                                     	this.toBeCroppedImg = {
                                 			imgOffsetX: imgOffsetX, 
@@ -11501,7 +11769,7 @@ var com;
                                 /* put */ (result[mxConstants.STYLE_SHAPE] = "stencil(" + enc + ")");
                             }
                             catch (e) {
-                                console.error(e.message, e);
+                                //console.error(e.message, e);
                             }
                             ;
                         }
@@ -12045,7 +12313,7 @@ var com;
                         var txtPinXV = this.getScreenNumericalValue$org_w3c_dom_Element$double(this.getShapeNode(com.mxgraph.io.vsdx.mxVsdxConstants.TXT_PIN_X), txtLocPinXV);
                         var txtPinYV = this.getScreenNumericalValue$org_w3c_dom_Element$double(this.getShapeNode(com.mxgraph.io.vsdx.mxVsdxConstants.TXT_PIN_Y), txtLocPinYV);
                         var txtAngleV = this.getValueAsDouble(this.getShapeNode(com.mxgraph.io.vsdx.mxVsdxConstants.TXT_ANGLE), 0);
-                        var textLabel = this.getTextLabel();
+                        var textLabel = this.getTextLabel(txtWV < 1 || txtHV < 1);
                         if (textLabel != null && !(textLabel.length === 0)) {
                         	var styleMap = mxUtils.clone(this.getStyleMap()) || {};
                             /* put */ (styleMap[mxConstants.STYLE_FILLCOLOR] = mxConstants.NONE);

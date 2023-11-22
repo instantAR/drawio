@@ -15,15 +15,20 @@ mxUtils.extend(OneDriveFile, DrawioFile);
 /**
  * Shorter autosave delay for optimistic sync.
  */
-OneDriveFile.prototype.autosaveDelay = 300;
+OneDriveFile.prototype.autosaveDelay = 500;
 
 /**
- * Translates this point by the given vector.
- * 
- * @param {number} dx X-coordinate of the translation.
- * @param {number} dy Y-coordinate of the translation.
+ * Hook for subclassers.
  */
-OneDriveFile.prototype.share = function()
+OneDriveFile.prototype.isRealtimeSupported = function()
+{
+	return true;
+};
+
+/**
+ * Returns true if copy, export and print are not allowed for this file.
+ */
+OneDriveFile.prototype.getFileUrl = function()
 {
 	var url = this.meta.webUrl;
 	url = url.substring(0, url.lastIndexOf('/'));
@@ -44,7 +49,7 @@ OneDriveFile.prototype.share = function()
 				path = path.substring(path.indexOf('/root:') + 6);
 				
 				var id = this.meta.webUrl;
-				var url = id.substring(0, id.length - path.length - this.meta.name.length - ((path.length > 0) ? 1 : 0)); 
+				var url = id.substring(0, id.length - path.length - encodeURIComponent(this.meta.name).length - 1); 
 				id = id.substring(id.indexOf('/', 8));
 				
 				url = url + '/Forms/AllItems.aspx?id=' + id + '&parent=' + id.substring(0, id.lastIndexOf('/'));
@@ -73,8 +78,35 @@ OneDriveFile.prototype.share = function()
 			// ignore
 		}
 	}
+
+	return url;
+};
+
+/**
+ * Returns true if copy, export and print are not allowed for this file.
+ */
+OneDriveFile.prototype.getFolderUrl = function()
+{
+	var url = this.meta.webUrl;
+	var name = encodeURIComponent(this.meta.name);
 	
-	this.ui.editor.graph.openLink(url);
+	if (url.substring(url.length - name.length, url.length) == name)
+	{
+		url = url.substring(0, url.length - name.length);
+	}
+
+	return url;
+};
+
+/**
+ * Translates this point by the given vector.
+ * 
+ * @param {number} dx X-coordinate of the translation.
+ * @param {number} dy Y-coordinate of the translation.
+ */
+OneDriveFile.prototype.share = function()
+{
+	this.ui.openLink(this.getFileUrl());
 };
 
 /**
@@ -109,7 +141,7 @@ OneDriveFile.prototype.getIdOf = function(itemObj, parent)
 {
 	//TODO driveId is most probably always there. No need to check if it exists. Also, after some time, the code that check the old id format won't be needed 
 	return ((itemObj.parentReference != null && itemObj.parentReference.driveId != null) ? itemObj.parentReference.driveId + '/' : '') +
-		((parent != null) ? itemObj.parentReference.id : itemObj.id);
+		((parent != null) ? itemObj.parentReference.id : (itemObj.id + (itemObj.folder && itemObj.folder.isRoot? '/root' : '')));
 };
 
 /**
@@ -388,7 +420,11 @@ OneDriveFile.prototype.saveFile = function(title, revision, success, error, unlo
 						(DrawioFile.SYNC == 'manual' || DrawioFile.SYNC == 'auto')) ?
 						this.getCurrentEtag() : null;
 					var lastDesc = this.meta;
-					this.fileSaving();
+
+					if (this.sync != null)
+					{
+						this.sync.fileSaving();
+					}
 
 					this.ui.oneDrive.saveFile(this, mxUtils.bind(this, function(meta, savedData)
 					{
@@ -520,7 +556,7 @@ OneDriveFile.prototype.saveFile = function(title, revision, success, error, unlo
  */
 OneDriveFile.prototype.rename = function(title, success, error)
 {
-	var etag = this.getCurrentEtag();
+	var rev = this.getCurrentRevisionId();
 	
 	this.ui.oneDrive.renameFile(this, title, mxUtils.bind(this, function(meta)
 	{
@@ -530,7 +566,7 @@ OneDriveFile.prototype.rename = function(title, success, error)
 			
 			if (this.sync != null)
 			{
-				this.sync.descriptorChanged(etag);
+				this.sync.descriptorChanged(rev);
 			}
 			
 			this.save(true, success, error);
@@ -542,7 +578,7 @@ OneDriveFile.prototype.rename = function(title, success, error)
 
 			if (this.sync != null)
 			{
-				this.sync.descriptorChanged(etag);
+				this.sync.descriptorChanged(rev);
 			}
 			
 			if (success != null)

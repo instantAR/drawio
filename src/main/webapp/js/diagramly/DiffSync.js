@@ -20,7 +20,8 @@ EditorUi.DIFF_UPDATE = 'u';
 /**
  * Shared codec.
  */
-EditorUi.prototype.codec = new mxCodec();
+EditorUi.transientViewStateProperties = ['defaultParent', 'currentRoot', 'scrollLeft',
+	'scrollTop', 'scale', 'translate', 'lastPasteXml', 'pasteCounter'];
 
 /**
  * Contains all view state properties that should not be ignored in diff sync.
@@ -33,8 +34,33 @@ EditorUi.prototype.viewStateProperties = {background: true, backgroundImage: tru
  */
 EditorUi.prototype.cellProperties = {id: true, value: true, xmlValue: true, vertex: true, edge: true,
 	visible: true, collapsed: true, connectable: true, parent: true, children: true, previous: true,
-	source: true, target: true, edges: true, geometry: true, style: true,
+	source: true, target: true, edges: true, geometry: true, style: true, overlays: true,
 	mxObjectId: true, mxTransient: true};
+
+/**
+ * Shared codec.
+ */
+EditorUi.prototype.codec = new mxCodec();
+
+/**
+ * Applies the given patches to the given pages.
+ */
+EditorUi.prototype.applyPatches = function(pages, patches, markPages, resolver, updateEdgeParents)
+{
+	if (patches != null)
+	{
+		for (var i = 0; i < patches.length; i++)
+		{
+			if (patches[i] != null)
+			{
+				pages = this.patchPages(pages, patches[i],
+					markPages, resolver, updateEdgeParents);
+			}
+		}
+	}
+
+	return pages;
+};
 
 /**
  * Removes all labels, user objects and styles from the given node in-place.
@@ -180,14 +206,10 @@ EditorUi.prototype.patchPages = function(pages, diff, markPages, resolver, updat
 		}
 		else
 		{
-			// Updates root if page already in UI
-			page.root = newPage.root;
-
-			if (this.currentPage == page)
-			{
-				this.editor.graph.model.setRoot(page.root);
-			}
-			else if (markPages)
+			this.patchPage(page, this.diffPages([page], [newPage]),
+				resolverLookup[page.getId()], updateEdgeParents);
+			
+			if (markPages)
 			{
 				page.needsUpdate = true;
 			}
@@ -229,7 +251,7 @@ EditorUi.prototype.patchViewState = function(page, diff)
 		{
 			try
 			{
-				page.viewState[key] = JSON.parse(diff[key]);
+				this.patchViewStateProperty(page, diff, key);
 			}
 			catch(e) {} //Ignore TODO Is this correct, we encountered an undefined value for a key (extFonts)
 		}
@@ -239,6 +261,14 @@ EditorUi.prototype.patchViewState = function(page, diff)
 			this.editor.graph.setViewState(page.viewState, true);
 		}
 	}
+};
+
+/**
+ * Removes all labels, user objects and styles from the given node in-place.
+ */
+EditorUi.prototype.patchViewStateProperty = function(page, diff, key)
+{
+	page.viewState[key] = JSON.parse(diff[key]);
 };
 
 /**
@@ -625,9 +655,58 @@ EditorUi.prototype.patchCell = function(model, cell, diff, resolve)
 };
 
 /**
- * Gets a file node that is comparable with a remote file node
- * so that using isEqualNode returns true if the files can be
- * considered equal.
+ * Returns the pages for the given XML string.
+ */
+EditorUi.prototype.getXmlForPages = function(pages)
+{
+	var node = this.getNodeForPages(pages);
+	var result = null;
+
+	if (node != null)
+	{
+		result = mxUtils.getXml(node);
+	}
+
+	return result;
+};
+
+/**
+ * Returns the pages for the given XML string.
+ */
+EditorUi.prototype.getNodeForPages = function(pages)
+{
+	var result = null;
+
+	if (this.fileNode != null && pages != null)
+	{
+		result = this.fileNode.cloneNode(false);
+
+		for (var i = 0; i < pages.length; i++)
+		{
+			var enc = new mxCodec(mxUtils.createXmlDocument());
+			var temp = enc.encode(new mxGraphModel(pages[i].root));
+			this.editor.graph.saveViewState(pages[i].viewState, temp);
+			var node = pages[i].node.cloneNode(false);
+			node.appendChild(temp);
+			result.appendChild(node);
+		}
+	}
+
+	return result;
+};
+
+/**
+ * Returns the pages for the given XML string.
+ */
+EditorUi.prototype.getPagesForXml = function(data)
+{
+	var doc = mxUtils.parseXml(data);
+
+	return this.getPagesForNode(doc.documentElement);
+};
+
+/**
+ * Returns the pages for the given node.
  */
 EditorUi.prototype.getPagesForNode = function(node, nodeName)
 {
@@ -652,7 +731,6 @@ EditorUi.prototype.getPagesForNode = function(node, nodeName)
 	}
 	else if (node.nodeName == 'mxGraphModel')
 	{
-		var graph = this.editor.graph;
 		var page = new DiagramPage(node.ownerDocument.createElement('diagram'));
 		page.setName(mxResources.get('pageWithNumber', [1]));
 		mxUtils.setTextContent(page.node, Graph.compressNode(node, true));
@@ -667,94 +745,97 @@ EditorUi.prototype.getPagesForNode = function(node, nodeName)
  */
 EditorUi.prototype.diffPages = function(oldPages, newPages)
 {
-	var graph = this.editor.graph;
 	var inserted = [];
 	var removed = [];
 	var result = {};
 	var lookup = {};
 	var diff = {};
 	var prev = null;
-	
-	for (var i = 0; i < newPages.length; i++)
-	{
-		lookup[newPages[i].getId()] = {page: newPages[i], prev: prev};
-		prev = newPages[i];
-	}
 
-	prev = null;
-	
-	for (var i = 0; i < oldPages.length; i++)
+	if (oldPages != null && newPages != null)
 	{
-		var id = oldPages[i].getId();
-		var newPage = lookup[id];
+		for (var i = 0; i < newPages.length; i++)
+		{
+			lookup[newPages[i].getId()] = {page: newPages[i], prev: prev};
+			prev = newPages[i];
+		}
+
+		prev = null;
 		
-		if (newPage == null)
+		for (var i = 0; i < oldPages.length; i++)
 		{
-			removed.push(id);
-		}
-		else
-		{
-			var temp = this.diffPage(oldPages[i], newPage.page);
-			var pageDiff = {};
+			var id = oldPages[i].getId();
+			var newPage = lookup[id];
 			
-			if (Object.keys(temp).length > 0)
+			if (newPage == null)
 			{
-				pageDiff.cells = temp;
+				removed.push(id);
 			}
-			
-			var view = this.diffViewState(oldPages[i], newPage.page);
-			
-			if (Object.keys(view).length > 0)
+			else
 			{
-				pageDiff.view = view;
-			}
-			
-			if (((newPage.prev != null) ? prev == null : prev != null) ||
-				(prev != null && newPage.prev != null &&
-				prev.getId() != newPage.prev.getId()))
-			{
-				pageDiff.previous = (newPage.prev != null) ? newPage.prev.getId() : '';
-			}
-			
-			// FIXME: Check why names can be null in newer files
-			// ignore in hash and do not diff null names for now
-			if (newPage.page.getName() != null &&
-				oldPages[i].getName() != newPage.page.getName())
-			{
-				pageDiff.name = newPage.page.getName();
-			}
-			
-			if (Object.keys(pageDiff).length > 0)
-			{
-				diff[id] = pageDiff;
-			}
-		}
+				var temp = this.diffPage(oldPages[i], newPage.page);
+				var pageDiff = {};
 
-		delete lookup[oldPages[i].getId()];
-		prev = oldPages[i];
-	}
-	
-	for (var id in lookup)
-	{
-		var newPage = lookup[id];
-		inserted.push({data: mxUtils.getXml(newPage.page.node),
-			previous: (newPage.prev != null) ?
-			newPage.prev.getId() : ''});
-	}
-	
-	if (Object.keys(diff).length > 0)
-	{
-		result[EditorUi.DIFF_UPDATE] = diff;
-	}
-	
-	if (removed.length > 0)
-	{
-		result[EditorUi.DIFF_REMOVE] = removed;
-	}
-	
-	if (inserted.length > 0)
-	{
-		result[EditorUi.DIFF_INSERT] = inserted;
+				if (!mxUtils.isEmptyObject(temp))
+				{
+					pageDiff.cells = temp;
+				}
+				
+				var view = this.diffViewState(oldPages[i], newPage.page);
+				
+				if (!mxUtils.isEmptyObject(view))
+				{
+					pageDiff.view = view;
+				}
+				
+				if (((newPage.prev != null) ? prev == null : prev != null) ||
+					(prev != null && newPage.prev != null &&
+					prev.getId() != newPage.prev.getId()))
+				{
+					pageDiff.previous = (newPage.prev != null) ? newPage.prev.getId() : '';
+				}
+				
+				// FIXME: Check why names can be null in newer files
+				// ignore in hash and do not diff null names for now
+				if (newPage.page.getName() != null &&
+					oldPages[i].getName() != newPage.page.getName())
+				{
+					pageDiff.name = newPage.page.getName();
+				}
+				
+				if (!mxUtils.isEmptyObject(pageDiff))
+				{
+					diff[id] = pageDiff;
+				}
+			}
+
+			delete lookup[oldPages[i].getId()];
+			prev = oldPages[i];
+		}
+		
+		for (var id in lookup)
+		{
+			var newPage = lookup[id];
+			inserted.push({id: newPage.page.getId(),
+				data: mxUtils.getXml(newPage.page.node),
+				previous: (newPage.prev != null) ?
+				newPage.prev.getId() : ''});
+		}
+		
+		if (!mxUtils.isEmptyObject(diff))
+		{
+			result[EditorUi.DIFF_UPDATE] = diff;
+		}
+		
+		if (removed.length > 0)
+		{
+			result[EditorUi.DIFF_REMOVE] = removed;
+		}
+		
+		if (inserted.length > 0)
+		{
+			result[EditorUi.DIFF_INSERT] = inserted;
+		}
 	}
 
 	return result;
@@ -806,7 +887,7 @@ EditorUi.prototype.diffCellRecursive = function(cell, prev, lookup, diff, remove
 			temp.previous = (newCell.prev != null) ? newCell.prev.getId() : '';
 		}
 		
-		if (Object.keys(temp).length > 0)
+		if (!mxUtils.isEmptyObject(temp))
 		{
 			diff[cell.getId()] = temp;
 		}
@@ -846,7 +927,7 @@ EditorUi.prototype.diffPage = function(oldPage, newPage)
 		inserted.push(this.getJsonForCell(newCell.cell, newCell.prev));
 	}
 
-	if (Object.keys(diff).length > 0)
+	if (!mxUtils.isEmptyObject(diff))
 	{
 		result[EditorUi.DIFF_UPDATE] = diff;
 	}
@@ -872,6 +953,11 @@ EditorUi.prototype.diffViewState = function(oldPage, newPage)
 	var source = oldPage.viewState;
 	var target = newPage.viewState;
 	var result = {};
+
+	if (oldPage == this.currentPage)
+	{
+		source = this.editor.graph.getViewState();
+	}
 	
 	if (newPage == this.currentPage)
 	{
@@ -882,18 +968,46 @@ EditorUi.prototype.diffViewState = function(oldPage, newPage)
 	{
 		for (var key in this.viewStateProperties)
 		{
-			// LATER: Check if normalization is needed for
-			// object attribute order to compare JSON
-			var old = JSON.stringify(source[key]);
-			var now = JSON.stringify(target[key]);
-			
-			if (old != now)
-			{
-				result[key] = now;
-			}
+			this.diffViewStateProperty(source, target, key, result);
 		}
 	}
 	
+	return result;
+};
+
+/**
+ * Removes all labels, user objects and styles from the given node in-place.
+ */
+EditorUi.prototype.diffViewStateProperty = function(source, target, key, result)
+{
+	// LATER: Check if normalization is needed for
+	// object attribute order to compare JSON
+	var old = JSON.stringify(this.getViewStateProperty(source, key));
+	var now = JSON.stringify(this.getViewStateProperty(target, key));
+	
+	if (old != now)
+	{
+		result[key] = now;
+	}
+};
+
+/**
+ * Ignores image data for background pages and normalizes extFonts.
+ */
+EditorUi.prototype.getViewStateProperty = function(viewState, key)
+{
+	var result = viewState[key];
+
+	if (key == 'backgroundImage' && result != null &&
+		result.originalSrc != null)
+	{
+		result = {originalSrc: result.originalSrc};
+	}
+	else if (key == 'extFonts' && result == null)
+	{
+		result = [];
+	}
+
 	return result;
 };
 
@@ -1135,6 +1249,256 @@ EditorUi.prototype.diffCell = function(oldCell, newCell)
 	}
 	
 	return diff;
+};
+
+/**
+ * Creates a patch that inserts pages and cells that are modified or referenced
+ * as parents or terminals in the given diff but have not been saved yet by the
+ * remote collaborator. These pages and cells are "adopted" by the local user.
+ */
+EditorUi.prototype.resolveCrossReferences = function(ownDiff, theirDiff)
+{
+	var resolve = {};
+
+	if (!mxUtils.isEmptyObject(theirDiff))
+	{
+		this.adoptTheirPages(ownDiff, theirDiff, resolve);
+		this.adoptTheirCells(ownDiff, theirDiff, resolve);
+	}
+
+	EditorUi.debug('EditorUi.resolveCrossReferences', [this],
+		'ownDiff', ownDiff, 'theirDiff', theirDiff,
+		'resolve', resolve);
+
+	return resolve;
+};
+
+/**
+ * Computes and sends the local changes if the file was changed.
+ */
+EditorUi.prototype.adoptTheirPages = function(ownDiff, theirDiff, resolve)
+{
+	var theirInsertedPages = {};
+
+	if (theirDiff[EditorUi.DIFF_INSERT] != null)
+	{
+		for (var i = 0; i < theirDiff[EditorUi.DIFF_INSERT].length; i++)
+		{
+			theirInsertedPages[theirDiff[EditorUi.DIFF_INSERT][i].id] =
+				theirDiff[EditorUi.DIFF_INSERT][i];
+		}
+	}
+
+	for (var id in ownDiff[EditorUi.DIFF_UPDATE])
+	{
+		if (theirInsertedPages[id] != null)
+		{
+			if (resolve[EditorUi.DIFF_INSERT] == null)
+			{
+				resolve[EditorUi.DIFF_INSERT] = [];
+			}
+
+			if (resolve[EditorUi.DIFF_UPDATE] == null)
+			{
+				resolve[EditorUi.DIFF_UPDATE] = {};
+			}
+
+			// Adds changed page to own pages
+			resolve[EditorUi.DIFF_INSERT].push(
+				theirInsertedPages[id]);
+			resolve[EditorUi.DIFF_UPDATE][id] =
+				ownDiff[EditorUi.DIFF_UPDATE][id];
+			delete ownDiff[EditorUi.DIFF_UPDATE][id];
+		}
+	}
+};
+
+/**
+ * Computes and sends the local changes if the file was changed.
+ */
+EditorUi.prototype.adoptTheirCells = function(ownDiff, theirDiff, resolve)
+{
+	for (var id in ownDiff[EditorUi.DIFF_UPDATE])
+	{
+		var ownPageUpdate = ownDiff[EditorUi.DIFF_UPDATE][id];
+
+		if (ownPageUpdate.cells != null)
+		{
+			this.adoptTheirCellsFromPage(ownPageUpdate, theirDiff, id, resolve);
+		}
+	}
+};
+
+/**
+ * Computes and sends the local changes if the file was changed.
+ */
+EditorUi.prototype.adoptTheirCellsFromPage = function(ownPageUpdate, theirDiff, pageId, resolve)
+{
+	var theirPageUpdate = theirDiff[EditorUi.DIFF_UPDATE] != null ?
+		theirDiff[EditorUi.DIFF_UPDATE][pageId] : null;
+
+	if (theirPageUpdate != null && theirPageUpdate.cells != null &&
+		theirPageUpdate.cells[EditorUi.DIFF_INSERT] != null)
+	{
+		var theirUpdatedCells = theirPageUpdate.cells[EditorUi.DIFF_UPDATE];
+		var theirInsertedCells = {};
+
+		for (var i = 0; i < theirPageUpdate.cells[EditorUi.DIFF_INSERT].length; i++)
+		{
+			var entry = theirPageUpdate.cells[EditorUi.DIFF_INSERT][i];
+			theirInsertedCells[entry.id] = entry;
+		}
+		
+		var pageDiff = {};
+		pageDiff.cells = {};
+		pageDiff.cells[EditorUi.DIFF_INSERT] = [];
+		pageDiff.cells[EditorUi.DIFF_UPDATE] = {};
+
+		// Blocks duplicate inserts, deleted below for result
+		pageDiff.inserted = {};
+
+		this.resolveOwnInsertedCells(
+			ownPageUpdate.cells[EditorUi.DIFF_INSERT],
+			theirInsertedCells, pageDiff);
+		this.resolveOwnUpdatedCells(
+			ownPageUpdate.cells[EditorUi.DIFF_UPDATE],
+			theirInsertedCells, theirUpdatedCells,
+			pageDiff);
+		
+		if (resolve[EditorUi.DIFF_UPDATE] == null)
+		{
+			resolve[EditorUi.DIFF_UPDATE] = {};
+		}
+		
+		delete pageDiff.inserted;
+		resolve[EditorUi.DIFF_UPDATE][pageId] = pageDiff;
+	}
+};
+
+/**
+ * Computes and sends the local changes if the file was changed.
+ */
+EditorUi.prototype.resolveOwnInsertedCells = function(ownInsertedCells, theirInsertedCells, pageDiff)
+{
+	if (ownInsertedCells != null)
+	{
+		for (var i = 0; i < ownInsertedCells.length; i++)
+		{
+			var cell = ownInsertedCells[i];
+
+			if (cell != null)
+			{
+				this.adoptParentCell(cell.id, null,
+					theirInsertedCells, pageDiff);
+				this.adoptTerminalCell(cell.id, cell,
+					theirInsertedCells, true, pageDiff);
+				this.adoptTerminalCell(cell.id, cell,
+					theirInsertedCells, false, pageDiff);
+			}
+		}
+	}
+};
+
+/**
+ * Computes and sends the local changes if the file was changed.
+ */
+EditorUi.prototype.resolveOwnUpdatedCells = function(ownUpdatedCells, theirInsertedCells, theirUpdatedCells, pageDiff)
+{
+	if (ownUpdatedCells != null)
+	{
+		for (var id in ownUpdatedCells)
+		{
+			// Adds changed cell to own cells
+			var cell = theirInsertedCells[id];
+
+			if (cell != null)
+			{
+				if (!pageDiff.inserted[id])
+				{
+					pageDiff.cells[EditorUi.DIFF_INSERT].push(cell);
+					pageDiff.inserted[id] = true;
+				}
+
+				pageDiff.cells[EditorUi.DIFF_UPDATE][id] =
+					ownUpdatedCells[id];
+			}
+			else if (theirUpdatedCells != null)
+			{
+				// Adds their referenced terminals
+				// and parents to own cells
+				var theirCell = theirUpdatedCells[id];
+				
+				if (theirCell != null)
+				{
+					this.adoptParentCell(id, theirCell,
+						theirInsertedCells, pageDiff);
+					this.adoptTerminalCell(id, theirCell,
+						theirInsertedCells, true, pageDiff, id);
+					this.adoptTerminalCell(id, theirCell,
+						theirInsertedCells, false, pageDiff, id);
+				}
+			}
+		}
+	}
+};
+
+/**
+ * Adds unsaved remote parents to the patch.
+ */
+EditorUi.prototype.adoptParentCell = function(cellId, cellDiff, theirInsertedCells, pageDiff)
+{
+	var cell = theirInsertedCells[cellId];
+	var parentId = (cellDiff != null) ? cellDiff.parent :
+		((cell != null) ? cell.parent : null);
+
+	if (parentId != null)
+	{
+		this.adoptParentCell(parentId, null, theirInsertedCells, pageDiff);
+	}
+
+	if (cell != null)
+	{
+		if (!pageDiff.inserted[cellId])
+		{
+			pageDiff.cells[EditorUi.DIFF_INSERT].push(cell);
+			pageDiff.inserted[cellId] = true;
+		}
+	}
+	else if (cellDiff != null)
+	{
+		if (pageDiff.cells[EditorUi.DIFF_UPDATE][cellId] == null)
+		{
+			pageDiff.cells[EditorUi.DIFF_UPDATE][cellId] = {};
+		}
+
+		pageDiff.cells[EditorUi.DIFF_UPDATE][cellId] = cellDiff;
+	}
+};
+
+/**
+ * Computes and sends the local changes if the file was changed.
+ */
+EditorUi.prototype.adoptTerminalCell = function(cellId, cell, theirInsertedCells, source, pageDiff)
+{
+	var terminalId = (source) ? cell.source : cell.target;
+	var terminal = theirInsertedCells[terminalId];
+
+	if (terminal != null)
+	{
+		if (!pageDiff.inserted[terminalId])
+		{
+			pageDiff.cells[EditorUi.DIFF_INSERT].push(terminal);
+			pageDiff.inserted[terminalId] = true;
+		}
+		
+		if (pageDiff.cells[EditorUi.DIFF_UPDATE][cellId] == null)
+		{
+			pageDiff.cells[EditorUi.DIFF_UPDATE][cellId] = {};
+		}
+
+		pageDiff.cells[EditorUi.DIFF_UPDATE][cellId]
+			[(source) ? 'source' : 'target'] = terminalId;
+	}
 };
 
 /**
