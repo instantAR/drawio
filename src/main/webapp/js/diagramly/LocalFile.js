@@ -133,7 +133,10 @@ LocalFile.prototype.getLatestVersion = function(success, error)
 {
 	if (this.fileHandle == null)
 	{
-		success(null);
+		if (error != null)
+		{
+			error({message: mxResources.get('cannotOpenFile')});
+		}
 	}
 	else
 	{
@@ -207,6 +210,11 @@ LocalFile.prototype.saveFile = function(title, revision, success, error, useCurr
 					this.fileHandle.getFile().then(mxUtils.bind(this, function(newDesc)
 					{
 						this.invalidFileHandle = null;
+
+						EditorUi.debug('LocalFile.saveFile', [this],
+							'desc', [this.desc], 'newDesc', [newDesc],
+							'conflict', this.desc.lastModified !=
+								newDesc.lastModified);
 						
 						if (this.desc.lastModified == newDesc.lastModified)
 						{
@@ -312,14 +320,4 @@ LocalFile.prototype.rename = function(title, success, error)
 	{
 		success();
 	}
-};
-
-/**
- * Returns the location as a new object.
- * @type mx.Point
- */
-LocalFile.prototype.open = function()
-{
-	this.ui.setFileData(this.getData());
-	this.installListeners();
 };
