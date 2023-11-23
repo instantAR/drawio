@@ -581,9 +581,7 @@
 						this.editorUi.confirm('Image data created', mxUtils.bind(this, function()
 						{
 							canvas.plainText(6, 0, 0, 0, mxUtils.getTextContent(children[i]));
-
-							break;
-						}
+						}))
 					}
 
 					for (var i = 0; i < svgs.length; i++)
@@ -1163,7 +1161,7 @@
 		this.addKubernetesPalette();
 		this.addMockupPalette();
 		this.addSitemapPalette();
-		this.addSalesforcePalette();
+		// this.addSalesforcePalette();
 		this.addUml25Palette();
 		this.addUmlPalette(false);
 		this.addAlliedTelesisPalette();

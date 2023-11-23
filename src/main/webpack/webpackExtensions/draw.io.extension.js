@@ -328,8 +328,37 @@ performCustomAction = function (editorUi, customAction) {
 			break;
 		case 'export_OptOut':
 			try {
-				var optOut = getGraphXmlData(editorUi);
-				if (optOut && optOut.xml && optOut.name) {
+				var div = document.createElement('div');
+				div.style.whiteSpace = 'nowrap';
+				var noPages = editorUi.pages == null || editorUi.pages.length <= 1;
+	
+				var hd = document.createElement('h3');
+				mxUtils.write(hd, mxResources.get('formatXml'));
+				hd.style.cssText = 'width:100%;text-align:center;margin-top:0px;margin-bottom:4px';
+				div.appendChild(hd);
+				
+				var selection = editorUi.addCheckbox(div, mxResources.get('selectionOnly'),
+					false, editorUi.editor.graph.isSelectionEmpty());
+				var compressed = editorUi.addCheckbox(div, mxResources.get('compressed'), Editor.defaultCompressed);
+				var pages = editorUi.addCheckbox(div, mxResources.get('allPages'), !noPages, noPages);
+				pages.style.marginBottom = '16px';
+				
+				mxEvent.addListener(selection, 'change', function()
+				{
+					if (selection.checked)
+					{
+						pages.setAttribute('disabled', 'disabled');
+					}
+					else
+					{
+						pages.removeAttribute('disabled');
+					}
+				});
+				var dlg = new CustomDialog(editorUi, div, mxUtils.bind(this, function()
+				{
+				var optOut = editorUi.downloadFile('xml', !compressed.checked, null,
+						!selection.checked, noPages || !pages.checked,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+				if (optOut) {
 					customAction['callback'](optOut).then(resolve => {
 						console.log("export_OptOut", resolve)
 					}, reject => {
@@ -339,19 +368,22 @@ performCustomAction = function (editorUi, customAction) {
 					});
 				} else {
 					sendErrorResponse(customAction, {
-						status: "export error",
+						status: "tranform error",
 						graphData: optOut
 					});
 				}
-			} catch (e) {
-				console.log(e);
-				sendErrorResponse(customAction, {
-					status: "something went wrong",
-					graphData: null,
-					reason: e
-				});
-			}
-			break;
+				}), null, mxResources.get('export'));
+				
+				editorUi.showDialog(dlg.container, 300, 200, true, true);				
+				} catch (e) {
+					console.log(e);
+					sendErrorResponse(customAction, {
+						status: "something went wrong",
+						graphData: null,
+						reason: e
+					});
+				}
+				break;
 		case 'open_OptIn':
 			try {
 				customAction['callback']().then(resolve => {

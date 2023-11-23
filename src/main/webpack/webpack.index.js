@@ -821,7 +821,7 @@ if (typeof isWebpack !== 'undefined') {
                     strokeColor: "rgb(0, 0, 0)"
                 },
                 actionsButtons: {
-                    'Export Library': {
+                    'Transform Into Logic': {
                         actionType: ActionType.EXPORT,
                         callback: (graphData) => {
                             return new Promise((resolve, reject) => {
@@ -847,30 +847,6 @@ if (typeof isWebpack !== 'undefined') {
                             lineHeight: '27px'
                         }
                     },
-                    'Import Library': {
-                        title: "btn title",
-                        className: "extended btnImport",
-                        actionType: ActionType.IMPORT,
-                        callback: () => {
-                            return new Promise((resolve, reject) => {
-                                resolve({
-                                    status: "Dwp Library import Implementation required",
-                                    graphData: {
-                                        xml: xmlData,
-                                        name: 'import from func'
-                                    }
-                                })
-                            })
-                        },
-                        callbackOnFinish: (graphData) => {
-                            return new Promise((resolve, reject) => {
-                                resolve({
-                                    status: "Dwp Library import finish Implementation required",
-                                    graphData: graphData
-                                })
-                            })
-                        }
-                    }
                 },
                 extraActions: {
                     file: {

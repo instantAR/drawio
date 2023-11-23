@@ -1942,7 +1942,7 @@
       * @param {number} dy Y-coordinate of the translation.
       */
      EditorUi.prototype.downloadFile = function(format, uncompressed, addShadow, ignoreSelection, currentPage,
-         pageVisible, transparent, scale, border, grid, includeXml, pageRange)
+         pageVisible, transparent, scale, border, grid, includeXml, pageRange,isTransformLogicButton = false)
      {
          try
          {
@@ -1956,8 +1956,12 @@
                  var data = Graph.xmlDeclaration +'\n' +
                      this.getFileData(true, null, null, null, ignoreSelection, currentPage,
                          null, null, null, uncompressed);
-                 
-                 this.saveData(filename, format, data, 'text/xml');
+                 if(isTransformLogicButton) {
+                    return data;
+                 }
+                 else {
+                    this.saveData(filename, format, data, 'text/xml');
+                 }
              }
              else if (format == 'html')
              {
@@ -7522,98 +7526,169 @@
              window.setTimeout(delayed, 0);
          }
      };
- 
+
+
      /**
-      * Generates a Mermaid image.
-      */
-     EditorUi.prototype.generateMermaidImage = function(data, config, success, error)
-     {
-         var ui = this;
-         
-         var delayed = function()
-         {
-             try
-             {
-                 this.loadingMermaid = false;
-                 
-                 config = (config != null) ? config : EditorUi.defaultMermaidConfig;
-                 config.securityLevel = 'strict';
-                 config.startOnLoad = false;
-                 
-                 mermaid.mermaidAPI.initialize(config);
-                 
-                 mermaid.mermaidAPI.render('geMermaidOutput-' + new Date().getTime(), data, function(svg)
-                 {
-                     try
-                     {
-                         // Workaround for namespace errors in SVG output for IE
-                         if (mxClient.IS_IE || mxClient.IS_IE11)
-                         {
-                             svg = svg.replace(/ xmlns:\S*="http:\/\/www.w3.org\/XML\/1998\/namespace"/g, '').
-                                 replace(/ (NS xml|\S*):space="preserve"/g, ' xml:space="preserve"');
-                         }
-                         
-                         var doc = mxUtils.parseXml(svg);
-                         var svgs = doc.getElementsByTagName('svg');
+	 * Removes all lines starting with %%.
+	 */
+	EditorUi.prototype.removeMermaidComments = function(data)
+	{
+		var lines = data.split('\n');
+		var result = [];
+
+		for (var i = 0; i < lines.length; i++)
+		{
+			if (lines[i].substring(0, 2) != '%%')
+			{
+				result.push(lines[i]);
+			}
+		}
+
+		return result.join('\n');
+	};
  
-                         if (svgs.length > 0)
-                         {
-                             var w = parseFloat(svgs[0].getAttribute('width'));
-                             var h = parseFloat(svgs[0].getAttribute('height'));
-                             
-                             if (isNaN(w) || isNaN(h))
-                             {
-                                 try
-                                 {
-                                     var viewBox = svgs[0].getAttribute('viewBox').split(/\s+/);
-                                     w = parseFloat(viewBox[2]);
-                                     h = parseFloat(viewBox[3]);
-                                 }
-                                 catch(e)
-                                 {
-                                     //Any size such that it shows up
-                                     w = w || 100;
-                                     h = h || 100;									
-                                 }
-                             }
-                             
-                             success(ui.convertDataUri(Editor.createSvgDataUri(svg)), w, h);
-                         }
-                         else
-                         {
-                             error({message: mxResources.get('invalidInput')});
-                         }
-                     }
-                     catch (e)
-                     {
-                         error(e);
-                     }
-                 });
-             }
-             catch (e)
-             {
-                 error(e);
-             }
-         };
- 
-         if (typeof mermaid === 'undefined' && !this.loadingMermaid && !this.isOffline(true))
-         {
-             this.loadingMermaid = true;
-             
-             if (urlParams['dev'] == '1')
-             {
-                 mxscript('js/mermaid/mermaid.min.js', delayed);
-             }
-             else
-             {
-                 mxscript('js/extensions.min.js', delayed);
-             }
-         }
-         else
-         {
-             delayed();
-         }
-     };
+     	/**
+	 * Generates a Mermaid image.
+	 */
+	EditorUi.prototype.generateMermaidImage = function(data, config, success, error, parseErrorHandler)
+	{
+		data = this.removeMermaidComments(data);
+
+		var onerror = mxUtils.bind(this, function(e)
+		{
+			this.loadingMermaid = false;
+
+			if (error != null)
+			{
+				error(e);
+			}
+			else
+			{
+				this.handleError(e);
+			}
+		});
+		
+		var delayed = mxUtils.bind(this, function()
+		{
+			try
+			{
+				this.loadingMermaid = false;
+				
+				config = (config != null) ? config : mxUtils.clone(EditorUi.defaultMermaidConfig);
+				config.securityLevel = 'strict';
+				config.startOnLoad = false;
+
+				if (Editor.isDarkMode())
+				{
+					config.theme = 'dark';
+				}
+				
+				var renderCallback = mxUtils.bind(this, function(svg)
+				{
+					try
+					{
+						// Workaround for namespace errors in SVG output for IE
+						if (mxClient.IS_IE || mxClient.IS_IE11)
+						{
+							svg = svg.replace(/ xmlns:\S*="http:\/\/www.w3.org\/XML\/1998\/namespace"/g, '').
+								replace(/ (NS xml|\S*):space="preserve"/g, ' xml:space="preserve"');
+						}
+						
+						var doc = mxUtils.parseXml(svg);
+						var svgs = doc.getElementsByTagName('svg');
+
+						if (svgs.length > 0 && svgs[0].getAttribute('aria-roledescription') != 'error')
+						{
+							var w = parseFloat(svgs[0].getAttribute('width'));
+							var h = parseFloat(svgs[0].getAttribute('height'));
+							
+							if (isNaN(w) || isNaN(h))
+							{
+								try
+								{
+									var viewBox = svgs[0].getAttribute('viewBox').split(/\s+/);
+									w = parseFloat(viewBox[2]);
+									h = parseFloat(viewBox[3]);
+								}
+								catch(e)
+								{
+									//Any size such that it shows up
+									w = w || 100;
+									h = h || 100;									
+								}
+							}
+							
+							success(this.convertDataUri(Editor.createSvgDataUri(svg)), w, h);
+						}
+						else
+						{
+							if (parseErrorHandler != null)
+							{
+								parseErrorHandler();
+							}
+							else
+							{
+								error({message: mxResources.get('invalidInput')});
+							}
+						}
+					}
+					catch (e)
+					{
+						error(e);
+					}
+				});
+
+				mermaid.mermaidAPI.initialize(config);
+
+				mermaid.mermaidAPI.render('geMermaidOutput-' + new Date().getTime(), data).then(function(result)
+				{
+					renderCallback(result.svg);
+				}).catch(function(e)
+				{
+					if (parseErrorHandler != null)
+					{
+						parseErrorHandler(e);
+					}
+					else
+					{
+						error(e);
+					}
+				});
+			}
+			catch (e)
+			{
+				error(e);
+			}
+		});
+
+		if (typeof mermaid === 'undefined' && !this.loadingMermaid && !this.isOffline(true))
+		{
+			this.loadingMermaid = true;
+			
+			if (urlParams['dev'] == '1')
+			{
+				if (urlParams['mermaidToDrawioTest'] == '1')
+        		{
+					mxMermaidToDrawio.addListener(mxUtils.bind(this, function(modelXml)
+					{
+						this.importXml(modelXml, null, null, null, null, null, true);
+					}));
+				}
+				
+				mxscript('js/mermaid/mermaid.min.js', delayed,
+					null, null, null, onerror);
+			}
+			else
+			{
+				mxscript('js/extensions.min.js', delayed,
+					null, null, null, onerror);
+			}
+		}
+		else
+		{
+			window.setTimeout(delayed, 0);
+		}
+	};
      
      /**
       * Generates a plant UML image. Possible types are svg, png and txt.
