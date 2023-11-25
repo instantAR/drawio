@@ -311,8 +311,8 @@ export class GraphEditor {
         this.addWebScript('pako', './mxgraph/grapheditor/deflate/pako.min.js', 1, config);
         this.addWebScript('base64', './mxgraph/grapheditor/deflate/base64.js', 1, config);
         this.addWebScript('jscolor', './mxgraph/grapheditor/jscolor/jscolor.js', 1, config);
-        this.addWebScript('html_sanitize', './mxgraph/grapheditor/sanitizer/sanitizer.min.js', 1, config);
-        this.addWebScript('croppie.min', './mxgraph/grapheditor/croppie/croppie.min.js', 1, config);
+        // this.addWebScript('html_sanitize', './mxgraph/grapheditor/sanitizer/sanitizer.min.js', 1, config);
+        // this.addWebScript('croppie.min', './mxgraph/grapheditor/croppie/croppie.min.js', 1, config);
         this.addWebScript('rough.min', './mxgraph/grapheditor/rough/rough.min.js', 1, config);
 
 
@@ -520,7 +520,7 @@ export class GraphEditor {
 
     activateSideBar(editorUi) {
         try {
-            var activateSiderBarAfterLoad = ['general', 'basic', 'uml', 'er', 'arrows2', 'flowchart', 'misc', 'advanced']
+            var activateSiderBarAfterLoad = ['general']
             setTimeout(() => {
                 // console.log("entries", editorUi.sidebar.entries, editorUi.sidebar.palettes)
                 activateSiderBarAfterLoad.forEach((id, index) => {
@@ -721,6 +721,12 @@ export class GraphEditor {
             menu: [...dE.menuList],
             subMenu: [...dE.subMenuList]
         }
+    }
+
+    convertToMermaid(container, scriptContainer, config, mermaidString) {
+        App.main((ui) => {
+            DrawIOMakeMermaid(ui, config, mermaidString);
+        }, null, container);
     }
 
     /**

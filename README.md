@@ -5,19 +5,13 @@ draw.io, this project, is a configurable diagramming/whiteboarding visualization
 As well as running this project, we run a production-grade deployment of the diagramming interface at https://app.diagrams.net.
 ### Library Build
 ```shell
-git clone https://github.com/ArfanMirza/drawio.git
+git clone https://github.com/bhavinmatariya/drawio.git
 cd "drawio\src\main\webpack"
 npm run build 
-```
-TGZ file created along with dist directory. TGZ file name start from **zklogic-draw.io-**
-Copy the tgz & Go to Angular Project, create lib directory along src directory and past TGZ file inside
-### NPM Build & Install
-```shell
-npm install --save ./lib/zklogic-draw.io-*.tgz
-```
+
 ### NPM Install
 ```shell
-npm install --save @zklogic/draw.io
+npm install --save draw.io-angular-new
 ```
 ### Update Angular.json
 ```shell
@@ -26,7 +20,7 @@ npm install --save @zklogic/draw.io
   .
   {
     "glob": "**/*",
-    "input": "./node_modules/@zklogic/draw.io/dist/mxgraph",
+    "input": "./node_modules/draw.io/dist/mxgraph",
     "output": "./mxgraph"
   }
 ]
@@ -34,7 +28,7 @@ npm install --save @zklogic/draw.io
 "styles": [
   .
   .
-  "./node_modules/@zklogic/draw.io/dist/mxgraph/styles/grapheditor.css"
+  "./node_modules/draw.io/dist/mxgraph/styles/grapheditor.css"
 ],
 ```
 
@@ -66,7 +60,7 @@ npm install --save @zklogic/draw.io
 ```
 **component.ts**
 ```shell
-import { GraphEditor, GraphEditorIn, GraphEditorOut, GraphInitConfig, GraphXmlData, ActionType, GraphEditorSVG, ButtonActionType }from '@zklogic/draw.io';
+import { GraphEditor, GraphEditorIn, GraphEditorOut, GraphInitConfig, GraphXmlData, ActionType, GraphEditorSVG, ButtonActionType }from 'draw.io';
 ...
 @ViewChild('container', { static: true }) container: ElementRef<HTMLElement>;
 @ViewChild('mxgraphScriptsContainer', { static: true }) mxgraphScriptsContainer: ElementRef<HTMLElement>;
@@ -240,7 +234,6 @@ We are grateful for community involvement, bug reports, & feature requests. We d
 not wish to come off as anything but welcoming, however, we've
 made the decision to keep this project closed to contributions for 
 the long term viability of the project.
-@zklogic/draw.io/dist/mxgraph
 draw.io is not suitable as a framework for building other products from. For this try either [Tldraw](https://github.com/tldraw/tldraw) or [Excalidraw](https://github.com/excalidraw/excalidraw).
 
 Logo and trademark usage

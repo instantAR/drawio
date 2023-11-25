@@ -189,6 +189,14 @@ DrawIOOverridUpdateBody = function (editorUi, config) {
 	// };
 }
 
+DrawIOMakeMermaid = function (editorUi, config, mermaidString) {
+	const dialog = new ParseDialog(editorUi, 'abc', 'mermaid');
+	setTimeout(() => {
+		DrawIOOverridExport(config, editorUi);
+		dialog.parseFunc(mermaidString, 'mermaid2drawio');
+	}, 2000)
+}
+
 // /**
 //  * Display a color dialog.
 //  */

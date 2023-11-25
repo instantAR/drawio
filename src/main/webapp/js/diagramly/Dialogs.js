@@ -2522,6 +2522,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 			}
 		}
 	};
+	this.parseFunc = parse;
 	
 	var div = document.createElement('div');
 	div.style.textAlign = 'right';
@@ -8499,7 +8500,7 @@ var FindWindow = function(ui, x, y, w, h, withReplace)
 		if (evt.keyCode == 91 || evt.keyCode == 93 || evt.keyCode == 17)
 		{
 			// Workaround for lost focus on show
-			mxEvent.consume(evt);
+			// mxEvent.consume(evt);
 		}
 		else if (evt.keyCode == 27)
 		{

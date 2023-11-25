@@ -6542,7 +6542,8 @@ DiagramFormatPanel.prototype.addView = function(div)
 	var ui = this.editorUi;
 	var editor = ui.editor;
 	var graph = editor.graph;
-	
+	graph.pageVisible = false;
+	graph.gridEnabled = false;
 	div.appendChild(this.createTitle(mxResources.get('view')));
 	
 	// Grid
@@ -6553,6 +6554,8 @@ DiagramFormatPanel.prototype.addView = function(div)
 	{
 		div.appendChild(this.createOption(mxResources.get('pageView'), function()
 		{
+			ui.setPageVisible(false);
+            graph.view.validateBackground();
 			return graph.pageVisible;
 		}, function(checked)
 		{
@@ -6832,7 +6835,7 @@ DiagramFormatPanel.prototype.addGridOption = function(container)
 	var fPanel = this;
 	var ui = this.editorUi;
 	var graph = ui.editor.graph;
-	
+
 	var input = document.createElement('input');
 	input.style.position = 'absolute';
 	input.style.textAlign = 'right';
