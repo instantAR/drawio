@@ -140,11 +140,13 @@ DrawIOOverridExport = function (config, ui) {
 		shareButton.style.borderColor = '#F08705';
 		shareButton.style.backgroundImage = 'none';
 		shareButton.style.padding = '2px 10px 0 10px';
-		shareButton.style.marginTop = '-10px';
-		shareButton.style.height = '28px';
-		shareButton.style.lineHeight = '28px';
+		shareButton.style.marginTop = '0px';
+		shareButton.style.height = '23px';
+		shareButton.style.lineHeight = '20px';
 		shareButton.style.minWidth = '0px';
 		shareButton.style.cssFloat = 'right';
+		shareButton.style.position = 'relative';
+		shareButton.style.right = '41px';
 
 		config.actionsButtons[btnKey].style && (Object.assign(shareButton.style, config.actionsButtons[btnKey].style));
 		config.actionsButtons[btnKey].className && (shareButton.className += ' ' + config.actionsButtons[btnKey].className);

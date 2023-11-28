@@ -1757,7 +1757,7 @@
          this.buttonContainer.style.right = '0px';
          this.buttonContainer.className = 'menuButtonContainer';
          
-         this.menubar.container.appendChild(this.buttonContainer);
+         this.toolbar.container.appendChild(this.buttonContainer);
      }
  
      if ((uiTheme == 'atlas' || urlParams['atlas'] == '1') && this.menubar != null)
@@ -6879,6 +6879,7 @@
          {
              this.menubarContainer.appendChild(this.fnameWrapper);
          
+             this.menubar.container.style.display = 'None';
              this.menubar.container.style.position = 'absolute';
              this.menubar.container.style.paddingLeft = '59px';
              this.toolbar.container.style.paddingLeft = '16px';

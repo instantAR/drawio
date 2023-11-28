@@ -1,6 +1,6 @@
 {
   "name": "draw.io-angular-new",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Draw.IO - Graph Editor integration in Angular-cli",
   "main": "./dist/grapheditor.js",
   "types": "./dist/types/webpack.index.d.ts",
