@@ -2065,8 +2065,8 @@ var ParseDialog = function(editorUi, title, defaultType)
 
 	function parse(text, type, evt)
 	{
+		return new Promise((resolve, reject) => {
 		var lines = text.split('\n');
-		
 		if (type == 'plantUmlPng' || type == 'plantUmlSvg' || type == 'plantUmlTxt')
 		{
 			if (editorUi.spinner.spin(document.body, mxResources.get('inserting')))
@@ -2193,7 +2193,8 @@ var ParseDialog = function(editorUi, title, defaultType)
 					}
 				}, function(e)
 				{
-					editorUi.handleError(e);
+					reject('Something went wrong, please try again');
+					editorUi.handleError('Something went wrong, please try again');
 				});
 			}
 		}
@@ -2521,6 +2522,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 				container.parentNode.removeChild(container);
 			}
 		}
+	})
 	};
 	this.parseFunc = parse;
 	

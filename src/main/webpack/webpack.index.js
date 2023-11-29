@@ -724,9 +724,16 @@ export class GraphEditor {
     }
 
     convertToMermaid(container, scriptContainer, config, mermaidString) {
-        App.main((ui) => {
-            DrawIOMakeMermaid(ui, config, mermaidString);
-        }, null, container);
+        return new Promise((resolve, reject) => {
+            App.main((ui) => {
+                try {
+                    const result = DrawIOMakeMermaid(ui, config, mermaidString);
+                    resolve(result); // Resolve with the result if successful
+                } catch (error) {
+                    reject(error); // Reject with the error if it fails
+                }
+            }, null, container);
+        });
     }
 
     /**
