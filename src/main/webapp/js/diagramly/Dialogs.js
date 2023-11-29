@@ -2161,6 +2161,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 							Math.max(insertPoint.y, 20),
 							true, null, null, true));
 						graph.scrollCellToVisible(graph.getSelectionCell());
+						resolve('mermiad sucessfully created');
 					}));
 				}
 
