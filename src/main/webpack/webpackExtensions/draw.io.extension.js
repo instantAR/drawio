@@ -343,7 +343,7 @@ performCustomAction = function (editorUi, customAction) {
 				var noPages = editorUi.pages == null || editorUi.pages.length <= 1;
 	
 				var hd = document.createElement('h3');
-				mxUtils.write(hd, mxResources.get('formatXml'));
+				mxUtils.write(hd, 'Logic Transformation');
 				hd.style.cssText = 'width:100%;text-align:center;margin-top:0px;margin-bottom:4px';
 				div.appendChild(hd);
 				
@@ -382,7 +382,7 @@ performCustomAction = function (editorUi, customAction) {
 						graphData: optOut
 					});
 				}
-				}), null, mxResources.get('export'));
+				}), null, 'Transform');
 				
 				editorUi.showDialog(dlg.container, 300, 200, true, true);				
 				} catch (e) {

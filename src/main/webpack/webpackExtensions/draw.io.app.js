@@ -6879,7 +6879,7 @@
          {
              this.menubarContainer.appendChild(this.fnameWrapper);
          
-             this.menubar.container.style.display = 'None';
+            //  this.menubar.container.style.display = 'None';
              this.menubar.container.style.position = 'absolute';
              this.menubar.container.style.paddingLeft = '59px';
              this.toolbar.container.style.paddingLeft = '16px';
