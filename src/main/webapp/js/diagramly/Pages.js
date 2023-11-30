@@ -654,6 +654,64 @@ EditorUi.prototype.scrollToPage = function()
 };
 
 /**
+	 * Updates the hash object with the current page id.
+	 */
+EditorUi.prototype.updateHashObject = function()
+{
+	if (this.currentFile != null && this.currentFile.getHash() != '' &&
+		this.currentPage != null && this.getSelectedPageIndex() > 0)
+	{
+		var obj = this.getHashObject();
+		obj.pageId = this.currentPage.getId();
+		this.setHashObject(obj);
+	}
+	else
+	{
+		this.setHashObject(null);
+	}
+};
+
+/**
+	 * Translates this point by the given vector.
+	 * 
+	 * @param {number} dx X-coordinate of the translation.
+	 * @param {number} dy Y-coordinate of the translation.
+	 */
+EditorUi.prototype.setHashObject = function(obj)
+{
+	if (Editor.enableHashObjects)
+	{
+		var id = window.location.hash;
+
+		if (id == null || id == '')
+		{
+			id = '#';
+		}
+
+		var last = id.lastIndexOf('#');
+
+		if (last > 0)
+		{
+			id = id.substring(0, last);
+		}
+		
+		try
+		{
+			if (obj != null && !mxUtils.isEmptyObject(obj))
+			{
+				id = id + '#' + encodeURIComponent(JSON.stringify(obj));
+			}
+		}
+		catch (e)
+		{
+			// ignore
+		}
+
+		window.location.hash = id;
+	}
+};
+
+/**
  * Adds the listener for automatically saving the diagram for local changes.
  */
 EditorUi.prototype.restoreViewState = function(page, viewState, selection)

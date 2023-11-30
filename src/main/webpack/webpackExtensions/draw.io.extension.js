@@ -353,11 +353,10 @@ performCustomAction = function (editorUi, customAction) {
 				mxUtils.write(hd, 'Logic Transformation');
 				hd.style.cssText = 'width:100%;text-align:center;margin-top:0px;margin-bottom:4px';
 				div.appendChild(hd);
-				
-				var selection = editorUi.addCheckbox(div, mxResources.get('selectionOnly'),
+				var selection = editorUi.addRadiobox(div, 'logic_transfomration',mxResources.get('selectionOnly'),
 					false, editorUi.editor.graph.isSelectionEmpty());
-				var compressed = editorUi.addCheckbox(div, mxResources.get('compressed'), Editor.defaultCompressed);
-				var pages = editorUi.addCheckbox(div, mxResources.get('allPages'), !noPages, noPages);
+					var selectedPage = editorUi.addRadiobox(div, 'logic_transfomration', 'Selected page only', true);
+				var pages = editorUi.addRadiobox(div, 'logic_transfomration',mxResources.get('allPages'),false, noPages);
 				pages.style.marginBottom = '16px';
 				
 				mxEvent.addListener(selection, 'change', function()
@@ -373,7 +372,7 @@ performCustomAction = function (editorUi, customAction) {
 				});
 				var dlg = new CustomDialog(editorUi, div, mxUtils.bind(this, function()
 				{
-				var optOut = editorUi.downloadFile('xml', !compressed.checked, null,
+				var optOut = editorUi.downloadFile('xml', true, null,
 						!selection.checked, noPages || !pages.checked,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 				if (optOut) {
 					customAction['callback'](optOut).then(resolve => {
