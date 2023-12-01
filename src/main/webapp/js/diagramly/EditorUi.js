@@ -11696,8 +11696,8 @@
 						graph.container.appendChild(textInput);
 						restoreFocus = true;
 						
-						// textInput.focus();
-						// document.execCommand('selectAll', false, null);
+						textInput.focus();
+						document.execCommand('selectAll', false, null);
 
 						// Workaround for Safari 16 scroll after CMD key press
 						graph.container.scrollLeft = x0;

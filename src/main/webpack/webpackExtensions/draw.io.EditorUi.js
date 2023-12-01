@@ -10144,6 +10144,13 @@
          {
              // No dialog visible
              var source = mxEvent.getSource(evt);
+
+             if(evt.keyCode == 67 || evt.keyCode == 86) {
+                if(evt.ctrlKey) {
+                    textInput.focus();
+                    document.execCommand('selectAll', false, null);
+                }
+             }
              
              if (graph.container != null && graph.isEnabled() && !graph.isMouseDown && !graph.isEditing() &&
                  this.dialog == null && source.nodeName != 'INPUT' && source.nodeName != 'TEXTAREA')
