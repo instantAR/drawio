@@ -130,7 +130,7 @@ export class GraphEditor {
         menu: ['help', 'extra'],
         subMenu: ['new', 'open', 'editDiagram', 'save', 'saveAs', 'outline', 'layers', 'tags', 'exportPdf', 'editStyle']
     }
-    /** @private */
+    /** @public */
     editorUiObj;
 
     /** 
