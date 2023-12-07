@@ -140,9 +140,24 @@ export class GraphEditor {
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      */
     loadScript(scriptGroup, scriptIndex, scriptContainer) {
+        const loadingText = document.createElement('div');
+        loadingText.innerText = 'Loading scripts...';
+        loadingText.style.position = 'fixed'; 
+        loadingText.style.top = '0';
+        loadingText.style.left = '0';
+        loadingText.style.width = '100%';
+        loadingText.style.height = '100%';
+        loadingText.style.display = 'flex';
+        loadingText.style.alignItems = 'center';
+        loadingText.style.justifyContent = 'center';
+        loadingText.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+        loadingText.style.fontSize = '25px';
+        scriptContainer.appendChild(loadingText);
+
         return new Promise((resolve, reject) => {
             //resolve if already loaded
             if (webpackScripts[scriptGroup][scriptIndex].loaded) {
+                scriptContainer.removeChild(loadingText);
                 resolve({
                     script: scriptIndex,
                     loaded: true,
@@ -187,6 +202,8 @@ export class GraphEditor {
                 if (scriptIndex == 0) {
                     this.backupWindowObject();
                 }
+                // loadingText.innerText = `Loading script ${scriptIndex + 1} of ${webpackScripts[scriptGroup].length}`;
+                // loadingText.innerText = 'Loading scripts...';
                 scriptContainer.appendChild(script);
             }
         });
@@ -240,7 +257,7 @@ export class GraphEditor {
                 webpackScripts[standAloneGroup].forEach((script, scriptIndex) => {
                     // console.log('script', script, scriptGroupIndex, ' =>', scriptIndex);
                     allLoadScripts.push(this.loadScript(standAloneGroup, scriptIndex, scriptContainer))
-                })
+                }) 
                 Promise.all(allLoadScripts).then(processScripts => {
                     console.log("all alone scripts loaded ", standAloneGroup, processScripts);
                 })
@@ -296,7 +313,7 @@ export class GraphEditor {
             // }
         })
     }
-
+ 
     /**
      * @private
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
