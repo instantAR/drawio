@@ -140,24 +140,10 @@ export class GraphEditor {
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      */
     loadScript(scriptGroup, scriptIndex, scriptContainer) {
-        const loadingText = document.createElement('div');
-        loadingText.innerText = 'Loading scripts...';
-        loadingText.style.position = 'fixed'; 
-        loadingText.style.top = '0';
-        loadingText.style.left = '0';
-        loadingText.style.width = '100%';
-        loadingText.style.height = '100%';
-        loadingText.style.display = 'flex';
-        loadingText.style.alignItems = 'center';
-        loadingText.style.justifyContent = 'center';
-        loadingText.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-        loadingText.style.fontSize = '25px';
-        scriptContainer.appendChild(loadingText);
 
         return new Promise((resolve, reject) => {
             //resolve if already loaded
             if (webpackScripts[scriptGroup][scriptIndex].loaded) {
-                scriptContainer.removeChild(loadingText);
                 resolve({
                     script: scriptIndex,
                     loaded: true,
@@ -202,8 +188,6 @@ export class GraphEditor {
                 if (scriptIndex == 0) {
                     this.backupWindowObject();
                 }
-                // loadingText.innerText = `Loading script ${scriptIndex + 1} of ${webpackScripts[scriptGroup].length}`;
-                // loadingText.innerText = 'Loading scripts...';
                 scriptContainer.appendChild(script);
             }
         });
@@ -249,16 +233,40 @@ export class GraphEditor {
      * @param {HTMLDivElement | HTMLElement} scriptContainer - Grapheditor scripts container.
      * @param {GraphInitConfig} [config] - Grapheditor Configuration.
      */
+    
     appendScriptAtIndex(scriptGroupIndex, scriptContainer, config) {
         return new Promise((resolve, reject) => {
             let standAloneGroup = (1000 + scriptGroupIndex);
             if (webpackScripts[standAloneGroup] != undefined && webpackScripts[standAloneGroup].length > 0) {
                 let allLoadScripts = [];
+                const loadingTextId = 'loadingText';
+                let loadingText = document.getElementById(loadingTextId);
+
+                if (!loadingText) {
+                    loadingText = document.createElement('div');
+                    loadingText.id = loadingTextId;
+                    loadingText.innerText = 'Loading scripts...';
+                    loadingText.style.position = 'fixed';
+                    loadingText.style.top = '0';
+                    loadingText.style.left = '0';
+                    loadingText.style.width = '100%';
+                    loadingText.style.height = '100%';
+                    loadingText.style.display = 'flex';
+                    loadingText.style.alignItems = 'center';
+                    loadingText.style.justifyContent = 'center';
+                    loadingText.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                    loadingText.style.fontSize = '25px';
+                    scriptContainer.appendChild(loadingText);
+                }
+
                 webpackScripts[standAloneGroup].forEach((script, scriptIndex) => {
                     // console.log('script', script, scriptGroupIndex, ' =>', scriptIndex);
                     allLoadScripts.push(this.loadScript(standAloneGroup, scriptIndex, scriptContainer))
                 }) 
                 Promise.all(allLoadScripts).then(processScripts => {
+                    if (loadingText.parentNode === scriptContainer) {
+                        scriptContainer.removeChild(loadingText);
+                    }
                     console.log("all alone scripts loaded ", standAloneGroup, processScripts);
                 })
             }
