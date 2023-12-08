@@ -239,42 +239,12 @@ export class GraphEditor {
             let standAloneGroup = (1000 + scriptGroupIndex);
             if (webpackScripts[standAloneGroup] != undefined && webpackScripts[standAloneGroup].length > 0) {
                 let allLoadScripts = [];
-                /* const loadingTextId = 'loadingText';
-                let loadingText = document.getElementById(loadingTextId);
-
-                if (!loadingText) {
-                    loadingText = document.createElement('div');
-                    loadingText.id = loadingTextId;
-                    loadingText.innerText = 'Loading scripts...';
-                    loadingText.style.position = 'fixed';
-                    loadingText.style.top = '0';
-                    loadingText.style.left = '0';
-                    loadingText.style.width = '100%';
-                    loadingText.style.height = '100%';
-                    loadingText.style.display = 'flex';
-                    loadingText.style.alignItems = 'center';
-                    loadingText.style.justifyContent = 'center';
-                    loadingText.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-                    loadingText.style.fontSize = '25px';
-                    scriptContainer.appendChild(loadingText);
-                } */
 
                 webpackScripts[standAloneGroup].forEach((script, scriptIndex) => {
                     // console.log('script', script, scriptGroupIndex, ' =>', scriptIndex);
                     allLoadScripts.push(this.loadScript(standAloneGroup, scriptIndex, scriptContainer))
                 }) 
                 Promise.all(allLoadScripts).then(processScripts => {
-                    /* if (loadingText.parentNode === scriptContainer) {
-                        scriptContainer.removeChild(loadingText);
-                    } */
-                    const scriptsLoadedEvent = new Event('scriptsLoaded', { bubbles: true });
-                    const eventDispatched = window.dispatchEvent(scriptsLoadedEvent);
-
-                    if (eventDispatched) {
-                        console.log('Event dispatched successfully');
-                    } else {
-                        console.error('Failed to dispatch the event');
-                    }
                     console.log("all alone scripts loaded ", standAloneGroup, processScripts);
                 })
             }
@@ -328,6 +298,24 @@ export class GraphEditor {
             //     })
             // }
         })
+    }
+
+    getScriptLoadedEvent(scriptContainer, config) {
+        try {
+            return new Promise((resolve, reject) => {
+                this.appendScriptAtIndex(1, scriptContainer, config).then((res) => {
+                    if(res.scriptLoaded) {
+                        console.log('Resolved');
+                        resolve(true);
+                    }
+                }).catch((error) => {
+                    console.log('Error in loading scripts',error);
+                    reject(error);
+                })
+            })
+        } catch(error) {
+            console.log('Errrror::', error);
+        }
     }
  
     /**
@@ -523,8 +511,15 @@ export class GraphEditor {
 
 
         // console.log("webpackScripts", webpackScripts)
-        return this.appendScriptAtIndex(1, scriptContainer, config);
-
+        // return this.appendScriptAtIndex(1, scriptContainer, config);
+        return this.getScriptLoadedEvent(scriptContainer, config).then((res) => {
+            if (res) {
+                console.log('Scripts loaded successfully....');
+                this.showScriptLoader = false;
+            }
+        }).catch((error) => {
+            console.log('Error:', error);
+        })
     }
 
     /**
@@ -786,7 +781,7 @@ export class GraphEditor {
                 App.main((ui) => {
                     DrawIOOverridUpdateBody(ui, config);
                     DrawIOOverridExport(config, ui);
-                    // console.log("App.main", ui);
+                                        // console.log("App.main", ui);
                     this.editorUiObj = ui;
                     if (ui != undefined && ui.actions != undefined && ui.actions.actions != undefined) {
                         DrawIOExtension.prototype.subMenuList = [...Object.keys(ui.actions.actions)];
@@ -799,6 +794,8 @@ export class GraphEditor {
                         config: config
                     })
                 }, null, container);
+                // DrawIOExtension(config);
+                this.postScript(config);
 
 
             }, rej => {
