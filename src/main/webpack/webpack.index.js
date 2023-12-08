@@ -239,7 +239,7 @@ export class GraphEditor {
             let standAloneGroup = (1000 + scriptGroupIndex);
             if (webpackScripts[standAloneGroup] != undefined && webpackScripts[standAloneGroup].length > 0) {
                 let allLoadScripts = [];
-                const loadingTextId = 'loadingText';
+                /* const loadingTextId = 'loadingText';
                 let loadingText = document.getElementById(loadingTextId);
 
                 if (!loadingText) {
@@ -257,15 +257,23 @@ export class GraphEditor {
                     loadingText.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
                     loadingText.style.fontSize = '25px';
                     scriptContainer.appendChild(loadingText);
-                }
+                } */
 
                 webpackScripts[standAloneGroup].forEach((script, scriptIndex) => {
                     // console.log('script', script, scriptGroupIndex, ' =>', scriptIndex);
                     allLoadScripts.push(this.loadScript(standAloneGroup, scriptIndex, scriptContainer))
                 }) 
                 Promise.all(allLoadScripts).then(processScripts => {
-                    if (loadingText.parentNode === scriptContainer) {
+                    /* if (loadingText.parentNode === scriptContainer) {
                         scriptContainer.removeChild(loadingText);
+                    } */
+                    const scriptsLoadedEvent = new Event('scriptsLoaded', { bubbles: true });
+                    const eventDispatched = window.dispatchEvent(scriptsLoadedEvent);
+
+                    if (eventDispatched) {
+                        console.log('Event dispatched successfully');
+                    } else {
+                        console.error('Failed to dispatch the event');
                     }
                     console.log("all alone scripts loaded ", standAloneGroup, processScripts);
                 })
