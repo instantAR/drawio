@@ -10146,8 +10146,8 @@
              var source = mxEvent.getSource(evt);
              if(evt.keyCode == 67 || evt.keyCode == 86 || evt.keyCode == 88) {
                 if(evt.ctrlKey || evt.metaKey) {
-                    textInput.focus();
-                    document.execCommand('selectAll', false, null);
+                    // textInput.focus();
+                    // document.execCommand('selectAll', false, null);
                 }
              }
              

@@ -300,23 +300,6 @@ export class GraphEditor {
         })
     }
 
-    getScriptLoadedEvent(scriptContainer, config) {
-        try {
-            return new Promise((resolve, reject) => {
-                this.appendScriptAtIndex(1, scriptContainer, config).then((res) => {
-                    if(res.scriptLoaded) {
-                        console.log('Resolved');
-                        resolve(true);
-                    }
-                }).catch((error) => {
-                    console.log('Error in loading scripts',error);
-                    reject(error);
-                })
-            })
-        } catch(error) {
-            console.log('Errrror::', error);
-        }
-    }
  
     /**
      * @private
@@ -511,15 +494,7 @@ export class GraphEditor {
 
 
         // console.log("webpackScripts", webpackScripts)
-        // return this.appendScriptAtIndex(1, scriptContainer, config);
-        return this.getScriptLoadedEvent(scriptContainer, config).then((res) => {
-            if (res) {
-                console.log('Scripts loaded successfully....');
-                this.showScriptLoader = false;
-            }
-        }).catch((error) => {
-            console.log('Error:', error);
-        })
+        return this.appendScriptAtIndex(1, scriptContainer, config);
     }
 
     /**
@@ -794,8 +769,6 @@ export class GraphEditor {
                         config: config
                     })
                 }, null, container);
-                // DrawIOExtension(config);
-                this.postScript(config);
 
 
             }, rej => {
