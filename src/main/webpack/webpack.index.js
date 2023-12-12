@@ -728,14 +728,14 @@ export class GraphEditor {
 
     convertToMermaid(container, scriptContainer, config, mermaidString) {
         return new Promise((resolve, reject) => {
-            App.main((ui) => {
+            // App.main((ui) => {
                 try {
-                    const result = DrawIOMakeMermaid(ui, config, mermaidString);
+                    const result = DrawIOMakeMermaid(this.editorUiObj, config, mermaidString);
                     resolve(result); // Resolve with the result if successful
                 } catch (error) {
                     reject(error); // Reject with the error if it fails
                 }
-            }, null, container);
+            // }, null, container);
         });
     }
 
@@ -756,7 +756,6 @@ export class GraphEditor {
                 App.main((ui) => {
                     DrawIOOverridUpdateBody(ui, config);
                     DrawIOOverridExport(config, ui);
-                                        // console.log("App.main", ui);
                     this.editorUiObj = ui;
                     if (ui != undefined && ui.actions != undefined && ui.actions.actions != undefined) {
                         DrawIOExtension.prototype.subMenuList = [...Object.keys(ui.actions.actions)];

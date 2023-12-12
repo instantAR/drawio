@@ -195,7 +195,7 @@ DrawIOMakeMermaid = function (editorUi, config, mermaidString) {
 	return new Promise((resolve, reject) => {
 	const dialog = new ParseDialog(editorUi, 'abc', 'mermaid');
 	setTimeout(() => {
-		DrawIOOverridExport(config, editorUi);
+		// DrawIOOverridExport(config, editorUi);
 		try {
 			const result = dialog.parseFunc(mermaidString, 'mermaid2drawio');
 			resolve(result); // Resolve with the result if successful
