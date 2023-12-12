@@ -147,6 +147,7 @@ DrawIOOverridExport = function (config, ui) {
 		shareButton.style.cssFloat = 'right';
 		shareButton.style.position = 'relative';
 		shareButton.style.right = '41px';
+		shareButton.style.cursor = 'pointer';
 
 		config.actionsButtons[btnKey].style && (Object.assign(shareButton.style, config.actionsButtons[btnKey].style));
 		config.actionsButtons[btnKey].className && (shareButton.className += ' ' + config.actionsButtons[btnKey].className);
@@ -266,31 +267,56 @@ performCustomAction = function (editorUi, customAction) {
 	switch (customAction['actionType']) {
 		case 'import_OptIn':
 			try {
-				customAction['callback']().then(resolve => {
-					editorUi.importFile(resolve.graphData.xml, "text/xml", 0, 0, 240, 160, resolve.graphData.name, function () {
-						console.log("done");
-						sendSuccessResponse(customAction, {
-							status: "import successfully",
-							graphData: resolve.graphData
-						});
-					}, null, false, undefined, undefined);
-
-					console.log("import_OptIn", resolve)
-
-				}, reject => {
-					console.log("import_OptIn", reject)
-				}).catch(e => {
-					console.log("import_OptIn", e)
+				var div = document.createElement('div');
+				div.style.whiteSpace = 'nowrap';
+				var noPages = editorUi.pages == null || editorUi.pages.length <= 1;
+	
+				var hd = document.createElement('h3');
+				mxUtils.write(hd, 'Logic Transformation');
+				hd.style.cssText = 'width:100%;text-align:center;margin-top:0px;margin-bottom:4px';
+				div.appendChild(hd);
+				var selection = editorUi.addRadiobox(div, 'logic_transfomration',mxResources.get('selectionOnly'),
+					false, editorUi.editor.graph.isSelectionEmpty());
+					var selectedPage = editorUi.addRadiobox(div, 'logic_transfomration', 'Selected page only', false);
+				var pages = editorUi.addRadiobox(div, 'logic_transfomration',mxResources.get('allPages'),true, noPages);
+				pages.style.marginBottom = '16px';
+				
+				mxEvent.addListener(selection, 'change', function()
+				{
+					if (selection.checked)
+					{
+						pages.setAttribute('disabled', 'disabled');
+					}
+					else
+					{
+						pages.removeAttribute('disabled');
+					}
 				});
-			} catch (e) {
-				console.log(e);
-				sendErrorResponse(customAction, {
-					status: "something went wrong",
-					graphData: null,
-					reason: e
-				});
-			}
-			break;
+				var optOut = editorUi.downloadFile('xml', true, null,
+						!selection.checked, noPages || !pages.checked,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
+				if (optOut) {
+					customAction['callback'](optOut).then(resolve => {
+						console.log("XML graphData for save:", resolve)
+					}, reject => {
+						console.log("XML graphData for save:", reject)
+					}).catch(e => {
+						console.log("XML graphData for save:", e)
+					});
+				} else {
+					sendErrorResponse(customAction, {
+						status: "tranform error",
+						graphData: optOut
+					});
+				}
+				} catch (e) {
+					console.log(e);
+					sendErrorResponse(customAction, {
+						status: "something went wrong",
+						graphData: null,
+						reason: e
+					});
+				}
+				break;
 		case 'export_SvG_OptOut':
 			try {
 				let editable = true;
@@ -376,11 +402,11 @@ performCustomAction = function (editorUi, customAction) {
 						!selection.checked, noPages || !pages.checked,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 				if (optOut) {
 					customAction['callback'](optOut).then(resolve => {
-						console.log("export_OptOut", resolve)
+						console.log("XML GraphData", resolve)
 					}, reject => {
-						console.log("export_OptOut", reject)
+						console.log("XML GraphData", reject)
 					}).catch(e => {
-						console.log("export_OptOut", e)
+						console.log("XML GraphData", e)
 					});
 				} else {
 					sendErrorResponse(customAction, {

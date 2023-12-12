@@ -841,7 +841,7 @@ if (typeof isWebpack !== 'undefined') {
                         callback: (graphData) => {
                             return new Promise((resolve, reject) => {
                                 resolve({
-                                    status: "Dwp Library Implementation required",
+                                    status: "Draw IO graphData get Sucessfully",
                                     graphData: graphData
                                 })
                             })
@@ -849,7 +849,33 @@ if (typeof isWebpack !== 'undefined') {
                         callbackOnError: (graphData) => {
                             return new Promise((resolve, reject) => {
                                 resolve({
-                                    status: "Dwp Library import error Implementation required",
+                                    status: "Draw IO graphData get Failed",
+                                    graphData: graphData
+                                })
+                            })
+                        },
+                        style: {
+                            backgroundColor: '#4d90fe',
+                            border: '1px solid #3079ed',
+                            backgroundImage: 'linear-gradient(#4d90fe 0,#4787ed 100%)',
+                            height: '29px',
+                            lineHeight: '27px'
+                        }
+                    },
+                    'Save': {
+                        actionType: ActionType.IMPORT,
+                        callback: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Draw IO graphData get Sucessfully",
+                                    graphData: graphData
+                                })
+                            })
+                        },
+                        callbackOnError: (graphData) => {
+                            return new Promise((resolve, reject) => {
+                                resolve({
+                                    status: "Draw IO graphData get Failed",
                                     graphData: graphData
                                 })
                             })
