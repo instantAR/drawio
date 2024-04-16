@@ -33,10 +33,10 @@ function Sidebar(editorUi, container)
 	this.wrapper.style.maxHeight = 'calc(100% - ' + this.moreShapesHeight + 'px)';
 	this.container.appendChild(this.wrapper);
 
-	// var title = this.createMoreShapes();
-	// this.container.appendChild(title);
+	var title = this.createMoreShapes();
+	this.container.appendChild(title);
 
-	// document.body.appendChild(this.graph.container);
+	document.body.appendChild(this.graph.container);
 	
 	this.pointerUpHandler = mxUtils.bind(this, function()
 	{

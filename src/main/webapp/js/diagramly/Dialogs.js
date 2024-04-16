@@ -2150,19 +2150,22 @@ var ParseDialog = function(editorUi, title, defaultType)
 							diagramType != 'quadrantchart' && diagramType != 'c4context';
 
 				var graph = editorUi.editor.graph;
-				
+				var isListenerActive = true;
+				var mermaidListener = mxUtils.bind(this, function(modelXml) {
+					if (!isListenerActive) {
+						return;
+					}
+					editorUi.spinner.stop();
+					graph.setSelectionCells(editorUi.importXml(modelXml,
+						Math.max(insertPoint.x, 20),
+						Math.max(insertPoint.y, 20),
+						true, null, null, true));
+					graph.scrollCellToVisible(graph.getSelectionCell());
+					resolve('mermiad successfully created');
+				});
 				if (inDrawioFormat)
 				{
-					mxMermaidToDrawio.addListener(mxUtils.bind(this, function(modelXml)
-					{
-						editorUi.spinner.stop();
-						graph.setSelectionCells(editorUi.importXml(modelXml,
-							Math.max(insertPoint.x, 20),
-							Math.max(insertPoint.y, 20),
-							true, null, null, true));
-						graph.scrollCellToVisible(graph.getSelectionCell());
-						resolve('mermiad sucessfully created');
-					}));
+					mxMermaidToDrawio.addListener(mermaidListener);
 				}
 
 				editorUi.generateMermaidImage(text, null, function(data, w, h)
@@ -2194,8 +2197,14 @@ var ParseDialog = function(editorUi, title, defaultType)
 					}
 				}, function(e)
 				{
-					reject('Something went wrong, please try again');
-					editorUi.handleError('Something went wrong, please try again');
+					isListenerActive = false;
+					if(title === "Mermaid...") {
+						editorUi.handleError('Something went wrong, please try again');
+					}
+					else {
+						editorUi.spinner.stop();
+						reject('Something went wrong, please try again');
+					}
 				});
 			}
 		}
