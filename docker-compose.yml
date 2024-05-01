@@ -2,7 +2,7 @@
 version: '3.5'
 services:
   drawio:
-    image: jgraph/drawio
+    image: jituhooda/drawio
     container_name: drawio
     build: 
       context: .
@@ -12,6 +12,7 @@ services:
       - 8080:8080
       - 8443:8443
     environment:
+      # DRAWIO_SERVER_URL: /test/
       PUBLIC_DNS: domain
       ORGANISATION_UNIT: unit
       ORGANISATION: org
@@ -24,3 +25,26 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    networks:
+      - app-network
+  nginx:
+    image: jituhooda/nginx:latest
+    build: 
+      context: ./nginx
+      dockerfile: Dockerfile
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx/ssl_certificates/bundle.crt:/etc/ssl/bundle.crt
+      - ./nginx/ssl_certificates/certname.key:/etc/ssl/certname.key
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - drawio
+    networks:
+      - app-network
+    
+
+networks:
+  app-network:
+    driver: bridge
