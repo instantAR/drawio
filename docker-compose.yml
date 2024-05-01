@@ -2,7 +2,7 @@
 version: '3.5'
 services:
   drawio:
-    image: jituhooda/drawio
+    image: jituhooda/drawio:latest
     container_name: drawio
     build: 
       context: .
