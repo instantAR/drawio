@@ -5,7 +5,7 @@
   "main": "./dist/grapheditor.js",
   "types": "./dist/types/webpack.index.d.ts",
   "scripts": {
-    "start": "rmdir dist /S /Q & npx webpack serve --mode=development --config webpack.config.js",
+    "start": "npx webpack serve --mode=development --config webpack.config.js",
     "build:types": "rmdir dist\\types /S /Q & tsc -p tsconfig.json",
     "clean": "del out.txt & rmdir dist /S /Q & del *-draw.io-*.tgz",
     "build:prod": "npm run clean & npm run build:types & npx webpack --mode=production --config webpack.config.js --progress --profile & npm pack",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bhavinmatariya/drawio.git"
+    "url": "git+https://github.com/instantAR/drawio.git"
   },
   "keywords": [
     "draw.io",
