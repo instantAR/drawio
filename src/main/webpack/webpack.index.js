@@ -746,17 +746,67 @@ export class GraphEditor {
      * @returns {Promise<GraphEditorLoaded>} Promise<GraphEditorLoaded>
      */
     initialized(container, scriptContainer, config) {
-        return new Promise((resolve, reject) => {
 
+        return new Promise((resolve, reject) => {
             // console.log('initialized', config);
+            let mermiadData = null;
 
             this.init(scriptContainer, config).then(res => {
                 this.pouplateScriptVars();
                 // console.log('script init', res, grapheditorKeys);
                 App.main((ui) => {
+                    this.editorUiObj = ui;
                     DrawIOOverridUpdateBody(ui, config);
                     DrawIOOverridExport(config, ui);
-                    this.editorUiObj = ui;
+                    
+                    window.addEventListener('message', function(event) {
+                        if(event.data && typeof event.data === 'string') {
+                            console.log('string--------', event);
+                            try {
+                                mermiadData = event.data;
+                                DrawIOMakeMermaid(ui, config,event.data);
+                            }
+                            catch(err) {
+                                // console.log("=========err",err);
+                            }
+                        }
+                      });
+                    const queryString = window.location.search.substring(1);
+                    const params = new URLSearchParams(queryString);
+                    let workspaceData = params ? params.get('workFlowData') : null;
+                    let projectId = params ? params.get('projectId') : null;
+                    let version = params ? params.get('version') : null;
+                    let iteration = params ? params.get('iteration') : null;
+                    if (workspaceData) {
+                        const apiUrl = `https://api.instantar.io/api/v2.0/getworkflows/${projectId}/${version}/${iteration}`;
+                        const token = workspaceData;
+
+                        const requestOptions = {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            }
+                        };
+                        fetch(apiUrl, requestOptions)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.text();
+                            })
+                            .then(data => {
+                                if (data) {
+                                    this.editorUiObj?.openLocalFile(data, 'data init', false);
+                                }
+                                console.log('API data:', data);
+                            })
+                            .catch(error => {
+                                console.error('API call error:', error);
+                            });
+
+                    }
+
                     if (ui != undefined && ui.actions != undefined && ui.actions.actions != undefined) {
                         DrawIOExtension.prototype.subMenuList = [...Object.keys(ui.actions.actions)];
                     }
@@ -1048,7 +1098,19 @@ if (typeof isWebpack !== 'undefined') {
                 }
             })
         .then(resolve => {
-            console.log("init", resolve)
+            console.log("init", resolve);
+            window.addEventListener('message', function(event) {
+            
+                if (event.data && typeof event.data === 'string') {
+                    try {
+                        const parsedData = JSON.parse(event.data);
+                        console.log('Received data from parent:', parsedData);            
+                    } catch (err) {
+                        console.error('Error parsing data:', err);
+                    }
+                }
+            });
+            
             let menuList = graphEditor.getMenuList();
             console.log("menuList", menuList.menu.sort(), menuList.subMenu.sort())
             graphEditor.setGrapheditorData({

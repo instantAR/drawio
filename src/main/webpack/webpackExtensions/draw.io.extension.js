@@ -296,11 +296,14 @@ performCustomAction = function (editorUi, customAction) {
 						!selection.checked, noPages || !pages.checked,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 				if (optOut) {
 					customAction['callback'](optOut).then(resolve => {
-						console.log("XML graphData for save:", resolve)
+						console.log("XML graphData for save:=====Resolve>", resolve)
+						const message = resolve;
+						message['buttonType'] = "save";
+						window.parent.postMessage(message, "*")
 					}, reject => {
-						console.log("XML graphData for save:", reject)
+						console.log("XML graphData for save:=====Reject", reject)
 					}).catch(e => {
-						console.log("XML graphData for save:", e)
+						console.log("XML graphData for save:====Error", e)
 					});
 				} else {
 					sendErrorResponse(customAction, {
@@ -402,11 +405,13 @@ performCustomAction = function (editorUi, customAction) {
 						!selection.checked, noPages || !pages.checked,undefined,undefined,undefined,undefined,undefined,undefined,undefined,true);
 				if (optOut) {
 					customAction['callback'](optOut).then(resolve => {
-						console.log("XML GraphData", resolve)
+						const message = resolve;
+						message['buttonType'] = "transformIntoLogic";
+						window.parent.postMessage(message, "*")
 					}, reject => {
-						console.log("XML GraphData", reject)
+						console.log("XML GraphData========reject==>", reject)
 					}).catch(e => {
-						console.log("XML GraphData", e)
+						console.log("XML GraphData========error==>", e)
 					});
 				} else {
 					sendErrorResponse(customAction, {
