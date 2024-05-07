@@ -1,0 +1,47 @@
+#This compose file adds draw.io to your stack
+version: '3.5'
+services:
+  drawio:
+    image: jituhooda/drawio:latest
+    container_name: drawio
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # environment:
+    #   # DRAWIO_SERVER_URL: /test/
+    #   PUBLIC_DNS: domain
+    #   ORGANISATION_UNIT: unit
+    #   ORGANISATION: org
+    #   CITY: city
+    #   STATE: state
+    #   COUNTRY_CODE: country
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f http://domain:8080 || exit 1"]
+    #   interval: 1m30s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 10s
+    networks:
+      - app-network
+  nginx:
+    image: jituhooda/nginx:latest
+    build: 
+      context: ./nginx
+      dockerfile: Dockerfile
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx/ssl_certificates/bundle.crt:/etc/ssl/bundle.crt
+      - ./nginx/ssl_certificates/certname.key:/etc/ssl/certname.key
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - drawio
+    networks:
+      - app-network
+    
+
+networks:
+  app-network:
+    driver: bridge
