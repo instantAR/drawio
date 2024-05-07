@@ -245,7 +245,7 @@ export class GraphEditor {
                     allLoadScripts.push(this.loadScript(standAloneGroup, scriptIndex, scriptContainer))
                 }) 
                 Promise.all(allLoadScripts).then(processScripts => {
-                    console.log("all alone scripts loaded ", standAloneGroup, processScripts);
+                    // console.log("all alone scripts loaded ", standAloneGroup, processScripts);
                 })
             }
             if (webpackScripts[scriptGroupIndex] != undefined) {
@@ -523,7 +523,7 @@ export class GraphEditor {
 
     activateSideBar(editorUi) {
         try {
-            var activateSiderBarAfterLoad = ['general']
+            var activateSiderBarAfterLoad = ['general', 'basic', 'uml', 'er', 'arrows2', 'flowchart', 'misc', 'advanced']
             setTimeout(() => {
                 // console.log("entries", editorUi.sidebar.entries, editorUi.sidebar.palettes)
                 activateSiderBarAfterLoad.forEach((id, index) => {
@@ -749,8 +749,6 @@ export class GraphEditor {
 
         return new Promise((resolve, reject) => {
             // console.log('initialized', config);
-            let mermiadData = null;
-
             this.init(scriptContainer, config).then(res => {
                 this.pouplateScriptVars();
                 // console.log('script init', res, grapheditorKeys);
@@ -758,54 +756,27 @@ export class GraphEditor {
                     this.editorUiObj = ui;
                     DrawIOOverridUpdateBody(ui, config);
                     DrawIOOverridExport(config, ui);
-                    
-                    window.addEventListener('message', function(event) {
-                        if(event.data && typeof event.data === 'string') {
-                            console.log('string--------', event);
-                            try {
-                                mermiadData = event.data;
-                                DrawIOMakeMermaid(ui, config,event.data);
-                            }
-                            catch(err) {
-                                // console.log("=========err",err);
+                    window.addEventListener('message', function (event) {
+                        if (event.data && typeof event.data === 'string') {
+                            if(event.data === 'DrawIO loaded') return;
+                            if(event.data === 'Mermaid Creation Failed') return;
+                            if(event.data === 'Mermiad successfully created') return;
+                            const mainObj = JSON.parse(event.data);
+                            if (mainObj.isMermaid) {
+                                try {
+                                    const mermiadData = mainObj.data;
+                                    DrawIOMakeMermaid(ui, config, mermiadData);
+                                }
+                                catch (err) {
+                                    // console.log("=========err",err);
+                                }
+                            } else {
+                                const xmlData = mainObj.data;
+                                this.editorUiObj = ui;
+                                this.editorUiObj?.openLocalFile(xmlData, 'data init', false);
                             }
                         }
-                      });
-                    const queryString = window.location.search.substring(1);
-                    const params = new URLSearchParams(queryString);
-                    let workspaceData = params ? params.get('workFlowData') : null;
-                    let projectId = params ? params.get('projectId') : null;
-                    let version = params ? params.get('version') : null;
-                    let iteration = params ? params.get('iteration') : null;
-                    if (workspaceData) {
-                        const apiUrl = `https://api.instantar.io/api/v2.0/getworkflows/${projectId}/${version}/${iteration}`;
-                        const token = workspaceData;
-
-                        const requestOptions = {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`
-                            }
-                        };
-                        fetch(apiUrl, requestOptions)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`HTTP error! status: ${response.status}`);
-                                }
-                                return response.text();
-                            })
-                            .then(data => {
-                                if (data) {
-                                    this.editorUiObj?.openLocalFile(data, 'data init', false);
-                                }
-                                console.log('API data:', data);
-                            })
-                            .catch(error => {
-                                console.error('API call error:', error);
-                            });
-
-                    }
+                    });
 
                     if (ui != undefined && ui.actions != undefined && ui.actions.actions != undefined) {
                         DrawIOExtension.prototype.subMenuList = [...Object.keys(ui.actions.actions)];
@@ -1098,22 +1069,13 @@ if (typeof isWebpack !== 'undefined') {
                 }
             })
         .then(resolve => {
-            console.log("init", resolve);
-            window.addEventListener('message', function(event) {
-            
-                if (event.data && typeof event.data === 'string') {
-                    try {
-                        const parsedData = JSON.parse(event.data);
-                        console.log('Received data from parent:', parsedData);            
-                    } catch (err) {
-                        console.error('Error parsing data:', err);
-                    }
-                }
-            });
+            // console.log("init", resolve);
+            window.parent.postMessage('DrawIO loaded', "*");
             
             let menuList = graphEditor.getMenuList();
-            console.log("menuList", menuList.menu.sort(), menuList.subMenu.sort())
-            graphEditor.setGrapheditorData({
+            // console.log("menuList", menuList.menu.sort(), menuList.subMenu.sort())
+            // static three page diagram render code
+           /*  graphEditor.setGrapheditorData({
                 xml: xmlData,
                 name: "data init"
             }).then(resolve => {
@@ -1122,7 +1084,7 @@ if (typeof isWebpack !== 'undefined') {
                 console.log("setGraphEditor", reject)
             }).catch(e => {
                 console.log("setGraphEditor", e)
-            });
+            }); */
         }, reject => {
             console.log("init", reject)
         }).catch(e => {

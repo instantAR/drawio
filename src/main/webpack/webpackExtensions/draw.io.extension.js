@@ -13,7 +13,7 @@ DrawIOExtension = function (config) {
 				typeof config['extraActions'][menuName]['callback'] === 'function') {
 				addMenuItem(menuName);
 			} else if (typeof config['extraActions'][menuName] === 'object') {
-				console.log("keys", Object.keys(config['extraActions'][menuName]));
+				// console.log("keys", Object.keys(config['extraActions'][menuName]));
 				Object.keys(config['extraActions'][menuName]).forEach((subMenuName) => {
 
 					if (config['extraActions'][menuName][subMenuName]['callback'] !== undefined &&

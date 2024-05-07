@@ -2162,6 +2162,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 						true, null, null, true));
 					graph.scrollCellToVisible(graph.getSelectionCell());
 					resolve('mermiad successfully created');
+					window.parent.postMessage('Mermiad successfully created', "*");
 				});
 				if (inDrawioFormat)
 				{
@@ -2199,10 +2200,12 @@ var ParseDialog = function(editorUi, title, defaultType)
 				{
 					isListenerActive = false;
 					if(title === "Mermaid...") {
+						window.parent.postMessage('Mermaid Creation Failed', "*");
 						editorUi.handleError('Something went wrong, please try again');
 					}
 					else {
 						editorUi.spinner.stop();
+						window.parent.postMessage('Mermaid Creation Failed', "*");
 						reject('Something went wrong, please try again');
 					}
 				});
