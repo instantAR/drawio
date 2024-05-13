@@ -762,6 +762,7 @@ export class GraphEditor {
                             if(event.data === 'Mermaid Creation Failed') return;
                             if(event.data === 'Mermiad successfully created') return;
                             const mainObj = JSON.parse(event.data);
+                            if(mainObj.isSharedAppSelected) return;
                             if (mainObj.isMermaid) {
                                 try {
                                     const mermiadData = mainObj.data;

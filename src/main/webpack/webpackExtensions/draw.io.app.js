@@ -1756,7 +1756,20 @@
          this.buttonContainer.style.position = 'absolute';
          this.buttonContainer.style.right = '0px';
          this.buttonContainer.className = 'menuButtonContainer';
-         
+         window.addEventListener('message', function (event) {
+            if (event.data && typeof event.data === 'string') {
+                if(event.data === 'DrawIO loaded') return;
+                if(event.data === 'Mermaid Creation Failed') return;
+                if(event.data === 'Mermiad successfully created') return;
+                const mainObj = JSON.parse(event.data);
+                if(mainObj.isSharedAppSelected) {
+                    const ele = document.querySelector('.menuButtonContainer');
+                    if(ele) {
+                        ele.style.display = 'none';
+                    }
+                }
+            }
+        });
          this.toolbar.container.appendChild(this.buttonContainer);
      }
  
