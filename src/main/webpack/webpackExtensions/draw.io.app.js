@@ -1760,6 +1760,7 @@
             if (event.data && typeof event.data === 'string') {
                 if(event.data === 'DrawIO loaded') return;
                 if(event.data === 'Mermaid Creation Failed') return;
+                if(event.data === 'webpackHot') return;
                 if(event.data === 'Mermiad successfully created') return;
                 const mainObj = JSON.parse(event.data);
                 if(mainObj.isSharedAppSelected) {

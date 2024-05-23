@@ -333,6 +333,7 @@ export class GraphEditor {
         this.addWebScript('Editor', './mxgraph/grapheditor/grapheditor/Editor.js', 4, config);
         this.addWebScript('EditorUi', './mxgraph/grapheditor/grapheditor/EditorUi.js', 5, config);
         this.addWebScript('Sidebar', './mxgraph/grapheditor/grapheditor/Sidebar.js', 4, config);
+        this.addWebScript('modalPopup', './mxgraph/grapheditor/popup/modalPopup.js', 4, config);
         this.addWebScript('Graph', './mxgraph/grapheditor/grapheditor/Graph.js', 5, config);
         this.addWebScript('Format', './mxgraph/grapheditor/grapheditor/Format.js', 6, config);
         this.addWebScript('Shapes', './mxgraph/grapheditor/grapheditor/Shapes.js', 5, config);
@@ -753,6 +754,7 @@ export class GraphEditor {
                 this.pouplateScriptVars();
                 // console.log('script init', res, grapheditorKeys);
                 App.main((ui) => {
+                    window.editorUiObj = ui;
                     this.editorUiObj = ui;
                     DrawIOOverridUpdateBody(ui, config);
                     DrawIOOverridExport(config, ui);
@@ -761,6 +763,7 @@ export class GraphEditor {
                             if(event.data === 'DrawIO loaded') return;
                             if(event.data === 'Mermaid Creation Failed') return;
                             if(event.data === 'Mermiad successfully created') return;
+                            if(event.data === 'webpackHot') return;
                             const mainObj = JSON.parse(event.data);
                             if(mainObj.isSharedAppSelected) return;
                             if (mainObj.isMermaid) {

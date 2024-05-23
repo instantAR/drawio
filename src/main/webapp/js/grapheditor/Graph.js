@@ -12959,6 +12959,10 @@ if (typeof mxVertexHandler !== 'undefined')
 		var mxCellEditorStartEditing = mxCellEditor.prototype.startEditing;
 		mxCellEditor.prototype.startEditing = function(cell, trigger)
 		{
+			if(cell.style.includes("rounded=1;whiteSpace=wrap;html=1;fillColor=#a20225;strokeColor=black;fontColor=white;")) {
+				triggerModalFromJs(cell);
+				return;
+			}
 			cell = this.graph.getStartEditingCell(cell, trigger);
 
 			mxCellEditorStartEditing.apply(this, arguments);

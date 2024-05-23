@@ -1608,7 +1608,14 @@ Sidebar.prototype.addMiscPalette = function(expand)
 		this.createEdgeTemplateEntry('edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;', 50, 50, '', 'Manual Line', null, lineTags + 'manual'),
 	 	this.createEdgeTemplateEntry('shape=filledEdge;curved=0;rounded=0;fixDash=1;endArrow=none;strokeWidth=10;fillColor=#ffffff;edgeStyle=orthogonalEdgeStyle;html=1;', 60, 40, '', 'Filled Edge'),
 	 	this.createEdgeTemplateEntry('edgeStyle=elbowEdgeStyle;elbow=horizontal;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;', 50, 50, '', 'Horizontal Elbow', null, lineTags + 'elbow horizontal'),
-	 	this.createEdgeTemplateEntry('edgeStyle=elbowEdgeStyle;elbow=vertical;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;', 50, 50, '', 'Vertical Elbow', null, lineTags + 'elbow vertical')
+	 	this.createEdgeTemplateEntry('edgeStyle=elbowEdgeStyle;elbow=vertical;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;', 50, 50, '', 'Vertical Elbow', null, lineTags + 'elbow vertical'),
+
+		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;fillColor=#a20225;strokeColor=black;fontColor=white;source_data;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Source Data', 'Source Data', null, null, 'source data tag'),
+		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;fillColor=#a20225;strokeColor=black;fontColor=white;data_filter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Filter', 'Data Filter', null, null, 'data filter tag'),
+		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;fillColor=#a20225;strokeColor=black;fontColor=white;data_rules;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Rules', 'Data Rules', null, null, 'data rules tag'),
+		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;fillColor=#a20225;strokeColor=black;fontColor=white;data_splitter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Splitter', 'Data Splitter', null, null, 'data splitter tag'),
+		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;fillColor=#a20225;strokeColor=black;fontColor=white;data_meger;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Meger', 'Data Meger', null, null, 'data meger tag'),
+		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;fillColor=#a20225;strokeColor=black;fontColor=white;data_formatter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Formatter', 'Data Formatter', null, null, 'data formatter tag'),
 	];
 
 	this.addPaletteFunctions('misc', mxResources.get('misc'), (expand != null) ? expand : true, fns);
