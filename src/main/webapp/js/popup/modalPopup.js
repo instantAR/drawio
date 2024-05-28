@@ -19,20 +19,28 @@ okBtn.onclick = function () {
   value = value.cloneNode(true);
   var removeLabel = false;
   var names = ['jsonData'];
-  for (var i = 0; i < names.length; i++) {
-
-    value.setAttribute(names[i], textArea.value ? textArea.value : '');
-    removeLabel = removeLabel || (names[i] == 'placeholder' &&
-      value.getAttribute('placeholders') == '1');
+  if(window.jsTreeDropdownData) {
+    for (var i = 0; i < names.length; i++) {
+      value.setAttribute(names[i], window.jsTreeDropdownData);
+      removeLabel = removeLabel || (names[i] == 'placeholder' &&
+        value.getAttribute('placeholders') == '1');
+    }
   }
+  else {
+    for (var i = 0; i < names.length; i++) {
 
-  if (removeLabel) {
-    value.removeAttribute('label');
+      value.setAttribute(names[i], textArea.value ? textArea.value : '');
+      removeLabel = removeLabel || (names[i] == 'placeholder' &&
+        value.getAttribute('placeholders') == '1');
+    }
+  
+    if (removeLabel) {
+      value.removeAttribute('label');
+    }
+    if(textArea) textArea.value = '';
   }
 
   graph.getModel().setValue(selectedcellData, value);
-
-  textArea.value = '';
   modal.style.display = "none";
 
 }
@@ -49,6 +57,7 @@ window.onclick = function (event) {
 
 function openModal() {
   modal.style.display = "block";
+  callJsTreeAPI();
 }
 
 function closeModal() {

@@ -1,4 +1,5 @@
 import './webpack.init';
+import {callAPI} from '../webapp/js/popup/jsTree';
 
 window.graphEditorRefCount = 0;
 window.webpackScripts = [];
@@ -8,6 +9,8 @@ window.grapheditorKeys = [];
 
 window.mxScriptsLoaded = false;
 window.mxWinLoaded = false;
+window.callJsTreeAPI = callAPI;
+window.jsTreeDropdownData = null;
 
 /**
  * Synchronously adds scripts to the page.
@@ -334,6 +337,7 @@ export class GraphEditor {
         this.addWebScript('EditorUi', './mxgraph/grapheditor/grapheditor/EditorUi.js', 5, config);
         this.addWebScript('Sidebar', './mxgraph/grapheditor/grapheditor/Sidebar.js', 4, config);
         this.addWebScript('modalPopup', './mxgraph/grapheditor/popup/modalPopup.js', 4, config);
+        this.addWebScript('filterDataPopup', './mxgraph/grapheditor/popup/filterDataPopup.js', 4, config);
         this.addWebScript('Graph', './mxgraph/grapheditor/grapheditor/Graph.js', 5, config);
         this.addWebScript('Format', './mxgraph/grapheditor/grapheditor/Format.js', 6, config);
         this.addWebScript('Shapes', './mxgraph/grapheditor/grapheditor/Shapes.js', 5, config);

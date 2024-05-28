@@ -8,7 +8,10 @@
   <!-- <link rel="stylesheet" type="text/css" href="./mxgraph/grapheditor/croppie/croppie.min.css"> -->
   <link rel="stylesheet" type="text/css" href="./mxgraph/styles/grapheditor.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></script>
   <style type="text/css">
 		body { overflow:hidden; }
 		div.picker { z-index: 10007; }
@@ -81,6 +84,10 @@
             border: 1px solid #888;
             width: 50%;
         }
+		#jstree {
+			max-height: 700px;
+    		overflow: auto;
+		}
 
         .close {
             color: #aaaaaa;
@@ -122,10 +129,24 @@
 	<div id="myModal" class="modal">
 		<div class="modal-content">
 			<span class="close">&times;</span>
-			<h2>JSON Data</h2>
-			<textarea id="text-area"rows="15" cols="100" placeholder="Enter text here..."></textarea>
+			<div id="jstree"></div>
+			<!-- <h2>JSON Data</h2>
+			<textarea id="text-area"rows="15" cols="50" placeholder="Enter text here..."></textarea> -->
 			<div class="modal-footer">
 				<button class="btn" id="okBtn">OK</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="filterDataModal" class="modal">
+		<div class="modal-content">
+			<span id="close-filterModal" class="close">&times;</span>
+			<div> Filter Modal</div>
+			<select id="keyData"></select>
+			<select id="operations"></select>
+			<input type="text" placeholder="Enter Value" />
+			<div class="modal-footer">
+				<button class="btn" id="filterOkBtn">OK</button>
 			</div>
 		</div>
 	</div>
