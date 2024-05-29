@@ -15,6 +15,9 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
       const apiCollectionData = apiData;
       const data = generateTree(apiCollectionData);
       let iscreated = {};
+      if ($('#jstree').jstree(true)) {
+        $('#jstree').jstree('destroy').empty();
+    }
       $('#jstree')
         .jstree({
           'core': {

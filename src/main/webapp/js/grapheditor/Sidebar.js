@@ -113,6 +113,7 @@ Sidebar.prototype.init = function()
 	
 	this.addSearchPalette(true);
 	this.addGeneralPalette(true);
+	this.addQueryBuilderPalette(true);
 	this.addMiscPalette(false);
 	this.addAdvancedPalette(false);
 	this.addBasicPalette(dir);
@@ -1414,7 +1415,7 @@ Sidebar.prototype.addGeneralPalette = function(expand)
 	 	this.createEdgeTemplateEntry('endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;', 50, 50, '', 'Dotted Line', null, lineTags + 'dotted undirected no'),
 	 	this.createEdgeTemplateEntry('endArrow=none;html=1;', 50, 50, '', 'Line', null, lineTags + 'simple undirected plain blank no'),
 	 	this.createEdgeTemplateEntry('endArrow=classic;startArrow=classic;html=1;', 50, 50, '', 'Bidirectional Connector', null, lineTags + 'bidirectional'),
-	 	this.createEdgeTemplateEntry('endArrow=classic;html=1;', 50, 50, '', 'Directional Connector', null, lineTags + 'directional directed'),
+	 	this.createEdgeTemplateEntry('edgeStyle=elbowEdgeStyle;endArrow=classic;html=1;curved=1;strokeWidth=2;', 50, 50, '', 'Directional Connector', null, lineTags + 'directional directed'),
 	 	this.createEdgeTemplateEntry('shape=link;html=1;', 100, 0, '', 'Link', null, lineTags + 'link'),
 	 	this.addEntry(lineTags + 'edge title', mxUtils.bind(this, function()
 		{
@@ -1501,6 +1502,40 @@ Sidebar.prototype.addGeneralPalette = function(expand)
 	];
 	
 	this.addPaletteFunctions('general', mxResources.get('general'), (expand != null) ? expand : true, fns);
+	this.setCurrentSearchEntryLibrary();
+};
+
+
+
+/**
+ * Adds the Query Builder palette to the sidebar.
+ */
+Sidebar.prototype.addQueryBuilderPalette = function(expand)
+{
+	var lineTags = 'line lines connector connectors connection connections arrow arrows ';
+	this.setCurrentSearchEntryLibrary('general', 'query_builder');
+	var sb = this;
+
+	var temp = parseInt(this.editorUi.editor.graph.defaultVertexStyle['fontSize']);
+	var fontSize = !isNaN(temp) ? 'fontSize=' + Math.min(16, temp) + ';' : '';
+
+	// Reusable cells
+	var field = new mxCell('List Item', new mxGeometry(0, 0, 80, 30),
+		'text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;' +
+		'spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];' +
+		'portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;' + fontSize);
+	field.vertex = true;
+
+	var fns = [
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;source_data;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Source Data', 'Source Data', null, null, 'source data tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_filter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Filter', 'Data Filter', null, null, 'data filter tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_rules;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Rules', 'Data Rules', null, null, 'data rules tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_splitter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Splitter', 'Data Splitter', null, null, 'data splitter tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_meger;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Meger', 'Data Meger', null, null, 'data meger tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_formatter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Formatter', 'Data Formatter', null, null, 'data formatter tag'),
+	];
+	
+	this.addPaletteFunctions('query_builder', 'Query Builder', (expand != null) ? expand : true, fns);
 	this.setCurrentSearchEntryLibrary();
 };
 
@@ -1609,13 +1644,6 @@ Sidebar.prototype.addMiscPalette = function(expand)
 	 	this.createEdgeTemplateEntry('shape=filledEdge;curved=0;rounded=0;fixDash=1;endArrow=none;strokeWidth=10;fillColor=#ffffff;edgeStyle=orthogonalEdgeStyle;html=1;', 60, 40, '', 'Filled Edge'),
 	 	this.createEdgeTemplateEntry('edgeStyle=elbowEdgeStyle;elbow=horizontal;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;', 50, 50, '', 'Horizontal Elbow', null, lineTags + 'elbow horizontal'),
 	 	this.createEdgeTemplateEntry('edgeStyle=elbowEdgeStyle;elbow=vertical;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;', 50, 50, '', 'Vertical Elbow', null, lineTags + 'elbow vertical'),
-
-		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;source_data;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Source Data', 'Source Data', null, null, 'source data tag'),
-		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_filter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Filter', 'Data Filter', null, null, 'data filter tag'),
-		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_rules;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Rules', 'Data Rules', null, null, 'data rules tag'),
-		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_splitter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Splitter', 'Data Splitter', null, null, 'data splitter tag'),
-		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_meger;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Meger', 'Data Meger', null, null, 'data meger tag'),
-		 this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_formatter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Formatter', 'Data Formatter', null, null, 'data formatter tag'),
 	];
 
 	this.addPaletteFunctions('misc', mxResources.get('misc'), (expand != null) ? expand : true, fns);

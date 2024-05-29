@@ -8,10 +8,20 @@
   <!-- <link rel="stylesheet" type="text/css" href="./mxgraph/grapheditor/croppie/croppie.min.css"> -->
   <link rel="stylesheet" type="text/css" href="./mxgraph/styles/grapheditor.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></script>
+ <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jQuery-QueryBuilder/2.6.1/css/query-builder.default.min.css">
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+ <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-QueryBuilder/2.6.1/js/query-builder.standalone.min.js"></script>
+</body>
   <style type="text/css">
 		body { overflow:hidden; }
 		div.picker { z-index: 10007; }
@@ -64,57 +74,17 @@
 			cursor:pointer;
 			margin:5px;
 		}
-		.modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-        }
-		#jstree {
-			max-height: 700px;
-    		overflow: auto;
+		.query-builder.form-inline {
+			.btn-success {
+				background: #449d44 !important;
+			}
+			.form-control {
+				background-color: #fff !important;
+			}
+			.btn-danger {
+				background: #d9534f !important;
+			}
 		}
-
-        .close {
-            color: #aaaaaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .modal-footer {
-            padding: 10px;
-            text-align: right;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            background-color: #0190fe !important;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
 </style>
 	</style>
 </head>
@@ -126,27 +96,46 @@
   </script>
   <div id="mxgraph-scripts-container"></div>
   <div id="mxgraph-diagram-container"></div>
-	<div id="myModal" class="modal">
+	<div id="myModal" class="modal cust-modal-wrapper">
 		<div class="modal-content">
-			<span class="close">&times;</span>
-			<div id="jstree"></div>
+			<div class="modal-header">
+				<h5 class="my-0">Source Data</h5>
+				<span class="close d-inline-block">&times;</span>
+			</div>
+			<div id="jstree"  class="main-wrapper"></div>
 			<!-- <h2>JSON Data</h2>
 			<textarea id="text-area"rows="15" cols="50" placeholder="Enter text here..."></textarea> -->
 			<div class="modal-footer">
-				<button class="btn" id="okBtn">OK</button>
+				<button class="btn m-0 okay-btn" id="okBtn">OK</button>
 			</div>
 		</div>
 	</div>
 
-	<div id="filterDataModal" class="modal">
+	<div id="filterDataModal" class="modal cust-modal-wrapper">
 		<div class="modal-content">
-			<span id="close-filterModal" class="close">&times;</span>
-			<div> Filter Modal</div>
-			<select id="keyData"></select>
-			<select id="operations"></select>
-			<input type="text" placeholder="Enter Value" />
+			<div class="modal-header">
+				<h5 class="my-0">Filter Query Builder</h5>
+				<span id="close-filterModal" class="close d-inline-block">&times;</span>
+			</div>
+			<div id="builder" class="main-wrapper"></div>
+			<button id="btn-get" class="btn">Get Query</button>
+			<pre id="output"></pre>
 			<div class="modal-footer">
-				<button class="btn" id="filterOkBtn">OK</button>
+				<button class="btn m-0 okay-btn" id="filterOkBtn">OK</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="formatterDataModal" class="modal cust-modal-wrapper">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="my-0">Formatter Query Builder</h5>
+				<span id="close-formatterModal" class="close d-inline-block">&times;</span>
+			</div>
+			<div id="formatter-builder" class="main-wrapper"></div>
+			<pre id="output"></pre>
+			<div class="modal-footer">
+				<button class="btn m-0 okay-btn" id="formatterOkBtn">OK</button>
 			</div>
 		</div>
 	</div>

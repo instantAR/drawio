@@ -12967,6 +12967,10 @@ if (typeof mxVertexHandler !== 'undefined')
 				filtermodalOpen(cell);
 				return;
 			}
+			else if(cell.style.includes("data_formatter")) {
+				formattermodalOpen(cell);
+				return;
+			}
 			cell = this.graph.getStartEditingCell(cell, trigger);
 
 			mxCellEditorStartEditing.apply(this, arguments);

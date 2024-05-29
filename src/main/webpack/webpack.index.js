@@ -338,6 +338,7 @@ export class GraphEditor {
         this.addWebScript('Sidebar', './mxgraph/grapheditor/grapheditor/Sidebar.js', 4, config);
         this.addWebScript('modalPopup', './mxgraph/grapheditor/popup/modalPopup.js', 4, config);
         this.addWebScript('filterDataPopup', './mxgraph/grapheditor/popup/filterDataPopup.js', 4, config);
+        this.addWebScript('formatterDataPopup', './mxgraph/grapheditor/popup/formatterDataPopup.js', 4, config);
         this.addWebScript('Graph', './mxgraph/grapheditor/grapheditor/Graph.js', 5, config);
         this.addWebScript('Format', './mxgraph/grapheditor/grapheditor/Format.js', 6, config);
         this.addWebScript('Shapes', './mxgraph/grapheditor/grapheditor/Shapes.js', 5, config);

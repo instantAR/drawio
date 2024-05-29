@@ -27,17 +27,17 @@ okBtn.onclick = function () {
     }
   }
   else {
-    for (var i = 0; i < names.length; i++) {
+    // for (var i = 0; i < names.length; i++) {
 
-      value.setAttribute(names[i], textArea.value ? textArea.value : '');
-      removeLabel = removeLabel || (names[i] == 'placeholder' &&
-        value.getAttribute('placeholders') == '1');
-    }
+    //   value.setAttribute(names[i], textArea?.value ? textArea.value : '');
+    //   removeLabel = removeLabel || (names[i] == 'placeholder' &&
+    //     value.getAttribute('placeholders') == '1');
+    // }
   
-    if (removeLabel) {
-      value.removeAttribute('label');
-    }
-    if(textArea) textArea.value = '';
+    // if (removeLabel) {
+    //   value.removeAttribute('label');
+    // }
+    // if(textArea) textArea.value = '';
   }
 
   graph.getModel().setValue(selectedcellData, value);
