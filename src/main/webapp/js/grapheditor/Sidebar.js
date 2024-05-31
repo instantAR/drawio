@@ -113,7 +113,7 @@ Sidebar.prototype.init = function()
 	
 	this.addSearchPalette(true);
 	this.addGeneralPalette(true);
-	this.addQueryBuilderPalette(true);
+	this.addDataTransformPalette(true);
 	this.addMiscPalette(false);
 	this.addAdvancedPalette(false);
 	this.addBasicPalette(dir);
@@ -1508,12 +1508,12 @@ Sidebar.prototype.addGeneralPalette = function(expand)
 
 
 /**
- * Adds the Query Builder palette to the sidebar.
+ * Adds the Data Transform palette to the sidebar.
  */
-Sidebar.prototype.addQueryBuilderPalette = function(expand)
+Sidebar.prototype.addDataTransformPalette = function(expand)
 {
 	var lineTags = 'line lines connector connectors connection connections arrow arrows ';
-	this.setCurrentSearchEntryLibrary('general', 'query_builder');
+	this.setCurrentSearchEntryLibrary('general', 'data_transform');
 	var sb = this;
 
 	var temp = parseInt(this.editorUi.editor.graph.defaultVertexStyle['fontSize']);
@@ -1527,15 +1527,15 @@ Sidebar.prototype.addQueryBuilderPalette = function(expand)
 	field.vertex = true;
 
 	var fns = [
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;source_data;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Source Data', 'Source Data', null, null, 'source data tag'),
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_filter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Filter', 'Data Filter', null, null, 'data filter tag'),
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_rules;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Rules', 'Data Rules', null, null, 'data rules tag'),
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_splitter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Splitter', 'Data Splitter', null, null, 'data splitter tag'),
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_meger;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Meger', 'Data Meger', null, null, 'data meger tag'),
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;data_formatter;', 120, 40, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Formatter', 'Data Formatter', null, null, 'data formatter tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;source_data;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Source Data', 'Source Data', null, null, 'source data tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_filter;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Filter', 'Data Filter', null, null, 'data filter tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_rules;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Rules', 'Data Rules', null, null, 'data rules tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_splitter;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Splitter', 'Data Splitter', null, null, 'data splitter tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_meger;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Meger', 'Data Meger', null, null, 'data meger tag'),
+		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_formatter;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Formatter', 'Data Formatter', null, null, 'data formatter tag'),
 	];
 	
-	this.addPaletteFunctions('query_builder', 'Query Builder', (expand != null) ? expand : true, fns);
+	this.addPaletteFunctions('data_transform', 'Data Transform', (expand != null) ? expand : true, fns);
 	this.setCurrentSearchEntryLibrary();
 };
 

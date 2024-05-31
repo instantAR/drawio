@@ -99,6 +99,7 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
           }
         }
       });
+      $('#jstree-loader').hide();
   })
   .catch(error => {
     console.error("Error during fetch:", error);

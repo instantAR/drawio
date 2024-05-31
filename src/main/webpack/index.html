@@ -102,11 +102,41 @@
 				<h5 class="my-0">Source Data</h5>
 				<span class="close d-inline-block">&times;</span>
 			</div>
-			<div id="jstree"  class="main-wrapper"></div>
-			<!-- <h2>JSON Data</h2>
-			<textarea id="text-area"rows="15" cols="50" placeholder="Enter text here..."></textarea> -->
+			<div class="modal-body px-0">
+				<div class="tabs-wrapper">
+					<div class="btn-group" role="group" aria-label="Basic example">
+						<button type="button" class="btn btn-json">From JSON</button>
+						<button type="button" class="btn active btn-api">From API</button>
+						<button type="button" class="btn btn-csv">From CSV</button>
+					  </div>
+				</div>
+				<div class="header-data-wrapper">
+					<div class="table-wrapper">
+						<div class="table-scrollable">
+							<table class="table border-bottom">
+							  <thead>
+								<tr>
+								  <th>Column Name</th>
+								  <th>is Visible</th>
+								  <th>Rename</th>
+								</tr>
+							  </thead>
+							  <tbody></tbody>
+							</table>
+						  </div>
+					</div>
+				</div>
+				<div id="jstree"  class="main-wrapper">
+					<div class="loader" id="jstree-loader"></div>
+				</div>
+				<div class="json-data-textarea-wrapper">
+					<textarea id="json-text-area"rows="15" cols="50" placeholder="Enter text here..." style="display:none;"></textarea>
+					<textarea id="csv-text-area"rows="15" cols="50" placeholder="Enter text here..." style="display:none;"></textarea>
+				</div>
+			</div>
 			<div class="modal-footer">
-				<button class="btn m-0 okay-btn" id="okBtn">OK</button>
+				<button class="btn m-0 okay-btn" id="okBtn" style="display: none;">OK</button>
+				<button class="btn m-0 next-btn" id="nextBtn">Next</button>
 			</div>
 		</div>
 	</div>
@@ -114,12 +144,23 @@
 	<div id="filterDataModal" class="modal cust-modal-wrapper">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="my-0">Filter Query Builder</h5>
+				<h5 class="my-0">Filter Data</h5>
 				<span id="close-filterModal" class="close d-inline-block">&times;</span>
 			</div>
-			<div id="builder" class="main-wrapper"></div>
-			<button id="btn-get" class="btn">Get Query</button>
-			<pre id="output"></pre>
+			<div id="filter-select-source-wrapper">
+				<span>Select Source Data</span>
+				<select id="select-source" class="form-control"></select>
+			</div>
+		<div class="filter-body-wrapper">
+			<div id="builder" class="builder-wrapper"></div>
+			<div class="output-wrapper">
+				<button id="btn-get-query" class="btn mb-2">Get Query</button>
+				<pre id="output"></pre>
+				<button class="copy-btn">
+					<i class="fa-regular fa-copy"></i>
+				</button>
+			</div>
+		</div>
 			<div class="modal-footer">
 				<button class="btn m-0 okay-btn" id="filterOkBtn">OK</button>
 			</div>
@@ -129,17 +170,24 @@
 	<div id="formatterDataModal" class="modal cust-modal-wrapper">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="my-0">Formatter Query Builder</h5>
+				<h5 class="my-0">Formatter Data</h5>
 				<span id="close-formatterModal" class="close d-inline-block">&times;</span>
 			</div>
-			<div id="formatter-builder" class="main-wrapper"></div>
-			<pre id="output"></pre>
+			<div id="formatter-select-source-wrapper">
+				<span>Select Source Data</span>
+				<select id="formatter-select-source" class="form-control"></select>
+			</div>
+			<div id="formatter-builder" class="builder-wrapper"></div>
 			<div class="modal-footer">
 				<button class="btn m-0 okay-btn" id="formatterOkBtn">OK</button>
 			</div>
 		</div>
 	</div>
 </body>
-
+<script>
+	$(".modal").draggable({
+		handle: ".modal-header"
+	});
+</script>
 
 </html>

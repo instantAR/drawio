@@ -1,31 +1,5 @@
 var filtermodal = document.getElementById("filterDataModal");
 var selectedcellData = '';
-var operations = [
-  "Validation",
-  "!=",
-  "Starts with",
-  "Does not starts with",
-  "Like",
-  "Does not like",
-  "Ends with",
-  "Does not end with",
-  "Contains",
-  "Does not contain",
-  "In Value list",
-  "Not in value list",
-  "Enriching",
-  "Round off",
-  "Length validation",
-  "Padding",
-  "Trimming",
-  "Formatting",
-  "Concatenation",
-  "Substring",
-  "Data Type Conversion",
-  "Default Value",
-  "Masking",
-  "Case Conversion"
-];
 var span = document.getElementById("close-filterModal");
 var filterOkBtn = document.getElementById("filterOkBtn");
 
@@ -45,36 +19,122 @@ window.onclick = function (event) {
 
 function openFilterModal() {
   filtermodal.style.display = "block";
-  if(selectedcellData?.edges?.length) {
-    const parentData = window.editorUiObj.editor.graph.getModel().getValue(window.editorUiObj.editor.graph.getModel().getTerminal(selectedcellData.edges[0],true));
-    let jsonData = null;
-    var selectedCell = window.editorUiObj.editor.graph.getModel().getTerminal(selectedcellData.edges[0],true);
-    jsonData = getJsonDataFromCell(selectedCell);
-    console.log(jsonData);
-    if(jsonData) {
-      const filters = jsonToFilterArray(jsonData);
-      $(document).ready(function() {
-        if ($('#builder').data('queryBuilder')) {
-          $('#builder').queryBuilder('destroy');
-      }
-        $('#builder').queryBuilder({
-            filters: filters
-        });
-    
-        $('#btn-get').on('click', function() {
+
+  if (!$('#builder').data('queryBuilder')) {
+    $('#btn-get-query').css('display', 'none');
+    $('#output').css('display', 'none');
+    $('.copy-btn').css('display', 'none');
+  }
+
+  if (selectedcellData?.edges?.length) {
+    var edgeCounts = countEdges(selectedcellData);
+    var resultCell = traverseGraph(selectedcellData);
+    if (resultCell.length === 1) {
+      $('#filter-select-source-wrapper').css('display', 'none');
+      let jsonData = null;
+      jsonData = getJsonDataFromCell(resultCell[0]);
+      console.log(jsonData);
+      if (jsonData) {
+        const filters = jsonToFilterArray(jsonData);
+        $(document).ready(function () {
+          if ($('#builder').data('queryBuilder')) {
+            $('#builder').queryBuilder('destroy');
+          }
+          $('#builder').queryBuilder({
+            filters
+          });
+          $('#btn-get-query').css('display', 'block');
+          $('select[name^="builder_rule_"]').css('max-width', '250px');
+          $('#btn-get-query').on('click', function () {
             var result = $('#builder').queryBuilder('getRules');
             if (!$.isEmptyObject(result)) {
-                $('#output').text(JSON.stringify(result, null, 2));
+              $('#output').css('display', 'block');
+              $('.copy-btn').css('display', 'block');
+              $('#output').text(JSON.stringify(result, null, 2));
             } else {
-                $('#output').text('No query defined.');
+              $('#output').text('No query defined.');
             }
+          });
         });
-    });
+      }
+      else {
+        filtermodal.style.display = "none";
+        alert("=======source data not found");
+      }
     }
     else {
-      filtermodal.style.display = "none";
-      alert("=======source data not found");
+      let jsonData = null;
+      let allSourceDataJSON = [];
+      for (var i = 0; i < resultCell.length; i++) {
+        jsonData = getJsonDataFromCell(resultCell[i]);
+        console.log(jsonData);
+        if (jsonData) {
+          allSourceDataJSON.push(jsonData);
+        }
+      }
+      if (allSourceDataJSON?.length) {
+        $('#filter-select-source-wrapper').css('display', 'flex');
+        const select = $('#select-source');
+        select.empty();
+
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.text = "Select an option";
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          select.append(defaultOption);
+
+
+        allSourceDataJSON.forEach(function (item) {
+          const parentKey = Object.keys(item)[0];
+          const value = JSON.stringify(item[parentKey]);
+
+          const option = document.createElement("option");
+          option.value = value;
+          option.text = parentKey;
+
+          select.append(option);
+        });
+
+        $('#select-source').on('change', function () {
+          $('#output').css('display', 'none');
+          $('.copy-btn').css('display', 'none');
+          const selectedValue = $(this).val();
+          console.log("Selected value:", selectedValue);
+          if (selectedValue) {
+            const filters = jsonToFilterArray(JSON.parse(selectedValue), true);
+            console.log("=====filters", filters);
+            $(document).ready(function () {
+              if ($('#builder').data('queryBuilder')) {
+                $('#builder').queryBuilder('destroy');
+              }
+              $('#builder').queryBuilder({
+                filters
+              });
+              $('#btn-get-query').css('display', 'block');
+              $('select[name^="builder_rule_"]').css('max-width', '250px');
+              $('#btn-get-query').on('click', function () {
+                var result = $('#builder').queryBuilder('getRules');
+                if (!$.isEmptyObject(result)) {
+                  $('#output').css('display', 'block');
+                  $('.copy-btn').css('display', 'block');
+                  $('#output').text(JSON.stringify(result, null, 2));
+                } else {
+                  $('#output').text('No query defined.');
+                }
+              });
+            });
+          }
+        });
+      }
+      else {
+        filtermodal.style.display = "none";
+        alert("=======source data not found");
+      }
     }
+  }
+  else {
+    filtermodal.style.display = "none";
   }
 }
 
@@ -125,9 +185,15 @@ function mapType(type) {
   }
 }
 
-function jsonToFilterArray(json) {
+function jsonToFilterArray(json,isMultipleSourceData = false) {
   let filters = [];
-  const data = Object.values(json)[0];
+  let data;
+  if(isMultipleSourceData) {
+    data = json;
+  }
+  else {
+    data = Object.values(json)[0];
+  }
   
   for (const key in data) {
       if (data.hasOwnProperty(key)) {

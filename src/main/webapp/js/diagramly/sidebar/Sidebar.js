@@ -1040,7 +1040,7 @@
 		}
 		
 		this.addGeneralPalette(this.customEntries == null);
-		this.addQueryBuilderPalette(false);
+		this.addDataTransformPalette(false);
 		this.addMiscPalette(false);	
 		this.addAdvancedPalette(false);
 		this.addBasicPalette();
