@@ -5,6 +5,7 @@ var span = document.getElementsByClassName("close")[0];
 var jsonTextArea = document.getElementById("json-text-area");
 var csvTextArea = document.getElementById("csv-text-area");
 var okBtn = document.getElementById("okBtn");
+var CurrentlyActivebtn = '';
 
 function setCellAttributeData(updatedData) {
   var graph = window.editorUiObj.editor.graph;
@@ -22,27 +23,20 @@ function setCellAttributeData(updatedData) {
   var names = ['jsonData'];
   if(updatedData) {
     for (var i = 0; i < names.length; i++) {
-      console.log("========updatedData inside loop",updatedData);
       value.setAttribute(names[i], JSON.stringify(updatedData));
       removeLabel = removeLabel || (names[i] == 'placeholder' &&
         value.getAttribute('placeholders') == '1');
     }
   }
-  else {
-    // for (var i = 0; i < names.length; i++) {
-
-    //   value.setAttribute(names[i], textArea?.value ? textArea.value : '');
-    //   removeLabel = removeLabel || (names[i] == 'placeholder' &&
-    //     value.getAttribute('placeholders') == '1');
-    // }
-  
-    // if (removeLabel) {
-    //   value.removeAttribute('label');
-    // }
-    // if(textArea) textArea.value = '';
-  }
 
   graph.getModel().setValue(selectedcellData, value);
+  const popupData = {
+    CurrentlyActivebtn,
+    data: JSON.stringify(updatedData)
+  }
+  selectedcellData['selectedSourceData'] = JSON.stringify(popupData);
+  jsonTextArea.value = '';
+  csvTextArea.value = '';
   modal.style.display = "none";
 
 }
@@ -59,15 +53,37 @@ window.onclick = function (event) {
 
 function openModal() {
   modal.style.display = "block";
+  $('.btn-group .btn').removeClass("active");
   $('#nextBtn').show();
   $('#okBtn').hide();
   $('#jstree-loader').show();
   $('#jstree').show();
   $('.header-data-wrapper, .json-data-textarea-wrapper').hide();
   callJsTreeAPI();
+  if(selectedcellData?.selectedSourceData){
+    if(JSON.parse(selectedcellData.selectedSourceData).CurrentlyActivebtn){
+      const buttonData = JSON.parse(selectedcellData.selectedSourceData).CurrentlyActivebtn;
+      const tabData = JSON.parse(selectedcellData.selectedSourceData).data;
+      $(buttonData).addClass('active');
+      $(buttonData).click();
+      if (buttonData === '.btn-json') {
+        const fromJsonData = JSON.parse(tabData)['From JSON'];
+        jsonTextArea.value = JSON.stringify(fromJsonData, null, 2);
+      } else if (buttonData === '.btn-csv') {
+        const fromCsvData = JSON.parse(tabData)['From CSV'];
+        const updatedData = Object.keys(fromCsvData).join(',');
+        csvTextArea.value = updatedData;
+      }
+    }
+  }
+  else {
+    $('.btn-api').addClass('active');
+  }
 }
 
 function closeModal() {
+  jsonTextArea.value = '';
+  csvTextArea.value = '';
   modal.style.display = "none";
 }
 
@@ -79,6 +95,7 @@ function triggerModalFromJs(cellData) {
 
 $(document).ready(function() {
   function handleButtonClick(buttonClass, showJsTree, showTextarea) {
+    CurrentlyActivebtn = buttonClass;
     $('.btn-group .btn').removeClass("active");
     $(buttonClass).addClass('active');
     $('#nextBtn').show();
@@ -122,12 +139,11 @@ $(document).ready(function() {
       var columnName = columnNameInput.val();
       var isChecked = checkbox.is(':checked');
       var rename = renameInput.val();
-
       if (isChecked & columnName != '') {
         if (rename && rename.trim() !== '') {
-          updatedJsonData[rename] = columnJsonData[mainKey][columnName];
+          updatedJsonData[rename] = columnJsonData[mainKey][columnName] || 'string';
         } else {
-          updatedJsonData[columnName] = columnJsonData[mainKey][columnName];
+          updatedJsonData[columnName] = columnJsonData[mainKey][columnName] || 'string';
         }
       }
     });
@@ -164,7 +180,6 @@ $(document).ready(function() {
 
   $('#nextBtn').on('click', function () {
     var activeButton = $('.btn-group .btn.active');
-    console.log("Active button:", activeButton.text());
 
     // Perform actions based on the active button
     if (activeButton.hasClass('btn-json')) {
@@ -172,11 +187,39 @@ $(document).ready(function() {
       if(jsonTextArea.value) {
         const isValid = isValidJSON(jsonTextArea.value);
         if(isValid) {
-          const data = getKeyWithDataType(JSON.parse(jsonTextArea.value));
-          console.log("=========json data",data);
+          const textAreaJsonData = JSON.parse(jsonTextArea.value);
+          const data = getKeyWithDataType(textAreaJsonData);
+            var tbody = $('.table tbody');
+            $('.table tbody').empty();
+
+            $('#jstree').hide();
+            $('.json-data-textarea-wrapper').hide();
+            $('.header-data-wrapper').show();
+            $('#nextBtn').hide();
+            $('#okBtn').show();
+            columnJsonData = {'From JSON' : data};
+           
+            Object.keys(columnJsonData[Object.keys(columnJsonData)[0]]).forEach(function (key) {
+              var tr = $('<tr class="border border-bottom"></tr>');
+              var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control" value="' + key + '"></div></td>');
+              var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+              var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
+
+              tr.append(tdName, tdIsVisible, tdRename);
+
+              tbody.append(tr);
+            });
+
+            addNewRow();
+
+            $(document).on('input', 'input[name="cname"]', function () {
+              if ($('.table tbody tr:last-child input[name="cname"]').val() !== '') {
+                addNewRow();
+              }
+            });
         }
         else {
-          alert("=======enter valid json")
+          alert("enter valid json")
         }
       }
     } else if (activeButton.hasClass('btn-api')) {
@@ -192,10 +235,8 @@ $(document).ready(function() {
         try {
           columnJsonData = JSON.parse(window.jsTreeDropdownData);
         } catch (e) {
-          columnJsonData = {'New' : { [window.jsTreeDropdownData] : 'string'}};
+          columnJsonData = {'From JsTree' : { [window.jsTreeDropdownData] : 'string'}};
         }
-        console.log("========= window.jsTreeDropdownData", window.jsTreeDropdownData);
-        console.log("========= columnJsonData", columnJsonData);
 
         Object.keys(columnJsonData[Object.keys(columnJsonData)[0]]).forEach(function(key) {
           var tr = $('<tr class="border border-bottom"></tr>');
@@ -223,11 +264,43 @@ $(document).ready(function() {
       if(csvTextArea.value) {
         const isValid = isCommaSeparated(csvTextArea.value);
         if(isValid) {
-          const data = csvTextArea.value.split(',');
-          console.log("========csv data",data);
+          const csvTextareadata = csvTextArea.value.split(',');
+
+          var tbody = $('.table tbody');
+          $('.table tbody').empty();
+
+          $('#jstree').hide();
+          $('.json-data-textarea-wrapper').hide();
+          $('.header-data-wrapper').show();
+          $('#nextBtn').hide();
+          $('#okBtn').show();
+          columnJsonData = {};
+          csvTextareadata.forEach(function (key) {
+            columnJsonData[key] = 'string';
+          });
+          columnJsonData = {'From CSV' : columnJsonData};
+
+          Object.keys(columnJsonData[Object.keys(columnJsonData)[0]]).forEach(function(key) {
+            var tr = $('<tr class="border border-bottom"></tr>');
+            var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control" value="' + key + '"></div></td>');
+            var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+            var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
+
+            tr.append(tdName, tdIsVisible, tdRename);
+
+            tbody.append(tr);
+          });
+
+          addNewRow();
+
+          $(document).on('input', 'input[name="cname"]', function () {
+            if ($('.table tbody tr:last-child input[name="cname"]').val() !== '') {
+              addNewRow();
+            }
+          });
         }
         else {
-          alert("=======enter valid csv")
+          alert("enter valid csv")
         }
       }
     }
@@ -236,7 +309,6 @@ $(document).ready(function() {
   $('#okBtn').on('click', function () {
     var updatedData = getUpdatedJsonData();
 
-    console.log("Updated JSON data:", updatedData);
     setCellAttributeData(updatedData);
 
     window.jsTreeDropdownData = null;
@@ -314,8 +386,6 @@ function headerTableCreate(data) {
     } catch (e) {
       columnJsonData = {'New' : { [data] : 'string'}};
     }
-    console.log("========= data", data);
-    console.log("========= columnJsonData", columnJsonData);
 
     Object.keys(columnJsonData[Object.keys(columnJsonData)[0]]).forEach(function(key) {
       var tr = $('<tr class="border border-bottom"></tr>');

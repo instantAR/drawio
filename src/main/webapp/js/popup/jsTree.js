@@ -69,12 +69,10 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
         const nodeId = data.node.id;
         if (nodeId != '#' && ['GET', 'POST', 'PATCH', 'PUT'].includes(data.node.type) && !iscreated[nodeId]) {
           iscreated[nodeId] = true;
-          console.log("=========data.node",data.node);
           $('#' + nodeId).addClass("jstree-loading").attr('aria-busy', true);
           switchToAjaxLoading(data);
         }
         else {
-          console.log("=========else data.node", data.node);
           const selectedCollection = data.node;
           if (selectedCollection.type === "arrayList") {
             const dropKeyData = selectedCollection.original.proxyData;
@@ -290,7 +288,6 @@ async function switchToAjaxLoading(selectedNode = null) {
                 } catch (error) {
                   handleErrorMessage(nodeId, 'Text plain data not parse');
                 }
-                console.log("=========jsonData",jsonData);
                 const newNodeData = apiResponseToGenerateTree(jsonData);
 
                 if (newNodeData?.length) {

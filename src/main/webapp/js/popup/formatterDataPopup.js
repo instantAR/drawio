@@ -33,89 +33,85 @@ window.onclick = function (event) {
 function openformatterModal() {
   formattermodal.style.display = "block";
   if(selectedcellData?.edges?.length) {
-    var edgeCounts =  countEdges(selectedcellData);
     var resultCell = traverseGraph(selectedcellData);
 
-    if (resultCell.length === 1) {
-      $('#formatter-select-source-wrapper').css('display', 'none');
-      let jsonData = null;
-      jsonData = getJsonDataFromCell(resultCell[0]);
-      console.log(jsonData);
-      if (jsonData) {
-        const filters = formatterJsonToFilterArray(jsonData);
-        $(document).ready(function () {
-          if ($('#formatter-builder').data('queryBuilder')) {
-            $('#formatter-builder').queryBuilder('destroy');
-          }
-          $('#formatter-builder').queryBuilder({
-            operators,
-            filters
+    if(resultCell) {
+      if (resultCell.length === 1) {
+        $('#formatter-select-source-wrapper').css('display', 'none');
+        let jsonData = null;
+        jsonData = getJsonDataFromCell(resultCell[0]);
+        if (jsonData) {
+          const filters = formatterJsonToFilterArray(jsonData);
+          $(document).ready(function () {
+            if ($('#formatter-builder').data('queryBuilder')) {
+              $('#formatter-builder').queryBuilder('destroy');
+            }
+            $('#formatter-builder').queryBuilder({
+              operators,
+              filters
+            });
+            $('select[name^="formatter-builder_rule_"]').css('max-width', '250px');
           });
-          $('select[name^="formatter-builder_rule_"]').css('max-width', '250px');
-        });
-      }
-      else {
-        formattermodal.style.display = "none";
-        alert("=======source data not found");
-      }
-    }
-    else {
-      let jsonData = null;
-      let allSourceDataJSON = [];
-      for(var i=0;i<resultCell.length;i++) {
-        jsonData = getJsonDataFromCell(resultCell[i]);
-        console.log(jsonData);
-        if(jsonData) {
-          allSourceDataJSON.push(jsonData);
+        }
+        else {
+          formattermodal.style.display = "none";
+          alert("source data not found");
         }
       }
-      console.log("=========allSourceDataJSON",allSourceDataJSON);
-      if(allSourceDataJSON?.length) {
-        $('#formatter-select-source-wrapper').css('display', 'flex');
-        const select = $('#formatter-select-source');
-        select.empty();
-
-        const defaultOption = document.createElement("option");
-          defaultOption.value = "";
-          defaultOption.text = "Select an option";
-          defaultOption.disabled = true;
-          defaultOption.selected = true;
-          select.append(defaultOption);
-
-        allSourceDataJSON.forEach(function(item) {
-                const parentKey = Object.keys(item)[0];
-                const value = JSON.stringify(item[parentKey]);
-
-                const option = document.createElement("option");
-                option.value = value;
-                option.text = parentKey;
-
-                select.append(option);
-            });
-
-            // Example of handling the selection
-            $('#formatter-select-source').on('change', function() {
-                const selectedValue = $(this).val();
-                console.log("Selected value:", selectedValue);
-                if (selectedValue) {
-                  const filters = formatterJsonToFilterArray(JSON.parse(selectedValue),true);
-                  console.log("=====filters",filters);
-                  $(document).ready(function () {
-                    if ($('#formatter-builder').data('queryBuilder')) {
-                      $('#formatter-builder').queryBuilder('destroy');
-                    }
-                    $('#formatter-builder').queryBuilder({
-                      operators,
-                      filters
-                    });
-                    $('select[name^="formatter-builder_rule_"]').css('max-width', '250px');
-                  });
-                }
-            });
-      }
       else {
-        formattermodal.style.display = "none";
-        alert("=======source data not found");
+        let jsonData = null;
+        let allSourceDataJSON = [];
+        for(var i=0;i<resultCell.length;i++) {
+          jsonData = getJsonDataFromCell(resultCell[i]);
+          if(jsonData) {
+            allSourceDataJSON.push(jsonData);
+          }
+        }
+        if(allSourceDataJSON?.length) {
+          $('#formatter-select-source-wrapper').css('display', 'flex');
+          const select = $('#formatter-select-source');
+          select.empty();
+  
+          const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.text = "Select an option";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            select.append(defaultOption);
+  
+          allSourceDataJSON.forEach(function(item) {
+                  const parentKey = Object.keys(item)[0];
+                  const value = JSON.stringify(item[parentKey]);
+  
+                  const option = document.createElement("option");
+                  option.value = value;
+                  option.text = parentKey;
+  
+                  select.append(option);
+              });
+  
+              // Example of handling the selection
+              $('#formatter-select-source').on('change', function() {
+                  const selectedValue = $(this).val();
+                  if (selectedValue) {
+                    const filters = formatterJsonToFilterArray(JSON.parse(selectedValue),true);
+                    $(document).ready(function () {
+                      if ($('#formatter-builder').data('queryBuilder')) {
+                        $('#formatter-builder').queryBuilder('destroy');
+                      }
+                      $('#formatter-builder').queryBuilder({
+                        operators,
+                        filters
+                      });
+                      $('select[name^="formatter-builder_rule_"]').css('max-width', '250px');
+                    });
+                  }
+              });
+        }
+        else {
+          formattermodal.style.display = "none";
+          alert("source data not found");
+        }
       }
     }
   }
@@ -131,7 +127,6 @@ function closeformatterModal() {
 
 function formattermodalOpen(cellData) {
   selectedcellData = cellData;
-  console.log("=========selectedcellData formatter data cell",selectedcellData);
 
   openformatterModal();
 }
@@ -243,36 +238,25 @@ function countEdges(cell) {
   };
 }
 
-
 function traverseGraph(cell, sourceDataCells = [], visited = new Set()) {
   var model = window.editorUiObj.editor.graph.getModel();
 
   if (!visited.has(cell)) {
-      visited.add(cell);
+    visited.add(cell);
+    if (cell.style.includes('source_data')) {
+      sourceDataCells.push(cell);
+    }
 
-      if (cell.edges?.length) {
-          console.log("Current cell:", cell);
+    if (cell.edges?.length) {
 
-          for (var i = 0; i < cell.edges.length; i++) {
-              var connectedCell = model.getTerminal(cell.edges[i], true);
-
-              if (connectedCell && connectedCell?.edges?.length) {
-                  if (connectedCell.edges.length === 1) {
-                      var edgeCounts = countEdges(connectedCell);
-                      if (edgeCounts && edgeCounts.incoming == 0) {
-                          if (connectedCell.style.includes('source_data')) {
-                              sourceDataCells.push(connectedCell);
-                          }
-                      } else {
-                          return;
-                      }
-                      console.log("Cell with one edge found:", connectedCell);
-                  } else {
-                      traverseGraph(connectedCell, sourceDataCells, visited);
-                  }
-              }
-          }
+      for (var i = 0; i < cell.edges.length; i++) {
+        var edge = cell.edges[i];
+        var connectedCellIncoming = model.getTerminal(edge, true);
+        if (connectedCellIncoming && !visited.has(connectedCellIncoming)) {
+          traverseGraph(connectedCellIncoming, sourceDataCells, visited);
+        }
       }
+    }
   }
   return sourceDataCells;
 }

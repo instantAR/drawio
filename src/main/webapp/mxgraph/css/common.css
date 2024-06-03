@@ -1360,6 +1360,14 @@ td.mxPopupMenuIcon {
 	cursor: pointer;
 }
 
+.btn.validate-btn{
+	padding: 4px 20px;
+	background-color: #eee !important;
+	color: black;
+	border: none;
+	cursor: pointer;
+}
+
 .cust-modal-wrapper .modal-header{
 	padding: 4px 16px;
 	display: flex;
@@ -1507,5 +1515,11 @@ td.mxPopupMenuIcon {
 
 .header-data-wrapper {
 	display: none;
+}
+
+.rule-filter-container select,
+.rule-operator-container select,
+.rule-value-container select {
+	max-width: 250px;
 }
   
