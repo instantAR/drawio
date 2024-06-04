@@ -163,7 +163,7 @@ function mapType(type) {
       case 'boolean':
           return 'boolean';
       default:
-          return type;
+          return 'string';
   }
 }
 

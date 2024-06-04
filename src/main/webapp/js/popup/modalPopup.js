@@ -32,7 +32,8 @@ function setCellAttributeData(updatedData) {
   graph.getModel().setValue(selectedcellData, value);
   const popupData = {
     CurrentlyActivebtn,
-    data: JSON.stringify(updatedData)
+    data: JSON.stringify(updatedData),
+    parentNode:window.jsTreeDropdownParentData?window.jsTreeDropdownParentData:null
   }
   selectedcellData['selectedSourceData'] = JSON.stringify(popupData);
   jsonTextArea.value = '';
@@ -55,10 +56,11 @@ function openModal() {
   modal.style.display = "block";
   $('.btn-group .btn').removeClass("active");
   $('#nextBtn').show();
-  $('#okBtn').hide();
+  $('#btn-wrapper').hide();
   $('#jstree-loader').show();
-  $('#jstree').show();
+  $('#jsTree-wrapper').show();
   $('.header-data-wrapper, .json-data-textarea-wrapper').hide();
+  localStorage.removeItem('jstree');
   callJsTreeAPI();
   if(selectedcellData?.selectedSourceData){
     if(JSON.parse(selectedcellData.selectedSourceData).CurrentlyActivebtn){
@@ -70,9 +72,25 @@ function openModal() {
         const fromJsonData = JSON.parse(tabData)['From JSON'];
         jsonTextArea.value = JSON.stringify(fromJsonData, null, 2);
       } else if (buttonData === '.btn-csv') {
-        const fromCsvData = JSON.parse(tabData)['From CSV'];
+        const fromCsvData = JSON.parse(tabData)['From Comma Separated'];
         const updatedData = Object.keys(fromCsvData).join(',');
         csvTextArea.value = updatedData;
+      } else{
+        console.log('JSON.parse(selectedcellData.selectedSourceData): ', JSON.parse(selectedcellData.selectedSourceData))
+          if(JSON.parse(selectedcellData.selectedSourceData).parentNode){
+            var tree = $('#jstree').jstree(true);
+            if(tree){
+              var rootNodeId = JSON.parse(JSON.parse(selectedcellData.selectedSourceData).parentNode)[0];
+              tree.open_node(rootNodeId, () => {
+                console.log('Node opened: ', rootNodeId);
+                var rootNodeElement = $('#' + rootNodeId + '_anchor');
+                
+                if (rootNodeElement.length) {
+                    rootNodeElement.trigger('click');
+                } 
+              });
+            }
+        }
       }
     }
   }
@@ -99,14 +117,14 @@ $(document).ready(function() {
     $('.btn-group .btn').removeClass("active");
     $(buttonClass).addClass('active');
     $('#nextBtn').show();
-    $('#okBtn').hide();
+    $('#btn-wrapper').hide();
     $('.header-data-wrapper, .json-data-textarea-wrapper').hide();
     if (showJsTree) {
       $('#jstree-loader').show();
-      $('#jstree').show();
+      $('#jsTree-wrapper').show();
       callJsTreeAPI();
     } else {
-      $('#jstree').hide();
+      $('#jsTree-wrapper').hide();
     }
 
     if (showTextarea) {
@@ -154,7 +172,7 @@ $(document).ready(function() {
   function initializeModal() {
     handleButtonClick('.btn-api', true, false); // Default to API tab
     $('#nextBtn').show();
-    $('#okBtn').hide();
+    $('#btn-wrapper').hide();
     $('.header-data-wrapper').hide();
   }
 
@@ -192,11 +210,11 @@ $(document).ready(function() {
             var tbody = $('.table tbody');
             $('.table tbody').empty();
 
-            $('#jstree').hide();
+            $('#jsTree-wrapper').hide();
             $('.json-data-textarea-wrapper').hide();
             $('.header-data-wrapper').show();
             $('#nextBtn').hide();
-            $('#okBtn').show();
+            $('#btn-wrapper').show();
             columnJsonData = {'From JSON' : data};
            
             Object.keys(columnJsonData[Object.keys(columnJsonData)[0]]).forEach(function (key) {
@@ -227,11 +245,11 @@ $(document).ready(function() {
         var tbody = $('.table tbody');
         $('.table tbody').empty();
       
-        $('#jstree').hide();
+        $('#jsTree-wrapper').hide();
         $('.json-data-textarea-wrapper').hide();
         $('.header-data-wrapper').show();
         $('#nextBtn').hide(); 
-        $('#okBtn').show();
+        $('#btn-wrapper').show();
         try {
           columnJsonData = JSON.parse(window.jsTreeDropdownData);
         } catch (e) {
@@ -269,16 +287,16 @@ $(document).ready(function() {
           var tbody = $('.table tbody');
           $('.table tbody').empty();
 
-          $('#jstree').hide();
+          $('#jsTree-wrapper').hide();
           $('.json-data-textarea-wrapper').hide();
           $('.header-data-wrapper').show();
           $('#nextBtn').hide();
-          $('#okBtn').show();
+          $('#btn-wrapper').show();
           columnJsonData = {};
           csvTextareadata.forEach(function (key) {
             columnJsonData[key] = 'string';
           });
-          columnJsonData = {'From CSV' : columnJsonData};
+          columnJsonData = {'From Comma Separated' : columnJsonData};
 
           Object.keys(columnJsonData[Object.keys(columnJsonData)[0]]).forEach(function(key) {
             var tr = $('<tr class="border border-bottom"></tr>');
@@ -313,6 +331,30 @@ $(document).ready(function() {
 
     window.jsTreeDropdownData = null;
 
+  });
+
+  $('#backBtn').on('click', function () { 
+    var activeButton = $('.btn-group .btn.active');
+    if (activeButton.hasClass('btn-json')) {
+      $('#jsTree-wrapper').hide();
+      $('.json-data-textarea-wrapper').show();
+      $('.header-data-wrapper').hide();
+      $('#nextBtn').show();
+      $('#btn-wrapper').hide();
+    } else if (activeButton.hasClass('btn-api')) {
+      $('#jsTree-wrapper').show();
+      $('.json-data-textarea-wrapper').hide();
+      $('.header-data-wrapper').hide();
+      $('#nextBtn').show(); 
+      $('#btn-wrapper').hide();
+
+    } else if (activeButton.hasClass('btn-csv')) {
+      $('#jsTree-wrapper').hide();
+      $('.json-data-textarea-wrapper').show();
+      $('.header-data-wrapper').hide();
+      $('#nextBtn').show();
+      $('#btn-wrapper').hide();
+    }
   });
 
   $('.copy-btn').on('click', function() {
@@ -376,11 +418,11 @@ function headerTableCreate(data) {
     var tbody = $('.table tbody');
     $('.table tbody').empty();
   
-    $('#jstree').hide();
+    $('#jsTree-wrapper').hide();
     $('.json-data-textarea-wrapper').hide();
     $('.header-data-wrapper').show();
     $('#nextBtn').hide(); 
-    $('#okBtn').show();
+    $('#btn-wrapper').show();
     try {
       columnJsonData = JSON.parse(data);
     } catch (e) {

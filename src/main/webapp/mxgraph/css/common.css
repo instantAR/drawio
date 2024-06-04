@@ -520,7 +520,7 @@ td.mxPopupMenuIcon {
   }
   .jstree-default .jstree-search {
 	font-style: italic;
-	color: #8b0000;
+	color: rgba(48, 48, 48, 0.74);
 	font-weight: bold;
   }
   .jstree-default .jstree-no-checkboxes .jstree-checkbox {
@@ -1359,7 +1359,7 @@ td.mxPopupMenuIcon {
 	border: none;
 	cursor: pointer;
 }
-
+.btn.back-btn,
 .btn.validate-btn{
 	padding: 4px 20px;
 	background-color: #eee !important;
@@ -1388,7 +1388,7 @@ td.mxPopupMenuIcon {
 	overflow: auto;
 	margin-bottom: 8px;
 }
-.filter-body-wrapper .btn{
+.filter-body-wrapper #btn-get-query{
 	background-color: #0190fe !important;
     margin-bottom: 8px;
     color: white;
@@ -1521,5 +1521,35 @@ td.mxPopupMenuIcon {
 .rule-operator-container select,
 .rule-value-container select {
 	max-width: 250px;
+}
+
+.btn-wrapper{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.btn-xs.btn-success[data-add="rule"] {
+	margin-right: 6px;
+}
+
+.btn-xs.btn-success[data-add="group"] {
+	margin-right: 6px;
+}
+
+.btn-group.group-conditions
+.btn-primary {
+	background-color : grey;
+}
+
+.btn-group.group-conditions
+.btn-primary.active {
+	background-color : #0190fe;
+}
+
+#deliverable_search {
+	margin-bottom: 10px;
+	width: 50%;
+    margin-left: 10px;
 }
   

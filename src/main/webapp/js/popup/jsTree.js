@@ -18,6 +18,7 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
       if ($('#jstree').jstree(true)) {
         $('#jstree').jstree('destroy').empty();
     }
+    localStorage.removeItem('jstree');
       $('#jstree')
         .jstree({
           'core': {
@@ -74,6 +75,7 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
         }
         else {
           const selectedCollection = data.node;
+          window.jsTreeDropdownParentData = JSON.stringify(selectedCollection.parents);
           if (selectedCollection.type === "arrayList") {
             const dropKeyData = selectedCollection.original.proxyData;
             const dropKeyPath = selectedCollection.original.text;
@@ -97,6 +99,10 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
           }
         }
       });
+      $('#deliverable_search').keyup(function(){
+        $('#jstree').jstree(true).show_all();
+        $('#jstree').jstree('search', $(this).val());
+    });
       $('#jstree-loader').hide();
   })
   .catch(error => {

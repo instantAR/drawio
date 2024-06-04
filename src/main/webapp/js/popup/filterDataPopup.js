@@ -49,6 +49,7 @@ function openFilterModal() {
           selectedSource = JSON.stringify(Object.values(jsonData)[0]);
           const filters = jsonToFilterArray(jsonData);
           $(document).ready(function () {
+
             if ($('#builder').data('queryBuilder')) {
               $('#builder').queryBuilder('destroy');
             }
@@ -56,7 +57,6 @@ function openFilterModal() {
               filters
             });
             $('#btn-get-query').css('display', 'block');
-            setMaxWidth();
             $('#btn-get-query').on('click', function () {
               var result = $('#builder').queryBuilder('getRules');
               if (!$.isEmptyObject(result)) {
@@ -69,8 +69,8 @@ function openFilterModal() {
             });
             if(selectedcellData?.selectedFilterData && selectedSource==JSON.stringify(JSON.parse(selectedcellData.selectedFilterData).selectedSource)&&JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery){
               $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery);
-              setMaxWidth();
             }
+            setAddDeleteRuleOrGroup();
           });
         }
         else {
@@ -126,7 +126,6 @@ function openFilterModal() {
                   filters
                 });
                 $('#btn-get-query').css('display', 'block');
-                setMaxWidth();
                 $('#btn-get-query').on('click', function () {
                   var result = $('#builder').queryBuilder('getRules');
                   if (!$.isEmptyObject(result)) {
@@ -139,8 +138,11 @@ function openFilterModal() {
                 });
                 if(selectedcellData?.selectedFilterData && selectedSource==JSON.stringify(JSON.parse(selectedcellData.selectedFilterData).selectedSource)&&JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery){
                   $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery);
-                  setMaxWidth();
                 }
+                setAddDeleteRuleOrGroup();
+                $('#builder').on('afterAddRule.queryBuilder', function(e, rule) {
+                  setAddDeleteRuleOrGroup();
+                });
               });
             }
           });
@@ -171,10 +173,6 @@ function filtermodalOpen(cellData) {
   openFilterModal();
 }
 
-function setMaxWidth() {
-  $('select[name^="builder_rule_"]').css('max-width', '250px');
-}
-
 function getJsonDataFromCell(cell) {
   if (cell && cell.getValue()) {
     var value = cell.getValue();
@@ -196,6 +194,27 @@ function getJsonDataFromCell(cell) {
     console.error("The cell is empty or does not have a value.");
   }
   return null;
+}
+
+function setAddDeleteRuleOrGroup() {
+  const addRuleBtn = document.querySelectorAll('.btn-xs.btn-success[data-add="rule"]');
+  const addGroupBtn = document.querySelectorAll('.btn-xs.btn-success[data-add="group"]');
+  const deleteBtn = document.querySelectorAll('.btn-xs.btn-danger[data-delete="rule"]');
+  if (addRuleBtn) {
+    addRuleBtn.forEach((ele) => {
+      ele.innerHTML = `<i class="glyphicon glyphicon-plus"></i> Rule`;
+    });
+  }
+  if (addGroupBtn) {
+    addGroupBtn.forEach((ele) => {
+      ele.innerHTML = `<i class="glyphicon glyphicon-plus-sign"></i> Group`;
+    });
+  }
+  if(deleteBtn) {
+    deleteBtn.forEach((ele) => {
+      ele.innerHTML = `<i class="fa fa-trash">`;
+    });
+  }
 }
 
 function mapType(type) {
