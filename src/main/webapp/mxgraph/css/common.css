@@ -1552,4 +1552,17 @@ td.mxPopupMenuIcon {
 	width: 50%;
     margin-left: 10px;
 }
+
+.text-header-wrapper{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+#from-api-path{
+    display: none;
+}
+#from-api-path::before{
+    content: '-';
+    padding-right: 5px;
+}
   

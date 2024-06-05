@@ -6,6 +6,7 @@ window.webpackScripts = [];
 window.windowKeysBackup = [];
 window.grapheditorKeysDefault = ["webpackScripts", "graphEditorRefCount", "windowKeysBackup", "grapheditorKeysDefault", "grapheditorKeys", "grapheditor", "onDestroy"];
 window.grapheditorKeys = [];
+window.jsTreeDropdownParentData = [];
 
 window.mxScriptsLoaded = false;
 window.mxWinLoaded = false;

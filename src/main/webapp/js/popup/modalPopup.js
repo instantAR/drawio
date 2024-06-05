@@ -60,6 +60,7 @@ function openModal() {
   $('#jstree-loader').show();
   $('#jsTree-wrapper').show();
   $('.header-data-wrapper, .json-data-textarea-wrapper').hide();
+  $('#from-api-path').hide()
   localStorage.removeItem('jstree');
   callJsTreeAPI();
   if(selectedcellData?.selectedSourceData){
@@ -76,20 +77,11 @@ function openModal() {
         const updatedData = Object.keys(fromCsvData).join(',');
         csvTextArea.value = updatedData;
       } else{
-        console.log('JSON.parse(selectedcellData.selectedSourceData): ', JSON.parse(selectedcellData.selectedSourceData))
-          if(JSON.parse(selectedcellData.selectedSourceData).parentNode){
-            var tree = $('#jstree').jstree(true);
-            if(tree){
-              var rootNodeId = JSON.parse(JSON.parse(selectedcellData.selectedSourceData).parentNode)[0];
-              tree.open_node(rootNodeId, () => {
-                console.log('Node opened: ', rootNodeId);
-                var rootNodeElement = $('#' + rootNodeId + '_anchor');
-                
-                if (rootNodeElement.length) {
-                    rootNodeElement.trigger('click');
-                } 
-              });
-            }
+        if(JSON.parse(selectedcellData.selectedSourceData).parentNode){
+          let parentNodes = JSON.parse(selectedcellData.selectedSourceData).parentNode;
+          parentNodes = parentNodes.filter(n => n);
+          $('#from-api-path').text(parentNodes.join(' > '));
+          $('#from-api-path').show()
         }
       }
     }

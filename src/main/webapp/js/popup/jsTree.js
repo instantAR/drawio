@@ -67,6 +67,8 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
           "plugins": ["search", "state", "types", "dnd", "contextmenu"]
         });
       $('#jstree').on('select_node.jstree', (e, data) => {
+        var path = getPath(data.node);
+        window.jsTreeDropdownParentData = path;
         const nodeId = data.node.id;
         if (nodeId != '#' && ['GET', 'POST', 'PATCH', 'PUT'].includes(data.node.type) && !iscreated[nodeId]) {
           iscreated[nodeId] = true;
@@ -75,7 +77,6 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
         }
         else {
           const selectedCollection = data.node;
-          window.jsTreeDropdownParentData = JSON.stringify(selectedCollection.parents);
           if (selectedCollection.type === "arrayList") {
             const dropKeyData = selectedCollection.original.proxyData;
             const dropKeyPath = selectedCollection.original.text;
@@ -109,7 +110,14 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
     console.error("Error during fetch:", error);
   });
 }
-
+function getPath(node) {
+  var path = [];
+  while (node) {
+      path.unshift(node.text);
+      node = $('#jstree').jstree('get_node', node.parent);
+  }
+  return path;
+}
 function generateTree(apiCollectionData) {
   const outputArray = apiTree(apiCollectionData);
   return outputArray;

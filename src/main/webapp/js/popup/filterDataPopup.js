@@ -71,6 +71,9 @@ function openFilterModal() {
               $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery);
             }
             setAddDeleteRuleOrGroup();
+            $('#builder').on('afterAddRule.queryBuilder', function(e, rule) {
+              setAddDeleteRuleOrGroup();
+            });
           });
         }
         else {
