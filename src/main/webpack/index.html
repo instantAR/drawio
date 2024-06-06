@@ -158,12 +158,19 @@
 				<span>Select Source Data</span>
 				<select id="select-source" class="form-control"></select>
 			</div>
+			<div class="loader" id="filter-loader"></div>
 		<div class="filter-body-wrapper">
 			<div id="builder" class="builder-wrapper"></div>
 			<div class="output-wrapper">
 				<button id="btn-get-query" class="btn mb-2">Get Query</button>
 				<pre id="output"></pre>
 				<button class="copy-btn">
+					<i class="fa-regular fa-copy"></i>
+				</button>
+			</div>
+			<div class="validate-wrapper">
+				<pre id="validateOutput"></pre>
+				<button class="validate-copy-btn">
 					<i class="fa-regular fa-copy"></i>
 				</button>
 			</div>

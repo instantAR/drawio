@@ -166,6 +166,7 @@ async function switchToAjaxLoading(selectedNode = null) {
 
     if (workspace) {
       const workspaceData = workspace.api;
+      window.selectedworkSpaceData = workspaceData;
       const apiRequest = selectedNode.node.original;
 
       if (apiRequest.type !== 'GET') {

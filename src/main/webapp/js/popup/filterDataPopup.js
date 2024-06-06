@@ -1,10 +1,14 @@
 var filtermodal = document.getElementById("filterDataModal");
 var selectedcellData = '';
 var selectedSource = '';
+var selectedWorkspace = [];
+var getQueryRulesData = '';
 var span = document.getElementById("close-filterModal");
 var filterOkBtn = document.getElementById("filterOkBtn");
+var validateBtn = document.getElementById("validateBtn");
 
 filterOkBtn.onclick = function () {
+  if ($('#builder').data('queryBuilder')) {
     var result = $('#builder').queryBuilder('getRules');
     if (!$.isEmptyObject(result)) {
       let selectedFilterData = {
@@ -13,9 +17,78 @@ filterOkBtn.onclick = function () {
       }
       selectedcellData['selectedFilterData']=JSON.stringify({...selectedFilterData});
     }
+  }
 
   filtermodal.style.display = "none";
 }
+
+validateBtn.onclick = async function () {
+  if ($('#builder').data('queryBuilder')) {
+
+    var result = $('#builder').queryBuilder('getRules');
+    if (!$.isEmptyObject(result)) {
+      getQueryRulesData = result;
+    } else {
+      alert('No query defined.');
+      return;
+    }
+    if (!selectedWorkspace.length) {
+      alert("workspace data not found");
+      return;
+    }
+    const isWorkSpaceContainNull = selectedWorkspace.some(value => value === null);
+    if (isWorkSpaceContainNull) {
+      alert("workspace data not found for all connected source");
+      return;
+    }
+
+    const selectedWorkspaceString = JSON.stringify(selectedWorkspace[0]);
+    const queryRuleDataString = JSON.stringify(getQueryRulesData);
+
+    const selectedWorkspaceUtf8Bytes = new TextEncoder().encode(selectedWorkspaceString);
+    const queryRuleDataUtf8Bytes = new TextEncoder().encode(queryRuleDataString);
+
+    const selectedWorkspaceEncoded = btoa(String.fromCharCode(...selectedWorkspaceUtf8Bytes));
+    const queryRuleDataEncoded = btoa(String.fromCharCode(...queryRuleDataUtf8Bytes));
+
+    const payload = {
+      "base64": selectedWorkspaceEncoded,
+      "rules": queryRuleDataEncoded
+    };
+    $('#filter-loader').show();
+    const response = await applyWorkflowRules(payload);
+    if(response) {
+      $('#filter-loader').hide();
+      $('#validateOutput').css('display', 'block');
+      $('.validate-copy-btn').css('display', 'block');
+      $('#validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
+    }
+  }
+}
+
+async function applyWorkflowRules(payload) {
+  const url = 'https://deva.instantar.io/api/api/v2.0/applyworkflowrules';
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      }),
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;  // Re-throw the error so it can be caught by the caller
+  }
+}
+
 
 span.onclick = function () {
   closeFilterModal();
@@ -32,7 +105,9 @@ function openFilterModal() {
 
     $('#btn-get-query').css('display', 'none');
     $('#output').css('display', 'none');
+    $('#validateOutput').css('display', 'none');
     $('.copy-btn').css('display', 'none');
+    $('.validate-copy-btn').css('display', 'none');
 
   if ($('#builder').data('queryBuilder')) {
     $('#builder').queryBuilder('destroy');
@@ -43,11 +118,15 @@ function openFilterModal() {
     if(resultCell) {
       if (resultCell.length === 1) {
         $('#filter-select-source-wrapper').css('display', 'none');
-        let jsonData = null;
-        jsonData = getJsonDataFromCell(resultCell[0]);
-        if (jsonData) {
-          selectedSource = JSON.stringify(Object.values(jsonData)[0]);
-          const filters = jsonToFilterArray(jsonData);
+        $('#builder').css('margin-top', '8px');
+        let cellAttributesData = null;
+        cellAttributesData = getJsonDataFromCell(resultCell[0]);
+        // console.log("==========cellAttributesData",cellAttributesData);
+        // console.log("=========cellAttributesData selected workspace",cellAttributesData.selectedworkSpaceData);
+        if (cellAttributesData?.jsonData) {
+          selectedSource = JSON.stringify(Object.values(cellAttributesData.jsonData)[0]);
+          selectedWorkspace[0] = cellAttributesData.selectedworkSpaceData;
+          const filters = jsonToFilterArray(cellAttributesData.jsonData);
           $(document).ready(function () {
 
             if ($('#builder').data('queryBuilder')) {
@@ -62,7 +141,9 @@ function openFilterModal() {
               if (!$.isEmptyObject(result)) {
                 $('#output').css('display', 'block');
                 $('.copy-btn').css('display', 'block');
+                console.log("========result",result);
                 $('#output').text(JSON.stringify(result, null, 2));
+                getQueryRulesData = result;
               } else {
                 $('#output').text('No query defined.');
               }
@@ -82,12 +163,13 @@ function openFilterModal() {
         }
       }
       else {
-        let jsonData = null;
+        let cellAttributesData = null;
         let allSourceDataJSON = [];
         for (var i = 0; i < resultCell.length; i++) {
-          jsonData = getJsonDataFromCell(resultCell[i]);
-          if (jsonData) {
-            allSourceDataJSON.push(jsonData);
+          cellAttributesData = getJsonDataFromCell(resultCell[i]);
+          if (cellAttributesData.jsonData) {
+            allSourceDataJSON.push(cellAttributesData.jsonData);
+            selectedWorkspace.push(cellAttributesData.selectedworkSpaceData);
           }
         }
         if (allSourceDataJSON?.length) {
@@ -116,7 +198,9 @@ function openFilterModal() {
   
           $('#select-source').on('change', function () {
             $('#output').css('display', 'none');
+            $('#validateOutput').css('display', 'none');
             $('.copy-btn').css('display', 'none');
+            $('.validate-copy-btn').css('display', 'none');
             const selectedValue = $(this).val();
             selectedSource = selectedValue;
             if (selectedValue) {
@@ -135,6 +219,7 @@ function openFilterModal() {
                     $('#output').css('display', 'block');
                     $('.copy-btn').css('display', 'block');
                     $('#output').text(JSON.stringify(result, null, 2));
+                    getQueryRulesData = result;
                   } else {
                     $('#output').text('No query defined.');
                   }
@@ -168,6 +253,11 @@ function openFilterModal() {
 
 function closeFilterModal() {
   filtermodal.style.display = "none";
+  getQueryRulesData = null;
+  selectedWorkspace = [];
+  if ($('#builder').data('queryBuilder')) {
+    $('#builder').queryBuilder('destroy');
+  }
 }
 
 
@@ -182,6 +272,7 @@ function getJsonDataFromCell(cell) {
 
     if (mxUtils.isNode(value)) {
       var jsonDataString = value.getAttribute('jsonData');
+      var selectedworkSpaceData = value.getAttribute('selectedworkSpaceData');
       var jsonData;
       try {
         jsonData = JSON.parse(jsonDataString);
@@ -189,7 +280,7 @@ function getJsonDataFromCell(cell) {
         jsonData = {'New' : { [jsonDataString] : 'string'}};
       }
 
-      return jsonData;
+      return {jsonData,selectedworkSpaceData : JSON.parse(selectedworkSpaceData)};
     } else {
       console.error("The cell value is not an XML node.");
     }

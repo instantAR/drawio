@@ -17,15 +17,24 @@ function setCellAttributeData(updatedData) {
     value = obj;
   }
 
-
   value = value.cloneNode(true);
   var removeLabel = false;
-  var names = ['jsonData'];
-  if(updatedData) {
+  var names = ['jsonData', 'selectedworkSpaceData'];
+  if (updatedData) {
     for (var i = 0; i < names.length; i++) {
-      value.setAttribute(names[i], JSON.stringify(updatedData));
-      removeLabel = removeLabel || (names[i] == 'placeholder' &&
-        value.getAttribute('placeholders') == '1');
+      if (names[i] === 'jsonData') {
+        value.setAttribute(names[i], JSON.stringify(updatedData));
+      } 
+      if (CurrentlyActivebtn === '.btn-api' && names[i] === 'selectedworkSpaceData') {
+        value.setAttribute(names[i], JSON.stringify(window.selectedworkSpaceData));
+      }
+      else {
+        if (names[i] === 'selectedworkSpaceData' && value.hasAttribute(names[i])) {
+          value.removeAttribute(names[i]);
+        }
+      }
+      removeLabel = removeLabel || (names[i] === 'placeholder' &&
+        value.getAttribute('placeholders') === '1');
     }
   }
 
@@ -351,6 +360,22 @@ $(document).ready(function() {
 
   $('.copy-btn').on('click', function() {
     var textToCopy = $('#output').text();
+
+    var tempTextArea = document.createElement('textarea');
+    tempTextArea.value = textToCopy;
+    document.body.appendChild(tempTextArea);
+
+    tempTextArea.select();
+    tempTextArea.setSelectionRange(0, 99999);
+
+    document.execCommand('copy');
+
+    document.body.removeChild(tempTextArea);
+
+  });
+
+  $('.validate-copy-btn').on('click', function() {
+    var textToCopy = $('#validateOutput').text();
 
     var tempTextArea = document.createElement('textarea');
     tempTextArea.value = textToCopy;

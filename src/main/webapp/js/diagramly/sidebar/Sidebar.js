@@ -1179,7 +1179,7 @@
 		this.addCiscoSafePalette();
 		this.addCumulusPalette();
 		this.addCitrixPalette();
-		this.addGCP2Palette();
+		// this.addGCP2Palette();
 		this.addGCPIconsPalette();
 		this.addIBMPalette();
 		this.addNetworkPalette();

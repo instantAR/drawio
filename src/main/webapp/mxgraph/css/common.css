@@ -1369,7 +1369,7 @@ td.mxPopupMenuIcon {
 }
 
 .cust-modal-wrapper .modal-header{
-	padding: 4px 16px;
+	padding: 10px 16px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -1399,10 +1399,20 @@ td.mxPopupMenuIcon {
 	overflow: auto;
 	position: relative;
 }
-.output-wrapper{
+
+#validateOutput{
+	max-height: 300px;
+	height: 100%;
+	overflow: auto;
 	position: relative;
 }
-.copy-btn{
+.output-wrapper,
+.validate-wrapper{
+	position: relative;
+}
+
+.copy-btn,
+.validate-copy-btn {
 	display: none;
 	position: absolute;
     top: 15%;
@@ -1413,6 +1423,10 @@ td.mxPopupMenuIcon {
 	background: transparent !important;
 	border: none !important;
 	font-size: 20px !important;
+}
+
+.validate-copy-btn {
+	top: 2% !important;
 }
 
 .loader {
@@ -1427,6 +1441,7 @@ td.mxPopupMenuIcon {
     left: 50%;
     transform: translate(-50%, -50%);
     display: none;
+	z-index: 9999;
 }
 
 @keyframes spin {
@@ -1453,9 +1468,9 @@ td.mxPopupMenuIcon {
 .modal-content {
 	background-color: #fefefe;
 	margin: 5% auto;
-	border: 1px solid #888;
 	max-width: 65%;
 	width: 100%;
+	border-radius: 10px;
 }
 .form-control:focus{
 	box-shadow: none;
@@ -1564,5 +1579,11 @@ td.mxPopupMenuIcon {
 #from-api-path::before{
     content: '-';
     padding-right: 5px;
+}
+.text-header-wrapper h5{
+    margin: 0;
+}
+.modal-header h5 {
+	margin: 0;
 }
   
