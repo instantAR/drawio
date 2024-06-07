@@ -382,10 +382,10 @@ export class GraphEditor {
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Floorplan.js', 1007, config);
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Flowchart.js', 1007, config);
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-FluidPower.js', 1007, config);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP.js', 1007, config);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP2.js', 1007, config);
+        // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/pSidebar-GCP.js', 1007, config);
+        // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP2.js', 1007, config);
         // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCP3.js', 1007,config);
-        this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCPIcons.js', 1007,config);
+        // this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-GCPIcons.js', 1007,config);
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Gmdl.js', 1007, config);
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-IBM.js', 1007, config);
         this.addWebScript(undefined, './mxgraph/grapheditor/diagramly/sidebar/Sidebar-Infographic.js', 1007, config);

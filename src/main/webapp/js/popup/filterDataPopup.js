@@ -121,8 +121,6 @@ function openFilterModal() {
         $('#builder').css('margin-top', '8px');
         let cellAttributesData = null;
         cellAttributesData = getJsonDataFromCell(resultCell[0]);
-        // console.log("==========cellAttributesData",cellAttributesData);
-        // console.log("=========cellAttributesData selected workspace",cellAttributesData.selectedworkSpaceData);
         if (cellAttributesData?.jsonData) {
           selectedSource = JSON.stringify(Object.values(cellAttributesData.jsonData)[0]);
           selectedWorkspace[0] = cellAttributesData.selectedworkSpaceData;
@@ -141,14 +139,15 @@ function openFilterModal() {
               if (!$.isEmptyObject(result)) {
                 $('#output').css('display', 'block');
                 $('.copy-btn').css('display', 'block');
-                console.log("========result",result);
                 $('#output').text(JSON.stringify(result, null, 2));
                 getQueryRulesData = result;
               } else {
                 $('#output').text('No query defined.');
               }
             });
-            if(selectedcellData?.selectedFilterData && selectedSource==JSON.stringify(JSON.parse(selectedcellData.selectedFilterData).selectedSource)&&JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery){
+            const selectedSourceNew = JSON.parse(selectedSource);
+            const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedFilterData).selectedSource);   
+            if(selectedcellData?.selectedFilterData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery){
               $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery);
             }
             setAddDeleteRuleOrGroup();
@@ -224,7 +223,9 @@ function openFilterModal() {
                     $('#output').text('No query defined.');
                   }
                 });
-                if(selectedcellData?.selectedFilterData && selectedSource==JSON.stringify(JSON.parse(selectedcellData.selectedFilterData).selectedSource)&&JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery){
+                const selectedSourceNew = JSON.parse(selectedSource);
+                const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedFilterData).selectedSource);
+                if(selectedcellData?.selectedFilterData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery){
                   $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery);
                 }
                 setAddDeleteRuleOrGroup();
@@ -324,26 +325,47 @@ function mapType(type) {
   }
 }
 
-function jsonToFilterArray(json,isMultipleSourceData = false) {
+function jsonToFilterArray(json, isMultipleSourceData = false) {
   let filters = [];
-  let data;
-  if(isMultipleSourceData) {
-    data = json;
+  const sourcBlockData = isMultipleSourceData ? json : Object.values(json)[0];
+  if (sourcBlockData && Array.isArray(sourcBlockData)) {
+    filters.push(...sourcBlockData.map(source => ({
+      id: source.id,
+      label: formatLabel(source.value),
+      type: mapType(source[source.value])
+    })));
   }
-  else {
-    data = Object.values(json)[0];
+  return filters;
+}
+
+function formatLabel(value) {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, ' ') : '';
+}
+
+function deepEqual(a, b) {
+  if (a === b) {
+      return true;
   }
-  
-  for (const key in data) {
-      if (data.hasOwnProperty(key)) {
-          filters.push({
-              id: key,
-              label: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '),
-              type: mapType(data[key])
-          });
+  if (typeof a !== 'object' || typeof b !== 'object' || a == null || b == null) {
+      return false;
+  }
+  if (Array.isArray(a) !== Array.isArray(b)) {
+      return false;
+  }
+
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+
+  if (keysA.length !== keysB.length) {
+      return false;
+  }
+
+  for (const key of keysA) {
+      if (!keysB.includes(key) || !deepEqual(a[key], b[key])) {
+          return false;
       }
   }
 
-  return filters;
+  return true;
 }
 

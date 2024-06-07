@@ -148,9 +148,9 @@ $(document).ready(function() {
   }
 
   function getUpdatedJsonData() {
-    var updatedJsonData = {};
     var mainKey = Object.keys(columnJsonData)[0];
     // Iterate over the table rows
+    const newData = [];
     $('.table tbody tr').each(function() {
       var checkbox = $(this).find('input[name="columnCheck"]');
       var columnNameInput = $(this).find('input[name="cname"]');
@@ -158,15 +158,13 @@ $(document).ready(function() {
       var columnName = columnNameInput.val();
       var isChecked = checkbox.is(':checked');
       var rename = renameInput.val();
-      if (isChecked & columnName != '') {
-        if (rename && rename.trim() !== '') {
-          updatedJsonData[rename] = columnJsonData[mainKey][columnName] || 'string';
-        } else {
-          updatedJsonData[columnName] = columnJsonData[mainKey][columnName] || 'string';
-        }
+      const trimmedRename = rename ? rename.trim() : ''; 
+      if (isChecked && columnName) {
+          const value = trimmedRename || columnName;
+          newData.push({ id: columnName, value });
       }
     });
-    const data = { [mainKey] : updatedJsonData};
+    const data = { [mainKey] : newData};
     return data;
   }
 

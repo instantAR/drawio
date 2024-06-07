@@ -495,8 +495,8 @@
 								{title: 'Cisco Safe', id: 'cisco_safe', image: IMAGE_PATH + '/sidebar-cisco_safe.png'},
 								{title: 'Cumulus', id: 'cumulus', image: IMAGE_PATH + '/sidebar-cumulus.png'},
 								{title: 'Citrix', id: 'citrix', image: IMAGE_PATH + '/sidebar-citrix.png'},
-								{title: 'Google Cloud Platform', id: 'gcp2', image: IMAGE_PATH + '/sidebar-gcp2.png'},
-								{title: 'GCP Icons', id: 'gcpicons', image: IMAGE_PATH + '/sidebar-gcpicons.png'},
+								// {title: 'Google Cloud Platform', id: 'gcp2', image: IMAGE_PATH + '/sidebar-gcp2.png'},
+								// {title: 'GCP Icons', id: 'gcpicons', image: IMAGE_PATH + '/sidebar-gcpicons.png'},
 								{title: 'IBM', id: 'ibm', image: IMAGE_PATH + '/sidebar-ibm.png'},
 								{title: 'Kubernetes', id: 'kubernetes', image: IMAGE_PATH + '/sidebar-kubernetes.png'},
 								{title: 'Network', id: 'network', image: IMAGE_PATH + '/sidebar-network.png'},
@@ -1180,7 +1180,7 @@
 		this.addCumulusPalette();
 		this.addCitrixPalette();
 		// this.addGCP2Palette();
-		this.addGCPIconsPalette();
+		// this.addGCPIconsPalette();
 		this.addIBMPalette();
 		this.addNetworkPalette();
 		this.addOfficePalette();

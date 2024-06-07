@@ -13,6 +13,19 @@ var operators = [
     { type: 'Masking', nb_inputs: 1, apply_to: ['string'] },
     { type: 'Case Conversion', nb_inputs: 1, apply_to: ['string'] },
 ];
+
+var queryBuilderArray = ["Round off",
+  "Length validation",
+  "Padding",
+  "Trimming",
+  "Formatting",
+  "Concatenation",
+  "Substring",
+  "Data Type Conversion",
+  "Default Value",
+  "Masking",
+  "Case Conversion"
+];
 var span = document.getElementById("close-formatterModal");
 var formatterOkBtn = document.getElementById("formatterOkBtn");
 
@@ -38,10 +51,10 @@ function openformatterModal() {
     if(resultCell) {
       if (resultCell.length === 1) {
         $('#formatter-select-source-wrapper').css('display', 'none');
-        let jsonData = null;
-        jsonData = getJsonDataFromCell(resultCell[0]);
-        if (jsonData) {
-          const filters = formatterJsonToFilterArray(jsonData);
+        let cellAttributesData = null;
+        cellAttributesData = getJsonDataFromCell(resultCell[0]);
+        if (cellAttributesData?.jsonData) {
+          const filters = formatterJsonToFilterArray(cellAttributesData.jsonData);
           $(document).ready(function () {
             if ($('#formatter-builder').data('queryBuilder')) {
               $('#formatter-builder').queryBuilder('destroy');
@@ -50,7 +63,10 @@ function openformatterModal() {
               operators,
               filters
             });
-            $('select[name^="formatter-builder_rule_"]').css('max-width', '250px');
+            setAddDeleteRuleOrGroup();
+            $('#formatter-builder').on('afterAddRule.queryBuilder', function(e, rule) {
+              setAddDeleteRuleOrGroup();
+            });
           });
         }
         else {
@@ -59,12 +75,12 @@ function openformatterModal() {
         }
       }
       else {
-        let jsonData = null;
+        let cellAttributesData = null;
         let allSourceDataJSON = [];
         for(var i=0;i<resultCell.length;i++) {
-          jsonData = getJsonDataFromCell(resultCell[i]);
-          if(jsonData) {
-            allSourceDataJSON.push(jsonData);
+          cellAttributesData = getJsonDataFromCell(resultCell[i]);
+          if(cellAttributesData?.jsonData) {
+            allSourceDataJSON.push(cellAttributesData.jsonData);
           }
         }
         if(allSourceDataJSON?.length) {
@@ -103,7 +119,10 @@ function openformatterModal() {
                         operators,
                         filters
                       });
-                      $('select[name^="formatter-builder_rule_"]').css('max-width', '250px');
+                      setAddDeleteRuleOrGroup();
+                      $('#formatter-builder').on('afterAddRule.queryBuilder', function(e, rule) {
+                        setAddDeleteRuleOrGroup();
+                      });
                     });
                   }
               });
@@ -154,51 +173,17 @@ function getJsonDataFromCellFormatter(cell) {
   return null;
 }
 
-function mapType(type) {
-  switch(type) {
-      case 'number':
-          return 'integer';
-      case 'string':
-          return 'string';
-      case 'boolean':
-          return 'boolean';
-      default:
-          return 'string';
-  }
-}
-
-function formatterJsonToFilterArray(json,isMultipleSourceData = false) {
+function formatterJsonToFilterArray(json, isMultipleSourceData = false) {
   let filters = [];
-  let data;
-  if(isMultipleSourceData) {
-    data = json;
+  const sourcBlockData = isMultipleSourceData ? json : Object.values(json)[0];
+  if (sourcBlockData && Array.isArray(sourcBlockData)) {
+    filters.push(...sourcBlockData.map(source => ({
+      id: source.id,
+      label: formatLabel(source.value),
+      type: mapType(source[source.value]),
+      operators: queryBuilderArray
+    })));
   }
-  else {
-    data = Object.values(json)[0];
-  }
-  
-  for (const key in data) {
-      if (data.hasOwnProperty(key)) {
-          filters.push({
-              id: key,
-              label: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '),
-              type: mapType(data[key]),
-              operators: ["Round off",
-                            "Length validation",
-                            "Padding",
-                            "Trimming",
-                            "Formatting",
-                            "Concatenation",
-                            "Substring",
-                            "Data Type Conversion",
-                            "Default Value",
-                            "Masking",
-                            "Case Conversion"
-                        ]
-          });
-      }
-  }
-
   return filters;
 }
 

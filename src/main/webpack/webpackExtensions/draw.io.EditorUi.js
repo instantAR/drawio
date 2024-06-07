@@ -11180,7 +11180,7 @@
          }
          else
          {
-            this.container.appendChild(h1) || document.body.appendChild(hl);
+            this.container.appendChild(hl) || document.body.appendChild(hl);
          }
          
          return hl;
