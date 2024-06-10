@@ -11,11 +11,11 @@ filterOkBtn.onclick = function () {
   if ($('#builder').data('queryBuilder')) {
     var result = $('#builder').queryBuilder('getRules');
     if (!$.isEmptyObject(result)) {
-      let selectedFilterData = {
-        filterDataBuilderQuery: {...result},
+      let selectedRuleData = {
+        filterDataBuilderQuery: {...result,type:'Filter'}, 
         selectedSource:{...JSON.parse(selectedSource)}
       }
-      selectedcellData['selectedFilterData']=JSON.stringify({...selectedFilterData});
+      selectedcellData['selectedRuleData']=JSON.stringify({...selectedRuleData});
     }
   }
 
@@ -24,6 +24,21 @@ filterOkBtn.onclick = function () {
 
 validateBtn.onclick = async function () {
   if ($('#builder').data('queryBuilder')) {
+
+    var allFilterCells = allFilterConnectedCells(selectedcellData);
+    var allConnectedCellRules = [];
+    console.log("==========allFilterCells",allFilterCells);
+    if(allFilterCells?.length) {
+      allFilterCells.forEach((filterCell) => {
+        if(filterCell?.selectedRuleData) {
+          console.log("======filterCell",filterCell);
+          const queryData = JSON.parse(filterCell.selectedRuleData).filterDataBuilderQuery;
+          if(queryData) {
+            allConnectedCellRules.push(queryData);
+          }
+        }
+      })
+    }
 
     var result = $('#builder').queryBuilder('getRules');
     if (!$.isEmptyObject(result)) {
@@ -41,20 +56,21 @@ validateBtn.onclick = async function () {
       alert("workspace data not found for all connected source");
       return;
     }
-
     const selectedWorkspaceString = JSON.stringify(selectedWorkspace[0]);
-    const queryRuleDataString = JSON.stringify(getQueryRulesData);
+    const reversedArray = allConnectedCellRules.reverse();
+    const queryRuleDataString = JSON.stringify(reversedArray);
+    console.log("===========allConnectedCellRules reverse",reversedArray);
 
     const selectedWorkspaceUtf8Bytes = new TextEncoder().encode(selectedWorkspaceString);
     const queryRuleDataUtf8Bytes = new TextEncoder().encode(queryRuleDataString);
 
     const selectedWorkspaceEncoded = btoa(String.fromCharCode(...selectedWorkspaceUtf8Bytes));
     const queryRuleDataEncoded = btoa(String.fromCharCode(...queryRuleDataUtf8Bytes));
-
     const payload = {
       "base64": selectedWorkspaceEncoded,
-      "rules": queryRuleDataEncoded
+      "rules": queryRuleDataEncoded,
     };
+    console.log("=========payload",payload);
     $('#filter-loader').show();
     const response = await applyWorkflowRules(payload);
     if(response) {
@@ -137,18 +153,21 @@ function openFilterModal() {
             $('#btn-get-query').on('click', function () {
               var result = $('#builder').queryBuilder('getRules');
               if (!$.isEmptyObject(result)) {
+                const showResultData = {...result, type:'Filter'};
                 $('#output').css('display', 'block');
                 $('.copy-btn').css('display', 'block');
-                $('#output').text(JSON.stringify(result, null, 2));
+                $('#output').text(JSON.stringify(showResultData, null, 2));
                 getQueryRulesData = result;
               } else {
                 $('#output').text('No query defined.');
               }
             });
             const selectedSourceNew = JSON.parse(selectedSource);
-            const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedFilterData).selectedSource);   
-            if(selectedcellData?.selectedFilterData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery){
-              $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery);
+            if(selectedcellData?.selectedRuleData) {
+              const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource);   
+              if(selectedcellData?.selectedRuleData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery){
+                $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery);
+              }
             }
             setAddDeleteRuleOrGroup();
             $('#builder').on('afterAddRule.queryBuilder', function(e, rule) {
@@ -166,7 +185,7 @@ function openFilterModal() {
         let allSourceDataJSON = [];
         for (var i = 0; i < resultCell.length; i++) {
           cellAttributesData = getJsonDataFromCell(resultCell[i]);
-          if (cellAttributesData.jsonData) {
+          if (cellAttributesData?.jsonData) {
             allSourceDataJSON.push(cellAttributesData.jsonData);
             selectedWorkspace.push(cellAttributesData.selectedworkSpaceData);
           }
@@ -215,18 +234,21 @@ function openFilterModal() {
                 $('#btn-get-query').on('click', function () {
                   var result = $('#builder').queryBuilder('getRules');
                   if (!$.isEmptyObject(result)) {
+                    const showResultData = {...result, type:'Filter'};
                     $('#output').css('display', 'block');
                     $('.copy-btn').css('display', 'block');
-                    $('#output').text(JSON.stringify(result, null, 2));
+                    $('#output').text(JSON.stringify(showResultData, null, 2));
                     getQueryRulesData = result;
                   } else {
                     $('#output').text('No query defined.');
                   }
                 });
                 const selectedSourceNew = JSON.parse(selectedSource);
-                const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedFilterData).selectedSource);
-                if(selectedcellData?.selectedFilterData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery){
-                  $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedFilterData).filterDataBuilderQuery);
+                if(selectedcellData?.selectedRuleData) {
+                  const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource);
+                  if(selectedcellData?.selectedRuleData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery){
+                    $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery);
+                  }
                 }
                 setAddDeleteRuleOrGroup();
                 $('#builder').on('afterAddRule.queryBuilder', function(e, rule) {
@@ -235,8 +257,8 @@ function openFilterModal() {
               });
             }
           });
-          if(selectedcellData?.selectedFilterData && JSON.parse(selectedcellData.selectedFilterData).selectedSource){
-            const selectedValue = JSON.parse(selectedcellData.selectedFilterData).selectedSource;
+          if(selectedcellData?.selectedRuleData && JSON.parse(selectedcellData.selectedRuleData).selectedSource){
+            const selectedValue = JSON.parse(selectedcellData.selectedRuleData).selectedSource;
             select.val(JSON.stringify(selectedValue)).trigger('change');
           }
         }

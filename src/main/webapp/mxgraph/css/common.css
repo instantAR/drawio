@@ -1586,4 +1586,63 @@ td.mxPopupMenuIcon {
 .modal-header h5 {
 	margin: 0;
 }
+
+.mxTooltip {
+	display: none;
+	z-index: -1;
+}
+
+.rules-group-wrapper.rules-group-container{
+	padding: 10px;
+    padding-bottom: 6px;
+    border: 1px solid #dcc896;
+    background: rgba(250, 240, 210, .5);
+	margin: 8px;
+	border-radius: 8px;
+	max-height: 500px;
+	overflow: auto;
+}
+.rules-group-header{
+	margin-bottom: 10px;
+}
+.rule-wrapper{
+	display: flex;
+	align-items: center;
+	justify-content: start;
+}
+.select-rule{
+	width: 100%;
+	max-width: 250px;
+	margin-right: 10px;
+}
+.rules-group-header .btn-xs.btn-success[data-add="rule"]{
+	margin-right: 0px;
+}
+.btn-success {
+	background: #449d44 !important;
+	margin-left: auto;
+    display: block;
+	margin-right: 0 !important;
+}
+.rule-container{
+	position: relative;
+    margin: 4px 0;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #eee;
+    background: rgba(255, 255, 255, .9);
+}
+.btn-danger{
+	float: right;
+	background: #d9534f !important;
+}
+.rule-container .form-control{
+	background: #ffffff !important;
+}
+.rule-dropdown-container{
+	display: none;
+	max-width: 125px;
+	width: 100%;
+	margin-right: 10px;
+}
   

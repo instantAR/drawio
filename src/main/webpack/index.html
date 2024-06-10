@@ -192,8 +192,36 @@
 				<span>Select Source Data</span>
 				<select id="formatter-select-source" class="form-control"></select>
 			</div>
-			<div id="formatter-builder" class="builder-wrapper"></div>
+			<div class="rules-group-container rules-group-wrapper">
+				<div class="rules-group-header">
+					<button type="button" class="btn btn-xs btn-success" data-add="rule" id="addRuleBtn">         
+						<i class="glyphicon glyphicon-plus"></i> Rule       
+					</button>
+				</div>
+				<div class="rule-container" id="ruleTemplate">
+					<div class="rule-header">
+						<button type="button" class="btn btn-xs btn-danger remove-rule-btn" style="display: none;">
+							<i class="fa fa-trash"></i>
+						</button>
+					</div>
+					<div class="rule-wrapper">
+						<div class="rule-filter-container select-rule">
+							<select class="form-control"></select>
+						</div>
+						<div class="rule-operator-container select-rule">
+							<select class="form-control"></select>
+						</div>
+						<div class="rule-dropdown-container">
+							<select class="form-control"></select>
+						</div>
+						<div class="rule-value-container select-rule">
+							<input type="text" class="form-control">
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="modal-footer">
+				<button class="btn m-0 validate-btn" id="formatValidateBtn">Validate</button>
 				<button class="btn m-0 okay-btn" id="formatterOkBtn">OK</button>
 			</div>
 		</div>

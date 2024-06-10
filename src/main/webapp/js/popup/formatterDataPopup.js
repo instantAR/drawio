@@ -1,5 +1,8 @@
 var formattermodal = document.getElementById("formatterDataModal");
+var validateBtn = document.getElementById("formatValidateBtn");
 var selectedcellData = '';
+var selectedSource = '';
+var selectedWorkspace = [];
 var operators = [
     { type: 'Round off', nb_inputs: 1, apply_to: ['string'] },
     { type: 'Length validation', nb_inputs: 1, apply_to: ['string'] },
@@ -26,11 +29,79 @@ var queryBuilderArray = ["Round off",
   "Masking",
   "Case Conversion"
 ];
+
+const operatorOptions = {
+  "Padding": ["Left", "Right", "Both"],
+  "Trimming": ["Left", "Right"],
+  "Concatenation": ["Left", "Right"],
+  "Case Conversion": ["Upper", "Lower"],
+  "Masking": ["First", "Last", "All"]
+};
+
 var span = document.getElementById("close-formatterModal");
 var formatterOkBtn = document.getElementById("formatterOkBtn");
 
 formatterOkBtn.onclick = function () {
+  
+  const queryRules = collectRuleData();
+  console.log(queryRules);
+  let selectedRuleData = {
+    filterDataBuilderQuery: {...queryRules}, 
+    selectedSource:{...JSON.parse(selectedSource)}
+  }
+  selectedcellData['selectedRuleData']=JSON.stringify({...selectedRuleData});
+  clearListner();
   formattermodal.style.display = "none";
+}
+
+validateBtn.onclick = async function () {
+    var allFilterCells = allFilterConnectedCells(selectedcellData);
+    var allConnectedCellRules = [];
+    console.log("==========allFilterCells",allFilterCells);
+    if(allFilterCells?.length) {
+      allFilterCells.forEach((filterCell) => {
+        if(filterCell?.selectedRuleData) {
+          console.log("======filterCell",filterCell);
+          const queryData = JSON.parse(filterCell.selectedRuleData).filterDataBuilderQuery;
+          if(queryData) {
+            allConnectedCellRules.push(queryData);
+          }
+        }
+      })
+    }
+    if (!selectedWorkspace.length) {
+      alert("workspace data not found");
+      return;
+    }
+    const isWorkSpaceContainNull = selectedWorkspace.some(value => value === null);
+    if (isWorkSpaceContainNull) {
+      alert("workspace data not found for all connected source");
+      return;
+    }
+    const selectedWorkspaceString = JSON.stringify(selectedWorkspace[0]);
+    const reversedArray = allConnectedCellRules.reverse();
+
+    const queryRuleDataString = JSON.stringify(reversedArray);
+    console.log("===========allConnectedCellRules reverse",reversedArray);
+
+    const selectedWorkspaceUtf8Bytes = new TextEncoder().encode(selectedWorkspaceString);
+    const queryRuleDataUtf8Bytes = new TextEncoder().encode(queryRuleDataString);
+
+    const selectedWorkspaceEncoded = btoa(String.fromCharCode(...selectedWorkspaceUtf8Bytes));
+    const queryRuleDataEncoded = btoa(String.fromCharCode(...queryRuleDataUtf8Bytes));
+    const payload = {
+      "base64": selectedWorkspaceEncoded,
+      "rules": queryRuleDataEncoded,
+    };
+    console.log("=========payload",payload);
+    $('#filter-loader').show();
+    const response = await applyWorkflowRules(payload);
+    if(response) {
+      $('#filter-loader').hide();
+      $('#validateOutput').css('display', 'block');
+      $('.validate-copy-btn').css('display', 'block');
+      $('#validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
+    }
 }
 
 span.onclick = function () {
@@ -54,19 +125,89 @@ function openformatterModal() {
         let cellAttributesData = null;
         cellAttributesData = getJsonDataFromCell(resultCell[0]);
         if (cellAttributesData?.jsonData) {
+          selectedSource = JSON.stringify(Object.values(cellAttributesData.jsonData)[0]);
+          selectedWorkspace[0] = cellAttributesData?.selectedworkSpaceData;
           const filters = formatterJsonToFilterArray(cellAttributesData.jsonData);
           $(document).ready(function () {
-            if ($('#formatter-builder').data('queryBuilder')) {
-              $('#formatter-builder').queryBuilder('destroy');
+            function addFilterOptions(selectElement) {
+              filters.forEach(filter => {
+                const filterElement = $('<option></option>').text(filter.id).val(filter.label);
+                selectElement.append(filterElement);
+              });
             }
-            $('#formatter-builder').queryBuilder({
-              operators,
-              filters
+            function addOperatorOptions(selectElement) {
+              queryBuilderArray.forEach(operator => {
+                const optionElement = $('<option></option>').text(operator).val(operator);
+                selectElement.append(optionElement);
+              });
+            }
+
+            function populateDropdownBasedOnOperator(dropdown, operator) {
+              dropdown.empty();
+              if (operatorOptions[operator]) {
+                operatorOptions[operator].forEach(value => {
+                  const optionElement = $('<option></option>').text(value).val(value);
+                  dropdown.append(optionElement);
+                });
+                dropdown.closest('.rule-dropdown-container').show();
+              } else {
+                dropdown.closest('.rule-dropdown-container').hide();
+              }
+            }
+
+            function updateDeleteButtonVisibility() {
+              const ruleContainers = $('.rules-group-container .rule-container');
+              ruleContainers.each(function (index) {
+                const removeBtn = $(this).find('.remove-rule-btn');
+                if (index === 0) {
+                  removeBtn.hide();
+                } else {
+                  removeBtn.show();
+                }
+              });
+            }
+            $('#addRuleBtn').on('click', function () {
+              var newRule = $('#ruleTemplate').clone().removeAttr('id');
+              newRule.find('select').val('');
+              newRule.find('input').val('');
+
+              $('.rules-group-container').append(newRule);
+
+              newRule.find('.rule-filter-container select').each(function () {
+                $(this).empty();
+                addFilterOptions($(this), filters);
+              });
+
+              newRule.find('.rule-operator-container select').each(function () {
+                $(this).empty();
+                addOperatorOptions($(this));
+              }).on('change', function () {
+                const selectedOperator = $(this).val();
+                const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
+                populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
+              });
+
+              newRule.find('.rule-dropdown-container').hide();
+              updateDeleteButtonVisibility();
             });
-            setAddDeleteRuleOrGroup();
-            $('#formatter-builder').on('afterAddRule.queryBuilder', function(e, rule) {
-              setAddDeleteRuleOrGroup();
+
+            $('.rules-group-container').on('click', '.remove-rule-btn', function () {
+              $(this).closest('.rule-container').remove();
+              updateDeleteButtonVisibility();
             });
+
+            $('#ruleTemplate .rule-filter-container select').each(function () {
+              $(this).empty();
+              addFilterOptions($(this), filters);
+            });
+            $('#ruleTemplate .rule-operator-container select').each(function () {
+              addOperatorOptions($(this));
+            }).on('change', function () {
+              const selectedOperator = $(this).val();
+              const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
+              populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
+            });
+            updateDeleteButtonVisibility();
           });
         }
         else {
@@ -81,6 +222,7 @@ function openformatterModal() {
           cellAttributesData = getJsonDataFromCell(resultCell[i]);
           if(cellAttributesData?.jsonData) {
             allSourceDataJSON.push(cellAttributesData.jsonData);
+            selectedWorkspace.push(cellAttributesData.selectedworkSpaceData);
           }
         }
         if(allSourceDataJSON?.length) {
@@ -109,20 +251,11 @@ function openformatterModal() {
               // Example of handling the selection
               $('#formatter-select-source').on('change', function() {
                   const selectedValue = $(this).val();
+                  selectedSource = selectedValue;
                   if (selectedValue) {
                     const filters = formatterJsonToFilterArray(JSON.parse(selectedValue),true);
                     $(document).ready(function () {
-                      if ($('#formatter-builder').data('queryBuilder')) {
-                        $('#formatter-builder').queryBuilder('destroy');
-                      }
-                      $('#formatter-builder').queryBuilder({
-                        operators,
-                        filters
-                      });
-                      setAddDeleteRuleOrGroup();
-                      $('#formatter-builder').on('afterAddRule.queryBuilder', function(e, rule) {
-                        setAddDeleteRuleOrGroup();
-                      });
+                      //TODO: for multiple block
                     });
                   }
               });
@@ -139,10 +272,50 @@ function openformatterModal() {
   }
 }
 
-function closeformatterModal() {
-  formattermodal.style.display = "none";
+function collectRuleData() {
+  const rules = [];
+
+  $('.rule-container').each(function () {
+      const id = $(this).find('.rule-filter-container select').val();
+      const field = $(this).find('.rule-filter-container select option:selected').text();
+      const operator = $(this).find('.rule-operator-container select').val();
+      const value = $(this).find('.rule-value-container input').val();
+      const valuePlusDropdown = $(this).find('.rule-dropdown-container select');
+      const valuePlus = valuePlusDropdown.val() || valuePlusDropdown.find('option:selected').val();
+      const rule = {
+          id: id,
+          field: field,
+          type: 'string',
+          input: 'text',
+          operator: operator,
+          value: value
+      };
+
+      if (valuePlus !== undefined) {
+          rule.valuePlus = valuePlus;
+      }
+
+      rules.push(rule);
+  });
+
+  return {
+      type: 'Format',
+      rules: rules
+  };
 }
 
+function closeformatterModal() {
+  formattermodal.style.display = "none";
+  clearListner();
+}
+
+function clearListner() {
+  $('#addRuleBtn').off('click');
+  $('.rules-group-container').off('click', '.remove-rule-btn');
+  $('#ruleTemplate .rule-operator-container select').off('change');
+  getQueryRulesData = null;
+  selectedWorkspace = [];
+}
 
 function formattermodalOpen(cellData) {
   selectedcellData = cellData;
@@ -244,5 +417,51 @@ function traverseGraph(cell, sourceDataCells = [], visited = new Set()) {
     }
   }
   return sourceDataCells;
+}
+
+function allFilterConnectedCells(cell, filterDataCells = [], visited = new Set()) {
+  var model = window.editorUiObj.editor.graph.getModel();
+
+  if (!visited.has(cell)) {
+    visited.add(cell);
+    if (cell.style.includes('data_filter') || cell.style.includes('data_formatter')) {
+      // debugger;
+      filterDataCells.push(cell);
+    }
+
+    if (cell.edges?.length) {
+
+      for (var i = 0; i < cell.edges.length; i++) {
+        var edge = cell.edges[i];
+        var connectedCellIncoming = model.getTerminal(edge, true);
+        if (connectedCellIncoming && !visited.has(connectedCellIncoming)) {
+          allFilterConnectedCells(connectedCellIncoming, filterDataCells, visited);
+        }
+      }
+    }
+  }
+  return filterDataCells;
+}
+
+function setAddDeleteRuleOrGroupFormatter() {
+  const addRuleBtn = document.querySelectorAll('.btn-xs.btn-success[data-add="rule"]');
+  const addGroupBtn = document.querySelectorAll('.btn-xs.btn-success[data-add="group"]');
+  const deleteBtn = document.querySelectorAll('.btn-xs.btn-danger[data-delete="rule"]');
+  if (addRuleBtn) {
+    addRuleBtn.forEach((ele) => {
+      ele.innerHTML = `<i class="glyphicon glyphicon-plus"></i> Rule`;
+    });
+  }
+  if (addGroupBtn) {
+    addGroupBtn.forEach((ele) => {
+      ele.innerHTML = `<i class="glyphicon glyphicon-plus-sign"></i> Group`;
+      ele.style.display = 'none';
+    });
+  }
+  if(deleteBtn) {
+    deleteBtn.forEach((ele) => {
+      ele.innerHTML = `<i class="fa fa-trash">`;
+    });
+  }
 }
 
