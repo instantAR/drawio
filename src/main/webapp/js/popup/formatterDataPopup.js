@@ -57,7 +57,13 @@ formatterOkBtn.onclick = function () {
 validateBtn.onclick = async function () {
     var allFilterCells = allFilterConnectedCells(selectedcellData);
     var allConnectedCellRules = [];
-    console.log("==========allFilterCells",allFilterCells);
+    const queryRules = collectRuleData();
+    console.log(queryRules);
+    let selectedRuleData = {
+      filterDataBuilderQuery: {...queryRules}, 
+      selectedSource:{...JSON.parse(selectedSource)}
+    }
+    selectedcellData['selectedRuleData']=JSON.stringify({...selectedRuleData});
     if(allFilterCells?.length) {
       allFilterCells.forEach((filterCell) => {
         if(filterCell?.selectedRuleData) {
@@ -79,19 +85,21 @@ validateBtn.onclick = async function () {
       return;
     }
     const selectedWorkspaceString = JSON.stringify(selectedWorkspace[0]);
-    const reversedArray = allConnectedCellRules.reverse();
+    const ruleData = allConnectedCellRules.reverse();
+    console.log("=========ruleData",ruleData);
+    const encodedData = ruleData.map(item => {
+      console.log('item: ', item)
+      const itemUtf8Bytes = new TextEncoder().encode(JSON.stringify(item));
+      return btoa(String.fromCharCode(...itemUtf8Bytes));
+    });
 
-    const queryRuleDataString = JSON.stringify(reversedArray);
-    console.log("===========allConnectedCellRules reverse",reversedArray);
 
     const selectedWorkspaceUtf8Bytes = new TextEncoder().encode(selectedWorkspaceString);
-    const queryRuleDataUtf8Bytes = new TextEncoder().encode(queryRuleDataString);
 
     const selectedWorkspaceEncoded = btoa(String.fromCharCode(...selectedWorkspaceUtf8Bytes));
-    const queryRuleDataEncoded = btoa(String.fromCharCode(...queryRuleDataUtf8Bytes));
     const payload = {
       "base64": selectedWorkspaceEncoded,
-      "rules": queryRuleDataEncoded,
+      "rules": encodedData,
     };
     console.log("=========payload",payload);
     $('#filter-loader').show();
@@ -100,7 +108,11 @@ validateBtn.onclick = async function () {
       $('#filter-loader').hide();
       $('#validateOutput').css('display', 'block');
       $('.validate-copy-btn').css('display', 'block');
-      $('#validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
+      if(!!response.json){
+        $('#validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
+      }else{
+        alert('No valid data found.')
+      }
     }
 }
 
@@ -166,6 +178,36 @@ function openformatterModal() {
                 }
               });
             }
+
+            function addRuleRow(rule) {
+              var newRule = $('#ruleTemplate').clone().removeAttr('id');
+              newRule.find('select').val('');
+              newRule.find('input').val('');
+
+              $('.rules-group-container').append(newRule);
+
+              newRule.find('.rule-filter-container select').each(function () {
+                $(this).empty();
+                addFilterOptions($(this), filters);
+                $(this).val(rule.id);
+              });
+
+              newRule.find('.rule-operator-container select').each(function () {
+                $(this).empty();
+                addOperatorOptions($(this));
+                $(this).val(rule.operator);
+                const selectedOperator = rule.operator;
+                const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
+                populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
+              }).on('change', function () {
+                const selectedOperator = $(this).val();
+                const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
+                populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
+              });
+
+              newRule.find('.rule-value-container input').val(rule.value);
+              updateDeleteButtonVisibility();
+            }
             $('#addRuleBtn').on('click', function () {
               var newRule = $('#ruleTemplate').clone().removeAttr('id');
               newRule.find('select').val('');
@@ -208,6 +250,22 @@ function openformatterModal() {
               populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
             });
             updateDeleteButtonVisibility();
+
+            if(selectedcellData?.selectedRuleData) {
+              const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource);
+              if(selectedcellData?.selectedRuleData && JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery){
+                const existingRules = JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery;
+                $('.rules-group-container .rule-container').each(function() {
+                  if (!$(this).attr('id')) {
+                      $(this).remove();
+                  }
+                });
+                existingRules.rules.forEach(rule => addRuleRow(rule));
+                $('#ruleTemplate').remove();
+                $('.rules-group-header').siblings('.rule-container').first().attr('id','ruleTemplate');
+                updateDeleteButtonVisibility();
+              }
+            }
           });
         }
         else {
@@ -246,19 +304,39 @@ function openformatterModal() {
                   option.text = parentKey;
   
                   select.append(option);
-              });
+          });
   
-              // Example of handling the selection
-              $('#formatter-select-source').on('change', function() {
-                  const selectedValue = $(this).val();
-                  selectedSource = selectedValue;
-                  if (selectedValue) {
-                    const filters = formatterJsonToFilterArray(JSON.parse(selectedValue),true);
-                    $(document).ready(function () {
-                      //TODO: for multiple block
+          // Example of handling the selection
+          $('#formatter-select-source').on('change', function() {
+              const selectedValue = $(this).val();
+              selectedSource = selectedValue;
+              if (selectedValue) {
+                const filters = formatterJsonToFilterArray(JSON.parse(selectedValue),true);
+                $(document).ready(function () {
+                  //TODO: for multiple block
+                });
+                /* const selectedSourceNew = JSON.parse(selectedSource);
+                if(selectedcellData?.selectedRuleData) {
+                  const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource);
+                  if(selectedcellData?.selectedRuleData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery){
+                    const existingRules = JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery;
+                    $('.rules-group-container .rule-container').each(function() {
+                      if (!$(this).attr('id')) {
+                          $(this).remove();
+                      }
                     });
+                    existingRules.rules.forEach(rule => addRuleRow(rule));
+                    $('#ruleTemplate').remove();
+                    $('.rules-group-header').siblings('.rule-container').first().attr('id','ruleTemplate');
                   }
-              });
+                } */
+              }
+          });
+
+          if(selectedcellData?.selectedRuleData && JSON.parse(selectedcellData.selectedRuleData).selectedSource){
+            const selectedValue = JSON.parse(selectedcellData.selectedRuleData).selectedSource;
+            select.val(JSON.stringify(Object.values(selectedValue))).trigger('change');
+          }
         }
         else {
           formattermodal.style.display = "none";

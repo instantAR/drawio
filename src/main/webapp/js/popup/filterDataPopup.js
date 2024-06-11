@@ -25,13 +25,24 @@ filterOkBtn.onclick = function () {
 validateBtn.onclick = async function () {
   if ($('#builder').data('queryBuilder')) {
 
+    var result = $('#builder').queryBuilder('getRules');
+    if (!$.isEmptyObject(result)) {
+      let selectedRuleData = {
+        filterDataBuilderQuery: {...result,type:'Filter'}, 
+        selectedSource:{...JSON.parse(selectedSource)}
+      }
+      selectedcellData['selectedRuleData']=JSON.stringify({...selectedRuleData});
+      getQueryRulesData = result;
+    } else {
+      alert('No query defined.');
+      return;
+    }
+
     var allFilterCells = allFilterConnectedCells(selectedcellData);
     var allConnectedCellRules = [];
-    console.log("==========allFilterCells",allFilterCells);
     if(allFilterCells?.length) {
       allFilterCells.forEach((filterCell) => {
         if(filterCell?.selectedRuleData) {
-          console.log("======filterCell",filterCell);
           const queryData = JSON.parse(filterCell.selectedRuleData).filterDataBuilderQuery;
           if(queryData) {
             allConnectedCellRules.push(queryData);
@@ -40,13 +51,7 @@ validateBtn.onclick = async function () {
       })
     }
 
-    var result = $('#builder').queryBuilder('getRules');
-    if (!$.isEmptyObject(result)) {
-      getQueryRulesData = result;
-    } else {
-      alert('No query defined.');
-      return;
-    }
+
     if (!selectedWorkspace.length) {
       alert("workspace data not found");
       return;
@@ -56,19 +61,21 @@ validateBtn.onclick = async function () {
       alert("workspace data not found for all connected source");
       return;
     }
+    const ruleData = allConnectedCellRules.reverse();
+    console.log("========ruleData",ruleData);
     const selectedWorkspaceString = JSON.stringify(selectedWorkspace[0]);
-    const reversedArray = allConnectedCellRules.reverse();
-    const queryRuleDataString = JSON.stringify(reversedArray);
-    console.log("===========allConnectedCellRules reverse",reversedArray);
-
     const selectedWorkspaceUtf8Bytes = new TextEncoder().encode(selectedWorkspaceString);
-    const queryRuleDataUtf8Bytes = new TextEncoder().encode(queryRuleDataString);
-
     const selectedWorkspaceEncoded = btoa(String.fromCharCode(...selectedWorkspaceUtf8Bytes));
-    const queryRuleDataEncoded = btoa(String.fromCharCode(...queryRuleDataUtf8Bytes));
+    
+    const encodedData = ruleData.map(item => {
+      console.log('item: ', item)
+      const itemUtf8Bytes = new TextEncoder().encode(JSON.stringify(item));
+      return btoa(String.fromCharCode(...itemUtf8Bytes));
+    });
+    
     const payload = {
       "base64": selectedWorkspaceEncoded,
-      "rules": queryRuleDataEncoded,
+      "rules": encodedData
     };
     console.log("=========payload",payload);
     $('#filter-loader').show();
@@ -77,7 +84,11 @@ validateBtn.onclick = async function () {
       $('#filter-loader').hide();
       $('#validateOutput').css('display', 'block');
       $('.validate-copy-btn').css('display', 'block');
-      $('#validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
+      if(!!response.json){
+        $('#validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
+      }else{
+        $('#validateOutput').text(response.json);
+      }
     }
   }
 }
@@ -164,7 +175,7 @@ function openFilterModal() {
             });
             const selectedSourceNew = JSON.parse(selectedSource);
             if(selectedcellData?.selectedRuleData) {
-              const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource);   
+              const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource); 
               if(selectedcellData?.selectedRuleData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery){
                 $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery);
               }
@@ -259,7 +270,7 @@ function openFilterModal() {
           });
           if(selectedcellData?.selectedRuleData && JSON.parse(selectedcellData.selectedRuleData).selectedSource){
             const selectedValue = JSON.parse(selectedcellData.selectedRuleData).selectedSource;
-            select.val(JSON.stringify(selectedValue)).trigger('change');
+            select.val(JSON.stringify(Object.values(selectedValue))).trigger('change');
           }
         }
         else {
