@@ -1534,8 +1534,13 @@ td.mxPopupMenuIcon {
 
 .rule-filter-container select,
 .rule-operator-container select,
-.rule-value-container select {
+.rule-value-container select ,
+.rule-value2-container select {
 	max-width: 250px;
+}
+
+.rule-value2-container {
+	display:  none;
 }
 
 .btn-wrapper{

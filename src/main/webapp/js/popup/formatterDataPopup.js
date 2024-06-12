@@ -24,7 +24,6 @@ var queryBuilderArray = ["Round off",
   "Formatting",
   "Concatenation",
   "Substring",
-  "Data Type Conversion",
   "Default Value",
   "Masking",
   "Case Conversion"
@@ -32,8 +31,8 @@ var queryBuilderArray = ["Round off",
 
 const operatorOptions = {
   "Padding": ["Left", "Right", "Both"],
-  "Trimming": ["Left", "Right"],
-  "Concatenation": ["Left", "Right"],
+  "Trimming": ["Left", "Right", "Both"],
+  "Concatenation": ["Left", "Right", "Both"],
   "Case Conversion": ["Upper", "Lower"],
   "Masking": ["First", "Last", "All"]
 };
@@ -162,7 +161,20 @@ function openformatterModal() {
                   dropdown.append(optionElement);
                 });
                 dropdown.closest('.rule-dropdown-container').show();
+                dropdown.parent().siblings('.rule-value2-container').hide();
+                dropdown.parent().siblings('.rule-value2-container input').val();
+                if(operator == 'Case Conversion'){
+                  dropdown.parent().siblings('.rule-value-container').hide();
+                }else{
+                  dropdown.parent().siblings('.rule-value-container').show();
+                }
+              } else if(operator == 'Substring'){
+                dropdown.parent().siblings('.rule-value2-container').show();
+                dropdown.parent().siblings('.rule-value-container').show();
+                dropdown.closest('.rule-dropdown-container').hide();
               } else {
+                dropdown.parent().siblings('.rule-value2-container').hide();
+                dropdown.parent().siblings('.rule-value2-container input').val();
                 dropdown.closest('.rule-dropdown-container').hide();
               }
             }
@@ -206,6 +218,9 @@ function openformatterModal() {
               });
 
               newRule.find('.rule-value-container input').val(rule.value);
+              if(rule.value2){
+                newRule.find('.rule-value2-container input').val(rule.value2);
+              }
               updateDeleteButtonVisibility();
             }
             $('#addRuleBtn').on('click', function () {
@@ -243,6 +258,7 @@ function openformatterModal() {
               addFilterOptions($(this), filters);
             });
             $('#ruleTemplate .rule-operator-container select').each(function () {
+              $(this).empty();
               addOperatorOptions($(this));
             }).on('change', function () {
               const selectedOperator = $(this).val();
@@ -360,6 +376,7 @@ function collectRuleData() {
       const value = $(this).find('.rule-value-container input').val();
       const valuePlusDropdown = $(this).find('.rule-dropdown-container select');
       const valuePlus = valuePlusDropdown.val() || valuePlusDropdown.find('option:selected').val();
+      const value2 = $(this).find('.rule-value2-container input').val();
       const rule = {
           id: id,
           field: field,
@@ -371,6 +388,10 @@ function collectRuleData() {
 
       if (valuePlus !== undefined) {
           rule.valuePlus = valuePlus;
+      }
+
+      if (value2 !== undefined) {
+          rule.value2 = value2;
       }
 
       rules.push(rule);
