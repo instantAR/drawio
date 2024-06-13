@@ -365,7 +365,7 @@ function jsonToFilterArray(json, isMultipleSourceData = false) {
     filters.push(...sourcBlockData.map(source => ({
       id: source.id,
       label: formatLabel(source.value),
-      type: mapType(source[source.value])
+      type: mapType(source.type)
     })));
   }
   return filters;

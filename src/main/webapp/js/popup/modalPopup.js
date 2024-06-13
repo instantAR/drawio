@@ -161,7 +161,7 @@ $(document).ready(function() {
       const trimmedRename = rename ? rename.trim() : ''; 
       if (isChecked && columnName) {
           const value = trimmedRename || columnName;
-          newData.push({ id: columnName, value });
+          newData.push({ id: columnName, value, type: columnJsonData[mainKey][columnName] || 'string' });
       }
     });
     const data = { [mainKey] : newData};

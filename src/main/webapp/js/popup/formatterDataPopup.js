@@ -165,7 +165,11 @@ function openformatterModal() {
                 dropdown.parent().siblings('.rule-value2-container input').val();
                 if(operator == 'Case Conversion'){
                   dropdown.parent().siblings('.rule-value-container').hide();
-                }else{
+                }
+                else if(operator == 'Masking'){
+                  dropdown.parent().siblings('.rule-value2-container').show();
+                }
+                else{
                   dropdown.parent().siblings('.rule-value-container').show();
                 }
               } else if(operator == 'Substring'){
@@ -211,10 +215,27 @@ function openformatterModal() {
                 const selectedOperator = rule.operator;
                 const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
                 populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
+                if(rule.valuePlus){
+                  correspondingDropdown.val(rule.valuePlus)
+                }
               }).on('change', function () {
                 const selectedOperator = $(this).val();
                 const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
                 populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
+              });
+              newRule.find('.rule-dropdown-container select').each(function () {
+              }).on('change', function () {
+                const selectedDrpdown = $(this).val();
+                const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-value-container');
+                const value2Dropdown = $(this).closest('.rule-wrapper').find('.rule-value2-container');
+                if(selectedDrpdown === "All" && correspondingDropdown) {
+                    correspondingDropdown.hide();
+                    value2Dropdown.hide();
+                }
+                else {
+                    correspondingDropdown.show();
+                    value2Dropdown.show();
+                }
               });
 
               newRule.find('.rule-value-container input').val(rule.value);
@@ -244,7 +265,24 @@ function openformatterModal() {
                 populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
               });
 
+              newRule.find('.rule-dropdown-container select').each(function () {
+              }).on('change', function () {
+                const selectedDrpdown = $(this).val();
+                const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-value-container');
+                const value2Dropdown = $(this).closest('.rule-wrapper').find('.rule-value2-container');
+                if(selectedDrpdown === "All" && correspondingDropdown) {
+                    correspondingDropdown.hide();
+                    value2Dropdown.hide();
+                }
+                else {
+                    correspondingDropdown.show();
+                    value2Dropdown.show();
+                }
+              
+              });
+
               newRule.find('.rule-dropdown-container').hide();
+              newRule.find('.rule-value2-container').hide();
               updateDeleteButtonVisibility();
             });
 
