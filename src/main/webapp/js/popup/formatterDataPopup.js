@@ -133,6 +133,7 @@ function openformatterModal() {
     if(resultCell) {
       if (resultCell.length === 1) {
         $('#formatter-select-source-wrapper').css('display', 'none');
+        $('#formatter-ignore-case-wrapper').css('display', 'flex');
         let cellAttributesData = null;
         cellAttributesData = getJsonDataFromCell(resultCell[0]);
         if (cellAttributesData?.jsonData) {
@@ -339,6 +340,7 @@ function openformatterModal() {
         }
         if(allSourceDataJSON?.length) {
           $('#formatter-select-source-wrapper').css('display', 'flex');
+          $('#formatter-ignore-case-wrapper').css('display', 'none');
           const select = $('#formatter-select-source');
           select.empty();
   
@@ -435,8 +437,12 @@ function collectRuleData() {
       rules.push(rule);
   });
 
+  var visibleCheckbox = $('.flex-shrink-0:visible');
+  var isIgnoreCaseChecked = visibleCheckbox.is(':checked');
+
   return {
       type: 'Format',
+      ignoreCase: isIgnoreCaseChecked,
       rules: rules
   };
 }

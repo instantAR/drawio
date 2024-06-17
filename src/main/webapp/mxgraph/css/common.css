@@ -1454,7 +1454,7 @@ td.mxPopupMenuIcon {
 	display: none;
 	align-items: center;
     justify-content: flex-start;
-	padding: 10px;
+	padding: 10px 16px;
 	span {
 		min-width: 150px;
 		font-weight: bold;
@@ -1650,4 +1650,15 @@ td.mxPopupMenuIcon {
 	width: 100%;
 	margin-right: 10px;
 }
-  
+.ignore-case{
+	display: flex;
+align-items: center;
+gap: 8px;
+padding: 8px 0;
+}
+.ignore-case label {
+	margin-bottom: 0 !important;
+}
+.ignore-case input[type=checkbox]{
+	margin: 0 !important;
+}

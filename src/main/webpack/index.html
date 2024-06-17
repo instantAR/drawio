@@ -157,9 +157,21 @@
 			<div id="filter-select-source-wrapper">
 				<span>Select Source Data</span>
 				<select id="select-source" class="form-control"></select>
+				<div class="ignore-case">
+					<label for="ignoreCase" class="mb-0">
+						Ignore Case
+					</label>
+					<input type="checkbox" class="flex-shrink-0" id="filter-ignore-checkbox">
+				</div>
 			</div>
 			<div class="loader" id="filter-loader"></div>
 		<div class="filter-body-wrapper">
+			<div id="filter-ignore-case-wrapper" class="ignore-case">
+				<label for="ignoreCase" class="mb-0">
+					Ignore Case
+				</label>
+				<input type="checkbox" class="flex-shrink-0" id="filter-ignore-checkbox">
+			</div>
 			<div id="builder" class="builder-wrapper"></div>
 			<div class="output-wrapper">
 				<button id="btn-get-query" class="btn mb-2">Get Query</button>
@@ -191,6 +203,19 @@
 			<div id="formatter-select-source-wrapper">
 				<span>Select Source Data</span>
 				<select id="formatter-select-source" class="form-control"></select>
+
+				<div class="ignore-case" style="padding: 8px;">
+					<label for="ignoreCase" class="mb-0">
+						Ignore Case
+					</label>
+					<input type="checkbox" class="flex-shrink-0">
+				</div>
+			</div>
+			<div id="formatter-ignore-case-wrapper" class="ignore-case" style="padding: 8px;">
+				<label for="ignoreCase" class="mb-0">
+					Ignore Case
+				</label>
+				<input type="checkbox" class="flex-shrink-0">
 			</div>
 			<div class="rules-group-container rules-group-wrapper">
 				<div class="rules-group-header">

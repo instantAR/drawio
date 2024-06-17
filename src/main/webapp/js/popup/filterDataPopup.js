@@ -11,8 +11,10 @@ filterOkBtn.onclick = function () {
   if ($('#builder').data('queryBuilder')) {
     var result = $('#builder').queryBuilder('getRules');
     if (!$.isEmptyObject(result)) {
+      var visibleCheckbox = $('.flex-shrink-0:visible');
+      var isIgnoreCaseChecked = visibleCheckbox.is(':checked');
       let selectedRuleData = {
-        filterDataBuilderQuery: {...result,type:'Filter'}, 
+        filterDataBuilderQuery: {...result,type:'Filter',ignoreCase: isIgnoreCaseChecked}, 
         selectedSource:{...JSON.parse(selectedSource)}
       }
       selectedcellData['selectedRuleData']=JSON.stringify({...selectedRuleData});
@@ -27,8 +29,10 @@ validateBtn.onclick = async function () {
 
     var result = $('#builder').queryBuilder('getRules');
     if (!$.isEmptyObject(result)) {
+      var visibleCheckbox = $('.flex-shrink-0:visible');
+      var isIgnoreCaseChecked = visibleCheckbox.is(':checked');
       let selectedRuleData = {
-        filterDataBuilderQuery: {...result,type:'Filter'}, 
+        filterDataBuilderQuery: {...result,type:'Filter',ignoreCase: isIgnoreCaseChecked}, 
         selectedSource:{...JSON.parse(selectedSource)}
       }
       selectedcellData['selectedRuleData']=JSON.stringify({...selectedRuleData});
@@ -72,7 +76,6 @@ validateBtn.onclick = async function () {
       const itemUtf8Bytes = new TextEncoder().encode(JSON.stringify(item));
       return btoa(String.fromCharCode(...itemUtf8Bytes));
     });
-    
     const payload = {
       "base64": selectedWorkspaceEncoded,
       "rules": encodedData
@@ -145,6 +148,7 @@ function openFilterModal() {
     if(resultCell) {
       if (resultCell.length === 1) {
         $('#filter-select-source-wrapper').css('display', 'none');
+        $('#filter-ignore-case-wrapper').css('display', 'flex');
         $('#builder').css('margin-top', '8px');
         let cellAttributesData = null;
         cellAttributesData = getJsonDataFromCell(resultCell[0]);
@@ -203,6 +207,7 @@ function openFilterModal() {
         }
         if (allSourceDataJSON?.length) {
           $('#filter-select-source-wrapper').css('display', 'flex');
+          $('#filter-ignore-case-wrapper').css('display', 'none');
           const select = $('#select-source');
           select.empty();
   
