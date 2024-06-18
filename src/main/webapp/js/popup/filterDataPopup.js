@@ -146,6 +146,8 @@ function openFilterModal() {
   if (selectedcellData?.edges?.length) {
     var resultCell = traverseGraph(selectedcellData);
     if(resultCell) {
+      var visibleCheckbox = $('.flex-shrink-0:visible');
+      visibleCheckbox.prop('checked', false);
       if (resultCell.length === 1) {
         $('#filter-select-source-wrapper').css('display', 'none');
         $('#filter-ignore-case-wrapper').css('display', 'flex');
@@ -181,7 +183,12 @@ function openFilterModal() {
             if(selectedcellData?.selectedRuleData) {
               const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource); 
               if(selectedcellData?.selectedRuleData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery){
-                $('#builder').queryBuilder('setRules', JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery);
+                const queryBuilderData = JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery;
+                $('#builder').queryBuilder('setRules', queryBuilderData);
+                if(queryBuilderData.ignoreCase) {
+                  var visibleCheckbox = $('.flex-shrink-0:visible');
+                  visibleCheckbox.prop('checked', true);
+                }
               }
             }
             setAddDeleteRuleOrGroup();
