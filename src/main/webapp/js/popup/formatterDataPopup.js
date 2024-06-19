@@ -3,38 +3,24 @@ var validateBtn = document.getElementById("formatValidateBtn");
 var selectedcellData = '';
 var selectedSource = '';
 var selectedWorkspace = [];
-var operators = [
-    { type: 'Round off', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Length validation', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Padding', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Trimming', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Formatting', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Concatenation', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Substring', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Data Type Conversion', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Default Value', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Masking', nb_inputs: 1, apply_to: ['string'] },
-    { type: 'Case Conversion', nb_inputs: 1, apply_to: ['string'] },
-];
 
 var queryBuilderArray = ["Round off",
-  "Length validation",
+  "Length",
   "Padding",
-  "Trimming",
-  "Formatting",
-  "Concatenation",
+  "Trim",
+  "Concat",
   "Substring",
-  "Default Value",
-  "Masking",
+  "Default",
+  "Mask",
   "Case Conversion"
 ];
 
 const operatorOptions = {
   "Padding": ["Left", "Right", "Both"],
-  "Trimming": ["Left", "Right", "Both"],
-  "Concatenation": ["Left", "Right", "Both"],
+  "Trim": ["Left", "Right", "Both"],
+  "Concat": ["Left", "Right", "Both"],
   "Case Conversion": ["Upper", "Lower"],
-  "Masking": ["First", "Last", "All"]
+  "Mask": ["First", "Last", "All"]
 };
 
 var span = document.getElementById("close-formatterModal");
@@ -101,14 +87,14 @@ validateBtn.onclick = async function () {
       "rules": encodedData,
     };
     console.log("=========payload",payload);
-    $('#filter-loader').show();
+    $('#formatter-loader').show();
     const response = await applyWorkflowRules(payload);
     if(response) {
-      $('#filter-loader').hide();
-      $('#validateOutput').css('display', 'block');
-      $('.validate-copy-btn').css('display', 'block');
+      $('#formatter-loader').hide();
+      $('#formatter-validateOutput').css('display', 'block');
+      $('.formatter-validate-copy-btn').css('display', 'block');
       if(!!response.json){
-        $('#validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
+        $('#formatter-validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
       }else{
         alert('No valid data found.')
       }
@@ -131,6 +117,8 @@ function openformatterModal() {
     var resultCell = traverseGraph(selectedcellData);
 
     if(resultCell) {
+      var visibleCheckbox = $('.flex-shrink-0:visible');
+      visibleCheckbox.prop('checked', false);
       if (resultCell.length === 1) {
         $('#formatter-select-source-wrapper').css('display', 'none');
         $('#formatter-ignore-case-wrapper').css('display', 'flex');
@@ -167,12 +155,16 @@ function openformatterModal() {
                 if(operator == 'Case Conversion'){
                   dropdown.parent().siblings('.rule-value-container').hide();
                 }
-                else if(operator == 'Masking'){
-                  dropdown.parent().siblings('.rule-value2-container').show();
+                else if(operator == 'Mask'){
+                  // dropdown.parent().siblings('.rule-value2-container').show();
                 }
                 else{
                   dropdown.parent().siblings('.rule-value-container').show();
                 }
+              } else if(operator == 'Default'){
+                dropdown.parent().siblings('.rule-value2-container').hide();
+                dropdown.parent().siblings('.rule-value-container').show();
+                dropdown.closest('.rule-dropdown-container').hide();
               } else if(operator == 'Substring'){
                 dropdown.parent().siblings('.rule-value2-container').show();
                 dropdown.parent().siblings('.rule-value-container').show();
@@ -232,10 +224,6 @@ function openformatterModal() {
                 if(selectedDrpdown === "All" && correspondingDropdown) {
                     correspondingDropdown.hide();
                     value2Dropdown.hide();
-                }
-                else {
-                    correspondingDropdown.show();
-                    value2Dropdown.show();
                 }
               });
 
@@ -413,10 +401,10 @@ function collectRuleData() {
       const id = $(this).find('.rule-filter-container select').val();
       const field = $(this).find('.rule-filter-container select option:selected').text();
       const operator = $(this).find('.rule-operator-container select').val();
-      const value = $(this).find('.rule-value-container input').val();
+      let value = $(this).find('.rule-value-container input').val();
       const valuePlusDropdown = $(this).find('.rule-dropdown-container select');
-      const valuePlus = valuePlusDropdown.val() || valuePlusDropdown.find('option:selected').val();
-      const value2 = $(this).find('.rule-value2-container input').val();
+      let valuePlus = valuePlusDropdown.val() || valuePlusDropdown.find('option:selected').val();
+      let value2 = $(this).find('.rule-value2-container input').val();
       const rule = {
           id: id,
           field: field,
@@ -425,12 +413,31 @@ function collectRuleData() {
           operator: operator,
           value: value
       };
-
-      if (valuePlus !== undefined) {
+      if(operator === "Round off") {
+        rule.operator = "RoundOff";
+      }
+      if(operator === "Substring") {
+        valuePlus = value2;
+        value2 = "";
+      }
+      if(operator === "Case Conversion") {
+        value = valuePlus;
+        valuePlus = "";
+        value2 = "";
+        rule.operator = "CaseConversion";
+      }
+     
+      if (valuePlus) {
           rule.valuePlus = valuePlus;
       }
 
-      if (value2 !== undefined) {
+      if(operator === "Mask") {
+        rule.value = valuePlus;
+        rule.valuePlus = value;
+        value2 = "";
+      }
+
+      if (value2) {
           rule.value2 = value2;
       }
 

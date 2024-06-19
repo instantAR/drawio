@@ -356,37 +356,33 @@ $(document).ready(function() {
     }
   });
 
-  $('.copy-btn').on('click', function() {
-    var textToCopy = $('#output').text();
+  $(document).ready(function() {
+    function copyTextFromElement(selector) {
+        var textToCopy = $(selector).text();
 
-    var tempTextArea = document.createElement('textarea');
-    tempTextArea.value = textToCopy;
-    document.body.appendChild(tempTextArea);
+        var tempTextArea = document.createElement('textarea');
+        tempTextArea.value = textToCopy;
+        document.body.appendChild(tempTextArea);
 
-    tempTextArea.select();
-    tempTextArea.setSelectionRange(0, 99999);
+        tempTextArea.select();
+        tempTextArea.setSelectionRange(0, 99999); // For mobile devices
 
-    document.execCommand('copy');
+        document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+    }
+    $(document).on('click', '.copy-btn, .validate-copy-btn, .formatter-validate-copy-btn', function() {
+        var idMap = {
+            'copy-btn': '#output',
+            'validate-copy-btn': '#validateOutput',
+            'formatter-validate-copy-btn': '#formatter-validateOutput'
+        };
 
-    document.body.removeChild(tempTextArea);
-
-  });
-
-  $('.validate-copy-btn').on('click', function() {
-    var textToCopy = $('#validateOutput').text();
-
-    var tempTextArea = document.createElement('textarea');
-    tempTextArea.value = textToCopy;
-    document.body.appendChild(tempTextArea);
-
-    tempTextArea.select();
-    tempTextArea.setSelectionRange(0, 99999);
-
-    document.execCommand('copy');
-
-    document.body.removeChild(tempTextArea);
-
-  });
+        var selector = idMap[$(this).attr('class').split(' ').find(cls => idMap[cls])];
+        if (selector) {
+            copyTextFromElement(selector);
+        }
+    });
+  })
 });
 
 function isValidJSON(str) {

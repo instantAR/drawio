@@ -217,6 +217,7 @@
 				</label>
 				<input type="checkbox" class="flex-shrink-0">
 			</div>
+			<div class="loader" id="formatter-loader"></div>
 			<div class="rules-group-container rules-group-wrapper">
 				<div class="rules-group-header">
 					<button type="button" class="btn btn-xs btn-success" data-add="rule" id="addRuleBtn">         
@@ -247,6 +248,12 @@
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="validate-wrapper">
+				<pre id="formatter-validateOutput"></pre>
+				<button class="formatter-validate-copy-btn">
+					<i class="fa-regular fa-copy"></i>
+				</button>
 			</div>
 			<div class="modal-footer">
 				<button class="btn m-0 validate-btn" id="formatValidateBtn">Validate</button>
