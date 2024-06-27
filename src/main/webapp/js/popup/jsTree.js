@@ -159,7 +159,7 @@ async function switchToAjaxLoading(selectedNode = null) {
   }
 
   const collectionId = selectedNode.node.original._id;
-
+  selectedcellData['collectionId'] = collectionId;
   try {
     const response = await fetch(`https://connect.instantar.io/restapi/api/get_api_by_id/${collectionId}`);
     const workspace = await response.json();

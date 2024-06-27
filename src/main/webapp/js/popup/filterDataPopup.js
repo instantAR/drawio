@@ -6,6 +6,10 @@ var getQueryRulesData = '';
 var span = document.getElementById("close-filterModal");
 var filterOkBtn = document.getElementById("filterOkBtn");
 var validateBtn = document.getElementById("validateBtn");
+const queryString = window.location.search.substring(1);
+const params = new URLSearchParams(queryString);
+let API_URL = params ? params.get('API_URL') : null;
+let token = params ? params.get('token') : null;
 
 filterOkBtn.onclick = function () {
   if ($('#builder').data('queryBuilder')) {
@@ -97,12 +101,13 @@ validateBtn.onclick = async function () {
 }
 
 async function applyWorkflowRules(payload) {
-  const url = 'https://deva.instantar.io/api/api/v2.0/applyworkflowrules';
+  const url = `${API_URL}applyworkflowrules`;
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: new Headers({
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `${token}`
       }),
       body: JSON.stringify(payload)
     });

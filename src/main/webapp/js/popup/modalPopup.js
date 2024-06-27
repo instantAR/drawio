@@ -90,7 +90,42 @@ function openModal() {
           let parentNodes = JSON.parse(selectedcellData.selectedSourceData).parentNode;
           parentNodes = parentNodes.filter(n => n);
           $('#from-api-path').text(parentNodes.join(' > '));
-          $('#from-api-path').show()
+          $('#from-api-path').show();
+          var activeButton = $('.btn-group .btn.active');
+          if (activeButton.hasClass('btn-api')) {
+            const selectedJsTreeData = selectedcellData.selectedJsTreeData;
+            window.jsTreeDropdownData = selectedJsTreeData;
+            if(selectedJsTreeData) {
+              var tbody = $('.table tbody');
+              $('.table tbody').empty();
+              $('#jsTree-wrapper').hide();
+              $('.json-data-textarea-wrapper').hide();
+              $('.header-data-wrapper').show();
+              $('#nextBtn').hide(); 
+              $('#btn-wrapper').show();
+              try {
+                columnJsonData = JSON.parse(selectedJsTreeData);
+              } catch (e) {
+                columnJsonData = {'From JsTree' : { [selectedJsTreeData] : 'string'}};
+              }
+              Object.keys(columnJsonData[Object.keys(columnJsonData)[0]]).forEach(function(key) {
+                var tr = $('<tr class="border border-bottom"></tr>');
+                var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control" value="' + key + '"></div></td>');
+                var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+                var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
+            
+                tr.append(tdName, tdIsVisible, tdRename);
+            
+                tbody.append(tr);
+              });
+              addNewRow();
+              $(document).on('input', 'input[name="cname"]', function() {
+                if ($('.table tbody tr:last-child input[name="cname"]').val() !== '') {
+                  addNewRow();
+                }
+              });
+            }
+          }
         }
       }
     }
@@ -110,6 +145,18 @@ function closeModal() {
 function triggerModalFromJs(cellData) {
   selectedcellData = cellData;
   openModal();
+}
+
+function addNewRow() {
+  var tbody = $('.table tbody');
+  var tr = $('<tr class="border border-bottom"></tr>');
+  var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control"></div></td>');
+  var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+  var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
+
+  tr.append(tdName, tdIsVisible, tdRename);
+
+  tbody.append(tr);
 }
 
 $(document).ready(function() {
@@ -135,17 +182,6 @@ $(document).ready(function() {
     }
   }
 
-  function addNewRow() {
-    var tbody = $('.table tbody');
-    var tr = $('<tr class="border border-bottom"></tr>');
-    var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control"></div></td>');
-    var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
-    var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
-
-    tr.append(tdName, tdIsVisible, tdRename);
-
-    tbody.append(tr);
-  }
 
   function getUpdatedJsonData() {
     var mainKey = Object.keys(columnJsonData)[0];
@@ -323,13 +359,22 @@ $(document).ready(function() {
     }
   });
 
-  $('#okBtn').on('click', function () {
+  $('#okBtn').on('click', async function () {
     var updatedData = getUpdatedJsonData();
+    const collectionId = selectedcellData['collectionId'];
+      const response = await fetch(`https://connect.instantar.io/restapi/api/get_api_by_id/${collectionId}`);
+      const workspace = await response.json();
+  
+      if (workspace) {
+        const workspaceData = workspace.api;
+        debugger;
+        window.selectedworkSpaceData = workspaceData;
+      }
 
     setCellAttributeData(updatedData);
 
+    selectedcellData['selectedJsTreeData']= window.jsTreeDropdownData;
     window.jsTreeDropdownData = null;
-
   });
 
   $('#backBtn').on('click', function () { 
