@@ -118,7 +118,7 @@ function openformatterModal() {
 
     if(resultCell) {
       var visibleCheckbox = $('.flex-shrink-0:visible');
-      visibleCheckbox.prop('checked', false);
+      visibleCheckbox.prop('checked', true);
       if (resultCell.length === 1) {
         $('#formatter-select-source-wrapper').css('display', 'none');
         $('#formatter-ignore-case-wrapper').css('display', 'flex');
@@ -575,7 +575,6 @@ function allFilterConnectedCells(cell, filterDataCells = [], visited = new Set()
   if (!visited.has(cell)) {
     visited.add(cell);
     if (cell.style.includes('data_filter') || cell.style.includes('data_formatter')) {
-      // debugger;
       filterDataCells.push(cell);
     }
 

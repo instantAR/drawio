@@ -8,7 +8,7 @@ var filterOkBtn = document.getElementById("filterOkBtn");
 var validateBtn = document.getElementById("validateBtn");
 const queryString = window.location.search.substring(1);
 const params = new URLSearchParams(queryString);
-let API_URL = params ? params.get('API_URL') : null;
+let API_URL = `${window.enviroment.API_URL}`;
 let token = params ? params.get('token') : null;
 
 filterOkBtn.onclick = function () {
@@ -113,7 +113,7 @@ async function applyWorkflowRules(payload) {
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
+      // throw new Error('Network response was not ok ' + response.statusText);
     }
 
     const data = await response.json();
@@ -152,7 +152,7 @@ function openFilterModal() {
     var resultCell = traverseGraph(selectedcellData);
     if(resultCell) {
       var visibleCheckbox = $('.flex-shrink-0:visible');
-      visibleCheckbox.prop('checked', false);
+      visibleCheckbox.prop('checked', true);
       if (resultCell.length === 1) {
         $('#filter-select-source-wrapper').css('display', 'none');
         $('#filter-ignore-case-wrapper').css('display', 'flex');

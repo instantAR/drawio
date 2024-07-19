@@ -1,8 +1,10 @@
 import './webpack.init';
 import {callAPI} from '../webapp/js/popup/jsTree';
+import {enviroment} from '../webapp/enviroment';
 
 window.graphEditorRefCount = 0;
 window.webpackScripts = [];
+window.enviroment = enviroment;
 window.windowKeysBackup = [];
 window.grapheditorKeysDefault = ["webpackScripts", "graphEditorRefCount", "windowKeysBackup", "grapheditorKeysDefault", "grapheditorKeys", "grapheditor", "onDestroy"];
 window.grapheditorKeys = [];

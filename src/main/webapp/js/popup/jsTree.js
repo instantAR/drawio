@@ -4,7 +4,7 @@ const queryString = window.location.search.substring(1);
 const params = new URLSearchParams(queryString);
 let workspaceIdURL = params ? params.get('workspaceId') : null;
 
-fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/collections`)
+fetch(`${window.enviroment.restClientService}restapi/app/workspaces/${workspaceIdURL}/collections`)
   .then(response => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -70,7 +70,7 @@ fetch(`https://connect.instantar.io/restapi/app/workspaces/${workspaceIdURL}/col
         var path = getPath(data.node);
         window.jsTreeDropdownParentData = path;
         const nodeId = data.node.id;
-        if (nodeId != '#' && ['GET', 'POST', 'PATCH', 'PUT'].includes(data.node.type) && !iscreated[nodeId]) {
+        if (nodeId != '#' && ['GET', 'POST', 'PATCH', 'PUT'].includes(data.node.type)) {
           iscreated[nodeId] = true;
           $('#' + nodeId).addClass("jstree-loading").attr('aria-busy', true);
           switchToAjaxLoading(data);
@@ -161,7 +161,7 @@ async function switchToAjaxLoading(selectedNode = null) {
   const collectionId = selectedNode.node.original._id;
   selectedcellData['collectionId'] = collectionId;
   try {
-    const response = await fetch(`https://connect.instantar.io/restapi/api/get_api_by_id/${collectionId}`);
+    const response = await fetch(`${window.enviroment.restClientService}restapi/api/get_api_by_id/${collectionId}`);
     const workspace = await response.json();
 
     if (workspace) {
@@ -281,7 +281,7 @@ async function switchToAjaxLoading(selectedNode = null) {
         };
 
         if (apiRequest.type === 'GET') {
-          const proxyResponse = await fetch('https://connect.instantar.io/proxy', {
+          const proxyResponse = await fetch(`${window.enviroment.restClientService}proxy`, {
             method: 'POST',
             headers: reqHeaders
           });

@@ -362,12 +362,11 @@ $(document).ready(function() {
   $('#okBtn').on('click', async function () {
     var updatedData = getUpdatedJsonData();
     const collectionId = selectedcellData['collectionId'];
-      const response = await fetch(`https://connect.instantar.io/restapi/api/get_api_by_id/${collectionId}`);
+      const response = await fetch(`${window.enviroment.restClientService}restapi/api/get_api_by_id/${collectionId}`);
       const workspace = await response.json();
   
       if (workspace) {
         const workspaceData = workspace.api;
-        debugger;
         window.selectedworkSpaceData = workspaceData;
       }
 
