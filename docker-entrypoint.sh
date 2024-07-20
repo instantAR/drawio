@@ -184,22 +184,9 @@ if [ -f $CATALINA_HOME/.keystore ] && [ -z $VAR ]; then
 fi
 
 JSON_STRING='window.configs = { \
-  "customIdentityService":"'"${customIdentityService}"'", \
-  "identityBaseService":"'"${identityBaseService}"'", \
-  "identityService":"'"${identityService}"'", \
-  "appBuilderBase":"'"${appBuilderBase}"'", \
   "appBuilder":"'"${appBuilder}"'", \
   "restClientService":"'"${restClientService}"'", \
-  "genAIService":"'"${genAIService}"'", \
-  "app_api_url":"'"${app_api_url}"'", \
-  "connectService":"'"${connectService}"'", \
-  "fontService":"'"${fontService}"'", \
-  "dropboxService":"'"${dropboxService}"'", \
-  "selfURL":"'"${selfURL}"'", \
-  "dataService":"'"${dataService}"'", \
-  "customCodeService":"'"${customCodeService}"'", \
-  "workflowService":"'"${workflowService}"'", \
-  "engineService":"'"${engineService}"'", \
+  "restBackendService":"'"${restBackendService}"'", \
 }'
 sed -i "s@// CONFIGURATIONS_PLACEHOLDER@${JSON_STRING}@" /usr/share/nginx/html/index.html
 

@@ -4,7 +4,7 @@ const queryString = window.location.search.substring(1);
 const params = new URLSearchParams(queryString);
 let workspaceIdURL = params ? params.get('workspaceId') : null;
 
-fetch(`${window.enviroment.restClientService}restapi/app/workspaces/${workspaceIdURL}/collections`)
+fetch(`${window.enviroment.restBackendService}app/workspaces/${workspaceIdURL}/collections`)
   .then(response => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -161,7 +161,7 @@ async function switchToAjaxLoading(selectedNode = null) {
   const collectionId = selectedNode.node.original._id;
   selectedcellData['collectionId'] = collectionId;
   try {
-    const response = await fetch(`${window.enviroment.restClientService}restapi/api/get_api_by_id/${collectionId}`);
+    const response = await fetch(`${window.enviroment.restBackendService}api/get_api_by_id/${collectionId}`);
     const workspace = await response.json();
 
     if (workspace) {
@@ -281,7 +281,7 @@ async function switchToAjaxLoading(selectedNode = null) {
         };
 
         if (apiRequest.type === 'GET') {
-          const proxyResponse = await fetch(`${window.enviroment.restClientService}proxy`, {
+          const proxyResponse = await fetch(`${window.enviroment.restBackendService}proxy`, {
             method: 'POST',
             headers: reqHeaders
           });

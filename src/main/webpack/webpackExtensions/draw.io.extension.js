@@ -131,7 +131,9 @@ Actions.prototype.removeAction = function (key) {
 };
 
 DrawIOOverridExport = function (config, ui) {
-
+	if (!ui.buttonContainer) {
+        return;
+    }
 	config.actionsButtons && Object.keys(config.actionsButtons).forEach((btnKey) => {
 		let shareButton = document.createElement('div');
 		shareButton.className = 'geBtn gePrimaryBtn';
