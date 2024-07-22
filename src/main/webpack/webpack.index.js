@@ -1,6 +1,6 @@
 import './webpack.init';
 import {callAPI} from '../webapp/js/popup/jsTree';
-import {enviroment} from '../webapp/enviroment';
+import {enviroment} from '../webapp/js/enviroment';
 
 window.graphEditorRefCount = 0;
 window.webpackScripts = [];
@@ -14,6 +14,10 @@ window.mxScriptsLoaded = false;
 window.mxWinLoaded = false;
 window.callJsTreeAPI = callAPI;
 window.jsTreeDropdownData = null;
+
+debugger;
+console.log("enviroment import ",enviroment);
+console.log("window.enviroment",window?.enviroment);
 
 /**
  * Synchronously adds scripts to the page.
@@ -327,6 +331,7 @@ export class GraphEditor {
 
 
         this.addWebScript('PreConfig', './mxgraph/grapheditor/PreConfig.js', 2, config);
+        this.addWebScript('enviroment', './mxgraph/grapheditor/enviroment.js', 20, config);
 
         // mxscript(drawDevUrl + './mxgraph/grapheditor/diagramly/Init.js');
         // this.addWebScript('diagramly_init', './mxgraph/grapheditor/diagramly/Init.js')
