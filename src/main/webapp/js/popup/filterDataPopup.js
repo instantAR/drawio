@@ -101,9 +101,9 @@ validateBtn.onclick = async function () {
 
 async function applyWorkflowRules(payload) {
   debugger;
-  console.log("appBuilder :",`${window?.enviroment?.appBuilder}`);
+  console.log("appBuilder 11:",`${window?.enviroment?.appBuilder}`);
   const url = `${window?.enviroment?.appBuilder}applyworkflowrules`;
-  console.log("url",url);
+  console.log("url 11",url);
   try {
     const response = await fetch(url, {
       method: 'POST',

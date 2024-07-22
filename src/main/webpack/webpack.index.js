@@ -1,10 +1,10 @@
 import './webpack.init';
 import {callAPI} from '../webapp/js/popup/jsTree';
-import {enviroment} from '../webapp/js/enviroment';
+// import {enviroment} from '../webapp/js/enviroment';
 
 window.graphEditorRefCount = 0;
 window.webpackScripts = [];
-window.enviroment = enviroment;
+// window.enviroment = enviroment;
 window.windowKeysBackup = [];
 window.grapheditorKeysDefault = ["webpackScripts", "graphEditorRefCount", "windowKeysBackup", "grapheditorKeysDefault", "grapheditorKeys", "grapheditor", "onDestroy"];
 window.grapheditorKeys = [];
@@ -15,9 +15,9 @@ window.mxWinLoaded = false;
 window.callJsTreeAPI = callAPI;
 window.jsTreeDropdownData = null;
 
-debugger;
-console.log("enviroment import ",enviroment);
-console.log("window.enviroment",window?.enviroment);
+// debugger;
+// console.log("enviroment import ",enviroment);
+// console.log("window.enviroment",window?.enviroment);
 
 /**
  * Synchronously adds scripts to the page.
@@ -331,7 +331,6 @@ export class GraphEditor {
 
 
         this.addWebScript('PreConfig', './mxgraph/grapheditor/PreConfig.js', 2, config);
-        this.addWebScript('enviroment', './mxgraph/grapheditor/enviroment.js', 20, config);
 
         // mxscript(drawDevUrl + './mxgraph/grapheditor/diagramly/Init.js');
         // this.addWebScript('diagramly_init', './mxgraph/grapheditor/diagramly/Init.js')
@@ -345,6 +344,7 @@ export class GraphEditor {
         this.addWebScript('EditorUi', './mxgraph/grapheditor/grapheditor/EditorUi.js', 5, config);
         this.addWebScript('Sidebar', './mxgraph/grapheditor/grapheditor/Sidebar.js', 4, config);
         this.addWebScript('modalPopup', './mxgraph/grapheditor/popup/modalPopup.js', 4, config);
+        this.addWebScript('enviroment', './mxgraph/grapheditor/enviroment.js', 4, config);
         this.addWebScript('filterDataPopup', './mxgraph/grapheditor/popup/filterDataPopup.js', 4, config);
         this.addWebScript('formatterDataPopup', './mxgraph/grapheditor/popup/formatterDataPopup.js', 4, config);
         this.addWebScript('Graph', './mxgraph/grapheditor/grapheditor/Graph.js', 5, config);
