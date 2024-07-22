@@ -8,7 +8,6 @@ var filterOkBtn = document.getElementById("filterOkBtn");
 var validateBtn = document.getElementById("validateBtn");
 const queryString = window.location.search.substring(1);
 const params = new URLSearchParams(queryString);
-let API_URL = `${window.enviroment.API_URL}`;
 let token = params ? params.get('token') : null;
 
 filterOkBtn.onclick = function () {
@@ -101,7 +100,9 @@ validateBtn.onclick = async function () {
 }
 
 async function applyWorkflowRules(payload) {
-  const url = `${API_URL}applyworkflowrules`;
+  console.log("appBuilder :",`${window.enviroment.appBuilder}`);
+  const url = `${window.enviroment.appBuilder}applyworkflowrules`;
+  console.log("url",url);
   try {
     const response = await fetch(url, {
       method: 'POST',
