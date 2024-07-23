@@ -12,6 +12,7 @@ RUN cd /app/src/main/webpack && npm run build
 
 FROM nginx:1.21-alpine
 
+COPY --from=build /app/src/main/webpack/dist /usr/share/nginx/html
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
