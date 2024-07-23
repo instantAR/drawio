@@ -85,22 +85,25 @@ validateBtn.onclick = async function () {
     };
     console.log("=========payload",payload);
     $('#filter-loader').show();
-    const response = await applyWorkflowRules(payload);
-    if(response) {
+    try {
+      const response = await applyWorkflowRules(payload);
       $('#filter-loader').hide();
-      $('#validateOutput').css('display', 'block');
-      $('.validate-copy-btn').css('display', 'block');
-      if(!!response.json){
+      
+      if (response && response.json) {
+        $('#validateOutput').css('display', 'block');
+        $('.validate-copy-btn').css('display', 'block');
         $('#validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
-      }else{
+      } else {
         $('#validateOutput').text(response.json);
       }
+    } catch (error) {
+      $('#filter-loader').hide();
+      console.error('Error while applying workflow rules:', error);
     }
   }
 }
 
 async function applyWorkflowRules(payload) {
-  debugger;
   console.log("appBuilder 11:",`${window?.enviroment?.appBuilder}`);
   const url = `${window?.enviroment?.appBuilder}applyworkflowrules`;
   console.log("url 11",url);

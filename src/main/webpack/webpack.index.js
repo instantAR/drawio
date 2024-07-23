@@ -1,6 +1,5 @@
 import './webpack.init';
 import {callAPI} from '../webapp/js/popup/jsTree';
-// import {enviroment} from '../webapp/js/enviroment';
 
 window.graphEditorRefCount = 0;
 window.webpackScripts = [];
@@ -14,10 +13,6 @@ window.mxScriptsLoaded = false;
 window.mxWinLoaded = false;
 window.callJsTreeAPI = callAPI;
 window.jsTreeDropdownData = null;
-
-// debugger;
-// console.log("enviroment import ",enviroment);
-// console.log("window.enviroment",window?.enviroment);
 
 /**
  * Synchronously adds scripts to the page.

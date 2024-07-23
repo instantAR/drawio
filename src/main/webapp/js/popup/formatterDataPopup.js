@@ -88,17 +88,22 @@ validateBtn.onclick = async function () {
     };
     console.log("=========payload",payload);
     $('#formatter-loader').show();
-    const response = await applyWorkflowRules(payload);
-    if(response) {
+    try {
+      const response = await applyWorkflowRules(payload);
       $('#formatter-loader').hide();
-      $('#formatter-validateOutput').css('display', 'block');
-      $('.formatter-validate-copy-btn').css('display', 'block');
-      if(!!response.json){
-        $('#formatter-validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
-      }else{
-        alert('No valid data found.')
+      if(response) {
+        $('#formatter-validateOutput').css('display', 'block');
+        $('.formatter-validate-copy-btn').css('display', 'block');
+        if(!!response.json){
+          $('#formatter-validateOutput').text(JSON.stringify(JSON.parse(response.json), null, 2));
+        }else{
+          alert('No valid data found.')
+        }
       }
-    }
+    } catch (error) {
+    $('#formatter-loader').hide();
+    console.error('Error while applying workflow rules:', error);
+  } 
 }
 
 span.onclick = function () {
@@ -298,6 +303,17 @@ function openformatterModal() {
               const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource);
               if(selectedcellData?.selectedRuleData && JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery){
                 const existingRules = JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery;
+                existingRules.rules.forEach(ruleData => {
+                  if (ruleData.operator === 'Mask') {
+                    [ruleData.valuePlus, ruleData.value] = [ruleData.value, ruleData.valuePlus];
+                  }
+                  if (ruleData.operator === "RoundOff") {
+                    ruleData.operator = 'Round off';
+                  }
+                  if (ruleData.operator === "CaseConversion") {
+                    ruleData.operator = 'Case Conversion';
+                  }
+                });
                 $('.rules-group-container .rule-container').each(function() {
                   if (!$(this).attr('id')) {
                       $(this).remove();
@@ -422,7 +438,7 @@ function collectRuleData() {
       }
       if(operator === "Case Conversion") {
         value = valuePlus;
-        valuePlus = "";
+        // valuePlus = "";
         value2 = "";
         rule.operator = "CaseConversion";
       }
