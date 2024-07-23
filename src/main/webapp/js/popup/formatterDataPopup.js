@@ -1,5 +1,5 @@
 var formattermodal = document.getElementById("formatterDataModal");
-var validateBtn = document.getElementById("formatValidateBtn");
+var formatValidateBtn = document.getElementById("formatValidateBtn");
 var selectedcellData = '';
 var selectedSource = '';
 var selectedWorkspace = [];
@@ -39,7 +39,7 @@ formatterOkBtn.onclick = function () {
   formattermodal.style.display = "none";
 }
 
-validateBtn.onclick = async function () {
+formatValidateBtn.onclick = async function () {
     var allFilterCells = allFilterConnectedCells(selectedcellData);
     var allConnectedCellRules = [];
     const queryRules = collectRuleData();
@@ -182,7 +182,7 @@ function openformatterModal() {
             }
 
             function updateDeleteButtonVisibility() {
-              const ruleContainers = $('.rules-group-container .rule-container');
+              const ruleContainers = $('.rules-group-container .formatter-rule-container');
               ruleContainers.each(function (index) {
                 const removeBtn = $(this).find('.remove-rule-btn');
                 if (index === 0) {
@@ -195,6 +195,7 @@ function openformatterModal() {
 
             function addRuleRow(rule) {
               var newRule = $('#ruleTemplate').clone().removeAttr('id');
+              console.log("=======newRule",newRule);
               newRule.find('select').val('');
               newRule.find('input').val('');
 
@@ -281,7 +282,7 @@ function openformatterModal() {
             });
 
             $('.rules-group-container').on('click', '.remove-rule-btn', function () {
-              $(this).closest('.rule-container').remove();
+              $(this).closest('.formatter-rule-container').remove();
               updateDeleteButtonVisibility();
             });
 
@@ -314,14 +315,14 @@ function openformatterModal() {
                     ruleData.operator = 'Case Conversion';
                   }
                 });
-                $('.rules-group-container .rule-container').each(function() {
+                $('.rules-group-container .formatter-rule-container').each(function() {
                   if (!$(this).attr('id')) {
                       $(this).remove();
                   }
                 });
                 existingRules.rules.forEach(rule => addRuleRow(rule));
                 $('#ruleTemplate').remove();
-                $('.rules-group-header').siblings('.rule-container').first().attr('id','ruleTemplate');
+                $('.rules-group-header').siblings('.formatter-rule-container').first().attr('id','ruleTemplate');
                 updateDeleteButtonVisibility();
               }
             }
@@ -380,14 +381,14 @@ function openformatterModal() {
                   const selectedSourceFromCellNew = Object.values(JSON.parse(selectedcellData.selectedRuleData).selectedSource);
                   if(selectedcellData?.selectedRuleData && deepEqual(selectedSourceNew, selectedSourceFromCellNew) && JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery){
                     const existingRules = JSON.parse(selectedcellData.selectedRuleData).filterDataBuilderQuery;
-                    $('.rules-group-container .rule-container').each(function() {
+                    $('.rules-group-container .formatter-rule-container').each(function() {
                       if (!$(this).attr('id')) {
                           $(this).remove();
                       }
                     });
                     existingRules.rules.forEach(rule => addRuleRow(rule));
                     $('#ruleTemplate').remove();
-                    $('.rules-group-header').siblings('.rule-container').first().attr('id','ruleTemplate');
+                    $('.rules-group-header').siblings('.formatter-rule-container').first().attr('id','ruleTemplate');
                   }
                 } */
               }
@@ -413,7 +414,7 @@ function openformatterModal() {
 function collectRuleData() {
   const rules = [];
 
-  $('.rule-container').each(function () {
+  $('.formatter-rule-container').each(function () {
       const id = $(this).find('.rule-filter-container select').val();
       const field = $(this).find('.rule-filter-container select option:selected').text();
       const operator = $(this).find('.rule-operator-container select').val();
@@ -481,6 +482,8 @@ function clearListner() {
   $('#ruleTemplate .rule-operator-container select').off('change');
   getQueryRulesData = null;
   selectedWorkspace = [];
+  selectedcellData = '';
+  selectedSource = '';
 }
 
 function formattermodalOpen(cellData) {

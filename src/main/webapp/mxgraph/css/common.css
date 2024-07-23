@@ -1640,11 +1640,22 @@ td.mxPopupMenuIcon {
     border: 1px solid #eee;
     background: rgba(255, 255, 255, .9);
 }
+.formatter-rule-container{
+	position: relative;
+    margin: 4px 0;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #eee;
+    background: rgba(255, 255, 255, .9);
+}
 .btn-danger{
 	float: right;
 	background: #d9534f !important;
 }
 .rule-container .form-control{
+	background: #ffffff !important;
+}
+.formatter-rule-container .form-control{
 	background: #ffffff !important;
 }
 .rule-dropdown-container{

@@ -23,7 +23,9 @@ filterOkBtn.onclick = function () {
       selectedcellData['selectedRuleData']=JSON.stringify({...selectedRuleData});
     }
   }
-
+  if ($('#builder').data('queryBuilder')) {
+    $('#builder').queryBuilder('destroy');
+  }
   filtermodal.style.display = "none";
 }
 
@@ -314,6 +316,9 @@ function closeFilterModal() {
   if ($('#builder').data('queryBuilder')) {
     $('#builder').queryBuilder('destroy');
   }
+  selectedcellData = '';
+  selectedSource = '';
+  selectedWorkspace = [];
 }
 
 
