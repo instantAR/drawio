@@ -13,8 +13,7 @@ RUN cd /app/src/main/webpack && npm run build
 FROM nginx:1.21-alpine
 
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
-COPY --from=build /app/src/main/webpack/dist /usr/share/nginx/html
 RUN chmod +x /docker-entrypoint.sh
-CMD ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 EXPOSE 80
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
