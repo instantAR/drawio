@@ -183,6 +183,7 @@ if [ -f $CATALINA_HOME/.keystore ] && [ -z $VAR ]; then
     conf/server.xml
 fi
 
+
 JSON_STRING='window.configs = { \
   "appBuilder":"'"${appBuilder}"'", \
   "restClientService":"'"${restClientService}"'", \
