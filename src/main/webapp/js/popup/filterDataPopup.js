@@ -6,6 +6,7 @@ var getQueryRulesData = '';
 var span = document.getElementById("close-filterModal");
 var filterOkBtn = document.getElementById("filterOkBtn");
 var validateBtn = document.getElementById("validateBtn");
+var filterCancelBtn = document.getElementById("filterCancelBtn");
 const queryString = window.location.search.substring(1);
 const params = new URLSearchParams(queryString);
 let token = params ? params.get('token') : null;
@@ -57,7 +58,8 @@ validateBtn.onclick = async function () {
             allConnectedCellRules.push(queryData);
           }
         }
-      })
+      });
+      selectedcellData['selectedRuleData'] = null;
     }
 
 
@@ -103,6 +105,10 @@ validateBtn.onclick = async function () {
       console.error('Error while applying workflow rules:', error);
     }
   }
+}
+
+filterCancelBtn.onclick = () => {
+  closeFilterModal();
 }
 
 async function applyWorkflowRules(payload) {

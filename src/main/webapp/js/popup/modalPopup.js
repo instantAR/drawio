@@ -65,6 +65,7 @@ function openModal() {
   modal.style.display = "block";
   $('.btn-group .btn').removeClass("active");
   $('#nextBtn').show();
+  $('#cancelBtn').show();
   $('#btn-wrapper').hide();
   $('#jstree-loader').show();
   $('#jsTree-wrapper').show();
@@ -102,6 +103,7 @@ function openModal() {
               $('.json-data-textarea-wrapper').hide();
               $('.header-data-wrapper').show();
               $('#nextBtn').hide(); 
+              $('#cancelBtn').hide();
               $('#btn-wrapper').show();
               try {
                 columnJsonData = JSON.parse(selectedJsTreeData);
@@ -165,6 +167,7 @@ $(document).ready(function() {
     $('.btn-group .btn').removeClass("active");
     $(buttonClass).addClass('active');
     $('#nextBtn').show();
+    $('#cancelBtn').show();
     $('#btn-wrapper').hide();
     $('.header-data-wrapper, .json-data-textarea-wrapper').hide();
     if (showJsTree) {
@@ -207,6 +210,7 @@ $(document).ready(function() {
   function initializeModal() {
     handleButtonClick('.btn-api', true, false); // Default to API tab
     $('#nextBtn').show();
+    $('#cancelBtn').show();
     $('#btn-wrapper').hide();
     $('.header-data-wrapper').hide();
   }
@@ -231,6 +235,10 @@ $(document).ready(function() {
     handleButtonClick('.btn-csv', false, true);
   });
 
+  $('#cancelBtn').on('click', function () {
+    closeModal();
+  });
+
   $('#nextBtn').on('click', function () {
     var activeButton = $('.btn-group .btn.active');
 
@@ -249,6 +257,7 @@ $(document).ready(function() {
             $('.json-data-textarea-wrapper').hide();
             $('.header-data-wrapper').show();
             $('#nextBtn').hide();
+            $('#cancelBtn').hide();
             $('#btn-wrapper').show();
             columnJsonData = {'From JSON' : data};
            
@@ -284,6 +293,7 @@ $(document).ready(function() {
         $('.json-data-textarea-wrapper').hide();
         $('.header-data-wrapper').show();
         $('#nextBtn').hide(); 
+        $('#cancelBtn').hide();
         $('#btn-wrapper').show();
         try {
           columnJsonData = JSON.parse(window.jsTreeDropdownData);
@@ -326,6 +336,7 @@ $(document).ready(function() {
           $('.json-data-textarea-wrapper').hide();
           $('.header-data-wrapper').show();
           $('#nextBtn').hide();
+          $('#cancelBtn').hide();
           $('#btn-wrapper').show();
           columnJsonData = {};
           csvTextareadata.forEach(function (key) {
@@ -383,12 +394,14 @@ $(document).ready(function() {
       $('.json-data-textarea-wrapper').show();
       $('.header-data-wrapper').hide();
       $('#nextBtn').show();
+      $('#cancelBtn').show();
       $('#btn-wrapper').hide();
     } else if (activeButton.hasClass('btn-api')) {
       $('#jsTree-wrapper').show();
       $('.json-data-textarea-wrapper').hide();
       $('.header-data-wrapper').hide();
-      $('#nextBtn').show(); 
+      $('#nextBtn').show();
+      $('#cancelBtn').show(); 
       $('#btn-wrapper').hide();
 
     } else if (activeButton.hasClass('btn-csv')) {
@@ -396,6 +409,7 @@ $(document).ready(function() {
       $('.json-data-textarea-wrapper').show();
       $('.header-data-wrapper').hide();
       $('#nextBtn').show();
+      $('#cancelBtn').show();
       $('#btn-wrapper').hide();
     }
   });
@@ -477,6 +491,7 @@ function headerTableCreate(data) {
     $('.json-data-textarea-wrapper').hide();
     $('.header-data-wrapper').show();
     $('#nextBtn').hide(); 
+    $('#cancelBtn').hide();
     $('#btn-wrapper').show();
     try {
       columnJsonData = JSON.parse(data);

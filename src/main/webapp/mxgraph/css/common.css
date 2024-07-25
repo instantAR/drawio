@@ -1351,6 +1351,9 @@ td.mxPopupMenuIcon {
 	text-align: right;
 }
 
+.float-left {
+	float: left;
+}
 .btn.okay-btn,
 .btn.next-btn{
 	padding: 4px 20px;

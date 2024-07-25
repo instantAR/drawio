@@ -1,5 +1,6 @@
 var formattermodal = document.getElementById("formatterDataModal");
 var formatValidateBtn = document.getElementById("formatValidateBtn");
+var formatterCancelBtn = document.getElementById("formatterCancelBtn");
 var selectedcellData = '';
 var selectedSource = '';
 var selectedWorkspace = [];
@@ -39,6 +40,10 @@ formatterOkBtn.onclick = function () {
   formattermodal.style.display = "none";
 }
 
+formatterCancelBtn.onclick = () => {
+  closeformatterModal();
+}
+
 formatValidateBtn.onclick = async function () {
     var allFilterCells = allFilterConnectedCells(selectedcellData);
     var allConnectedCellRules = [];
@@ -58,7 +63,8 @@ formatValidateBtn.onclick = async function () {
             allConnectedCellRules.push(queryData);
           }
         }
-      })
+      });
+      selectedcellData['selectedRuleData']= null;
     }
     if (!selectedWorkspace.length) {
       alert("workspace data not found");
@@ -118,6 +124,8 @@ window.onclick = function (event) {
 
 function openformatterModal() {
   formattermodal.style.display = "block";
+  $('#formatter-validateOutput').css('display', 'none');
+  $('.formatter-validate-copy-btn').css('display', 'none');
   if(selectedcellData?.edges?.length) {
     var resultCell = traverseGraph(selectedcellData);
 
@@ -213,6 +221,12 @@ function openformatterModal() {
                 $(this).val(rule.operator);
                 const selectedOperator = rule.operator;
                 const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
+                $(this).closest('.rule-wrapper').find('.rule-value-container input').val('');
+                correspondingDropdown.val('');
+                $(this).closest('.rule-wrapper').find('.rule-value2-container input').val('');
+                value = '';
+                valuePlus = '';
+                value2 = '';
                 populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
                 if(rule.valuePlus){
                   correspondingDropdown.val(rule.valuePlus)
@@ -258,6 +272,13 @@ function openformatterModal() {
                 const selectedOperator = $(this).val();
                 const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
                 populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
+                $(this).closest('.rule-wrapper').find('.rule-value-container input').val('');
+                correspondingDropdown.val('');
+                $(this).closest('.rule-wrapper').find('.rule-value2-container input').val('');
+                
+                value = '';
+                valuePlus = '';
+                value2 = '';
               });
 
               newRule.find('.rule-dropdown-container select').each(function () {
@@ -296,6 +317,13 @@ function openformatterModal() {
             }).on('change', function () {
               const selectedOperator = $(this).val();
               const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
+              $(this).closest('.rule-wrapper').find('.rule-value-container input').val('');
+              correspondingDropdown.val('');
+              $(this).closest('.rule-wrapper').find('.rule-value2-container input').val('');
+              
+              value = '';
+              valuePlus = '';
+              value2 = '';
               populateDropdownBasedOnOperator(correspondingDropdown, selectedOperator);
             });
             updateDeleteButtonVisibility();
@@ -313,6 +341,10 @@ function openformatterModal() {
                   }
                   if (ruleData.operator === "CaseConversion") {
                     ruleData.operator = 'Case Conversion';
+                  }
+                  debugger;
+                  if (ruleData.operator === "Substring") {
+                    ruleData.value2 = ruleData.valuePlus;
                   }
                 });
                 $('.rules-group-container .formatter-rule-container').each(function() {
@@ -411,6 +443,16 @@ function openformatterModal() {
   }
 }
 
+
+function resetValues() {
+  var newRule = $('#ruleTemplate');
+  newRule.find('.rule-value2-container input').val('');
+  newRule.find('.rule-value-container input').val('');
+  newRule.find('.rule-dropdown-container select').val('');
+  newRule.find('.rule-dropdown-container').hide();
+  newRule.find('.rule-value2-container').hide();
+
+}
 function collectRuleData() {
   const rules = [];
 
@@ -484,6 +526,7 @@ function clearListner() {
   selectedWorkspace = [];
   selectedcellData = '';
   selectedSource = '';
+  resetValues();
 }
 
 function formattermodalOpen(cellData) {
