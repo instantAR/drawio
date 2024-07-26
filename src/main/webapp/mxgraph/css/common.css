@@ -1363,6 +1363,7 @@ td.mxPopupMenuIcon {
 	cursor: pointer;
 }
 .btn.back-btn,
+.btn.cancel-btn,
 .btn.validate-btn{
 	padding: 4px 20px;
 	background-color: #eee !important;

@@ -144,7 +144,8 @@ function openformatterModal() {
           $(document).ready(function () {
             function addFilterOptions(selectElement) {
               filters.forEach(filter => {
-                const filterElement = $('<option></option>').text(filter.id).val(filter.label);
+                const value = filter.id.split('.');
+                const filterElement = $('<option></option>').text(filter.label).val(value[value.length - 1]);
                 selectElement.append(filterElement);
               });
             }
@@ -169,7 +170,8 @@ function openformatterModal() {
                   dropdown.parent().siblings('.rule-value-container').hide();
                 }
                 else if(operator == 'Mask'){
-                  // dropdown.parent().siblings('.rule-value2-container').show();
+                  dropdown.parent().siblings('.rule-value-container').show();
+                  dropdown.parent().siblings('.rule-value2-container').hide();
                 }
                 else{
                   dropdown.parent().siblings('.rule-value-container').show();
@@ -178,6 +180,16 @@ function openformatterModal() {
                 dropdown.parent().siblings('.rule-value2-container').hide();
                 dropdown.parent().siblings('.rule-value-container').show();
                 dropdown.closest('.rule-dropdown-container').hide();
+              } else if(operator == 'Round off'){
+                dropdown.parent().siblings('.rule-value2-container').hide();
+                dropdown.parent().siblings('.rule-value2-container input').val();
+                dropdown.closest('.rule-dropdown-container').hide();
+                dropdown.parent().siblings('.rule-value-container').show();
+              } else if(operator == 'Length'){
+                dropdown.parent().siblings('.rule-value2-container').hide();
+                dropdown.parent().siblings('.rule-value2-container input').val();
+                dropdown.closest('.rule-dropdown-container').hide();
+                dropdown.parent().siblings('.rule-value-container').show();
               } else if(operator == 'Substring'){
                 dropdown.parent().siblings('.rule-value2-container').show();
                 dropdown.parent().siblings('.rule-value-container').show();
@@ -244,6 +256,13 @@ function openformatterModal() {
                 if(selectedDrpdown === "All" && correspondingDropdown) {
                     correspondingDropdown.hide();
                     value2Dropdown.hide();
+                } else if(selectedDrpdown === "First") {
+                  correspondingDropdown.show();
+                  value2Dropdown.hide();
+                }
+                else if(selectedDrpdown === "Last") {
+                  correspondingDropdown.show();
+                  value2Dropdown.hide();
                 }
               });
 
@@ -289,16 +308,19 @@ function openformatterModal() {
                 if(selectedDrpdown === "All" && correspondingDropdown) {
                     correspondingDropdown.hide();
                     value2Dropdown.hide();
+                } else if(selectedDrpdown === "First") {
+                  correspondingDropdown.show();
+                  value2Dropdown.hide();
                 }
-                else {
-                    correspondingDropdown.show();
-                    value2Dropdown.show();
+                else if(selectedDrpdown === "Last") {
+                  correspondingDropdown.show();
+                  value2Dropdown.hide();
                 }
-              
               });
 
               newRule.find('.rule-dropdown-container').hide();
               newRule.find('.rule-value2-container').hide();
+              newRule.find('.rule-value-container').show();
               updateDeleteButtonVisibility();
             });
 
@@ -314,6 +336,14 @@ function openformatterModal() {
             $('#ruleTemplate .rule-operator-container select').each(function () {
               $(this).empty();
               addOperatorOptions($(this));
+              const selectedOperator = $(this).val();
+              if(selectedOperator === 'Round off') {
+                const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
+                correspondingDropdown.parent().siblings('.rule-value2-container').hide();
+                correspondingDropdown.parent().siblings('.rule-value2-container input').val();
+                correspondingDropdown.closest('.rule-dropdown-container').hide();
+                correspondingDropdown.parent().siblings('.rule-value-container').show();
+              }
             }).on('change', function () {
               const selectedOperator = $(this).val();
               const correspondingDropdown = $(this).closest('.rule-wrapper').find('.rule-dropdown-container select');
@@ -451,6 +481,9 @@ function resetValues() {
   newRule.find('.rule-dropdown-container select').val('');
   newRule.find('.rule-dropdown-container').hide();
   newRule.find('.rule-value2-container').hide();
+  $('.formatter-rule-container').slice(1).each(function () {
+    $(this).remove();    
+});
 
 }
 function collectRuleData() {
@@ -466,7 +499,7 @@ function collectRuleData() {
       let value2 = $(this).find('.rule-value2-container input').val();
       const rule = {
           id: id,
-          field: field,
+          field: id,
           type: 'string',
           input: 'text',
           operator: operator,
@@ -481,7 +514,8 @@ function collectRuleData() {
       }
       if(operator === "Case Conversion") {
         value = valuePlus;
-        // valuePlus = "";
+        rule.value = value;
+        valuePlus = "";
         value2 = "";
         rule.operator = "CaseConversion";
       }
