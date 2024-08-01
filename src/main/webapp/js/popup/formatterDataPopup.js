@@ -372,7 +372,6 @@ function openformatterModal() {
                   if (ruleData.operator === "CaseConversion") {
                     ruleData.operator = 'Case Conversion';
                   }
-                  debugger;
                   if (ruleData.operator === "Substring") {
                     ruleData.value2 = ruleData.valuePlus;
                   }

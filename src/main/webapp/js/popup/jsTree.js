@@ -281,7 +281,7 @@ async function switchToAjaxLoading(selectedNode = null) {
         };
 
         if (apiRequest.type === 'GET') {
-          const proxyResponse = await fetch(`${window.enviroment.restBackendService}proxy`, {
+          const proxyResponse = await fetch(`${window.enviroment.restClientService}proxy`, {
             method: 'POST',
             headers: reqHeaders
           });

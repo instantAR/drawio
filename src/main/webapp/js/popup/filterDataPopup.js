@@ -35,6 +35,13 @@ validateBtn.onclick = async function () {
 
     var result = $('#builder').queryBuilder('getRules');
     if (!$.isEmptyObject(result)) {
+      result.rules = result?.rules?.map((rule) => {
+        if ((rule.operator === "between" || rule.operator === "not_between") && Array.isArray(rule.value)) {
+          rule.valuePlus = String(rule.value[1]);
+          rule.value = String(rule.value[0]);
+        }
+        return rule;
+      });
       var visibleCheckbox = $('.flex-shrink-0:visible');
       var isIgnoreCaseChecked = visibleCheckbox.is(':checked');
       let selectedRuleData = {
