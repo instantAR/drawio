@@ -6,6 +6,8 @@ var jsonTextArea = document.getElementById("json-text-area");
 var csvTextArea = document.getElementById("csv-text-area");
 var okBtn = document.getElementById("okBtn");
 var CurrentlyActivebtn = '';
+var selectedSourceDataName = '';
+let selectedSourceDataNames = [];
 
 function setCellAttributeData(updatedData) {
   var graph = window.editorUiObj.editor.graph;
@@ -70,7 +72,10 @@ function openModal() {
   $('#jstree-loader').show();
   $('#jsTree-wrapper').show();
   $('.header-data-wrapper, .json-data-textarea-wrapper').hide();
-  $('#from-api-path').hide()
+  $('#from-api-path').hide();
+  $('#edit-api-path').hide();
+  $('#edit-btn').hide();
+  $('#save-btn').hide();
   localStorage.removeItem('jstree');
   callJsTreeAPI();
   if(selectedcellData?.selectedSourceData){
@@ -90,7 +95,43 @@ function openModal() {
         if(JSON.parse(selectedcellData.selectedSourceData).parentNode){
           let parentNodes = JSON.parse(selectedcellData.selectedSourceData).parentNode;
           parentNodes = parentNodes.filter(n => n);
-          $('#from-api-path').text(parentNodes.join(' > '));
+          const spanElement = document.getElementById('from-api-path');
+          const inputElement = document.getElementById('edit-api-path');
+          const editButton = document.getElementById('edit-btn');
+          const saveButton = document.getElementById('save-btn');
+      
+          editButton.addEventListener('click', function () {
+              spanElement.style.display = 'none';
+              inputElement.style.display = 'inline';
+              saveButton.style.display = 'inline';
+              inputElement.value = spanElement.textContent;
+              editButton.style.display = 'none';
+          });
+      
+          saveButton.addEventListener('click', function () {
+           /*  let inputValue = inputElement.value;
+            let baseValue = inputValue;
+            let suffix = 1;
+        
+            while (selectedSourceDataNames.includes(inputValue)) {
+                // If it exists, append -1, -2, etc. until a unique name is found
+                inputValue = `${baseValue}-${suffix}`;
+                suffix++;
+            } */
+              spanElement.textContent = inputElement.value;
+              spanElement.style.display = 'inline';
+              inputElement.style.display = 'none';
+              saveButton.style.display = 'none';
+              editButton.style.display = 'inline';
+              selectedSourceDataName = inputElement.value;
+          });
+          editButton.style.display = 'inline';
+          if(selectedcellData?.selectedSourceDataName) {
+            $('#from-api-path').text(selectedcellData.selectedSourceDataName);
+          }
+          else {
+            $('#from-api-path').text(parentNodes.join('.'));
+          }
           $('#from-api-path').show();
           var activeButton = $('.btn-group .btn.active');
           if (activeButton.hasClass('btn-api')) {
@@ -135,12 +176,28 @@ function openModal() {
   else {
     $('.btn-api').addClass('active');
   }
+/*   selectedSourceDataNames = [];
+  var currentGraphXml = mxUtils.getXml(window.editorUiObj.editor.getGraphXml());
+
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(currentGraphXml, "text/xml");
+  const mxCells = xmlDoc.getElementsByTagName('mxCell');
+  
+  for (let i = 0; i < mxCells.length; i++) {
+    const selectedSourceDataName = mxCells[i].getAttribute('selectedSourceDataName');
+    if (selectedSourceDataName) {
+      selectedSourceDataNames.push(selectedSourceDataName);
+    }
+  }
+  console.log("==========selectedSourceDataNames",selectedSourceDataNames);
+   */
 }
 
 function closeModal() {
   jsonTextArea.value = '';
   csvTextArea.value = '';
   modal.style.display = "none";
+  selectedSourceDataName = '';
 }
 
 
@@ -384,6 +441,7 @@ $(document).ready(function() {
     setCellAttributeData(updatedData);
 
     selectedcellData['selectedJsTreeData']= window.jsTreeDropdownData;
+    selectedcellData['selectedSourceDataName']= selectedSourceDataName;
     window.jsTreeDropdownData = null;
   });
 
