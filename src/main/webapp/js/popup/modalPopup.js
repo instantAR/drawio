@@ -109,21 +109,20 @@ function openModal() {
           });
       
           saveButton.addEventListener('click', function () {
-           /*  let inputValue = inputElement.value;
+            let inputValue = inputElement.value;
             let baseValue = inputValue;
             let suffix = 1;
         
             while (selectedSourceDataNames.includes(inputValue)) {
-                // If it exists, append -1, -2, etc. until a unique name is found
                 inputValue = `${baseValue}-${suffix}`;
                 suffix++;
-            } */
-              spanElement.textContent = inputElement.value;
+            }
+              spanElement.textContent = inputValue;
               spanElement.style.display = 'inline';
               inputElement.style.display = 'none';
               saveButton.style.display = 'none';
               editButton.style.display = 'inline';
-              selectedSourceDataName = inputElement.value;
+              selectedSourceDataName = inputValue;
           });
           editButton.style.display = 'inline';
           if(selectedcellData?.selectedSourceDataName) {
@@ -176,7 +175,7 @@ function openModal() {
   else {
     $('.btn-api').addClass('active');
   }
-/*   selectedSourceDataNames = [];
+  selectedSourceDataNames = [];
   var currentGraphXml = mxUtils.getXml(window.editorUiObj.editor.getGraphXml());
 
   const parser = new DOMParser();
@@ -185,12 +184,10 @@ function openModal() {
   
   for (let i = 0; i < mxCells.length; i++) {
     const selectedSourceDataName = mxCells[i].getAttribute('selectedSourceDataName');
-    if (selectedSourceDataName) {
+    if (selectedSourceDataName && !selectedSourceDataNames.includes(selectedSourceDataName)) {
       selectedSourceDataNames.push(selectedSourceDataName);
     }
   }
-  console.log("==========selectedSourceDataNames",selectedSourceDataNames);
-   */
 }
 
 function closeModal() {
@@ -198,6 +195,7 @@ function closeModal() {
   csvTextArea.value = '';
   modal.style.display = "none";
   selectedSourceDataName = '';
+  inputValue = '';
 }
 
 
@@ -443,6 +441,8 @@ $(document).ready(function() {
     selectedcellData['selectedJsTreeData']= window.jsTreeDropdownData;
     selectedcellData['selectedSourceDataName']= selectedSourceDataName;
     window.jsTreeDropdownData = null;
+    document.getElementById('edit-api-path').value = '';
+    selectedSourceDataName = '';
   });
 
   $('#backBtn').on('click', function () { 
