@@ -950,7 +950,6 @@ BaseFormatPanel.prototype.createColorOption = function(label, getColorFn, setCol
 	div.style.whiteSpace = 'nowrap';
 	div.style.overflow = 'hidden';
 	div.style.width = '200px';
-	div.style.height = '18px';
 	
 	var cb = document.createElement('input');
 	cb.setAttribute('type', 'checkbox');
