@@ -3985,7 +3985,9 @@ Sidebar.prototype.addPalette = function(id, title, expanded, onInit)
 	
 	var div = document.createElement('div');
 	div.className = 'geSidebar';
-	
+	if(id === "data_transform") {
+		div.classList.add('data_transform_sidebar');
+	}
 	// Disables built-in pan and zoom on touch devices
 	if (mxClient.IS_POINTER)
 	{

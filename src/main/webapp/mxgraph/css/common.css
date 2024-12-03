@@ -1680,3 +1680,42 @@ padding: 8px 0;
 .ignore-case input[type=checkbox]{
 	margin: 0 !important;
 }
+
+.data_transform_sidebar .geItem {
+	display: block !important;
+    width: 80% !important;
+    height: 38px !important;
+    margin: 10px auto !important;
+    text-align: center !important;
+    background-color: #1ba1e2;
+    border: 1px solid #000;
+    border-radius: 50px;
+}
+
+.data_transform_sidebar .geItem:hover {
+	background-color: #1ba1e2;
+}
+
+.data_transform_sidebar .geItem svg {
+    width: 100% !important;
+}
+
+.data_transform_sidebar .geItem svg g rect {
+    width: 90% !important;
+    height: max-content !important; 
+}
+
+.data_transform_sidebar .geItem g foreignObject div[data-drawio-colors] > div {
+    font-size: 70px !important;
+    color: white !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 16px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    position: fixed !important;
+    margin-top: -40px;
+    width: 80%; 
+}
