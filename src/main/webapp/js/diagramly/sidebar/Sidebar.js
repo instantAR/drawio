@@ -180,7 +180,11 @@
 	 */
 	Sidebar.prototype.showPalette = function(id, visible)
 	{
-		var elts = this.palettes[id];
+		console.log("showPalette id :",id);
+		var elts = this.palettes?.[id] || [];
+		if (elts.length === 0) {
+			return null;
+		}
 		
 		if (elts != null)
 		{
@@ -246,8 +250,10 @@
 			if (config != null)
 			{
 				var id = (config.libs != null) ? ((config.prefix || '') + config.libs[0]) : key;
-				var elts = this.palettes[id];
-
+				var elts = this.palettes?.[id] || [];
+				if (elts.length === 0) {
+					return null;
+				}
 				if (elts != null)
 				{
 					return elts[0].style.display != 'none';
