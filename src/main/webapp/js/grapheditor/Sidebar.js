@@ -1530,9 +1530,9 @@ Sidebar.prototype.addDataTransformPalette = function(expand)
 		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;source_data;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Source Data', 'Source Data', null, null, 'source data tag'),
 		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_filter;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Filter', 'Data Filter', null, null, 'data filter tag'),
 		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_rules;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Rules', 'Data Rules', null, null, 'data rules tag'),
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_splitter;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Splitter', 'Data Splitter', null, null, 'data splitter tag'),
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_meger;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Meger', 'Data Meger', null, null, 'data meger tag'),
-		this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_formatter;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Formatter', 'Data Formatter', null, null, 'data formatter tag'),
+		// this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_splitter;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Splitter', 'Data Splitter', null, null, 'data splitter tag'),
+		// this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_meger;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Meger', 'Data Meger', null, null, 'data meger tag'),
+		// this.createVertexTemplateEntry('rounded=1;whiteSpace=wrap;html=1;strokeColor=black;fontColor=white;arcSize=50;data_formatter;', 150, 38, '<i class="fa fa-filter" style="margin-right: 4px;"></i> Data Formatter', 'Data Formatter', null, null, 'data formatter tag'),
 	];
 	
 	this.addPaletteFunctions('data_transform', 'Data Transform', (expand != null) ? expand : true, fns);

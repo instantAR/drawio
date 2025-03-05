@@ -154,9 +154,10 @@ function openModal() {
                 var tr = $('<tr class="border border-bottom"></tr>');
                 var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control" value="' + key + '"></div></td>');
                 var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+                var tdDataType = createDataTypeDropdown(key, columnJsonData);
                 var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
-            
-                tr.append(tdName, tdIsVisible, tdRename);
+
+                tr.append(tdName, tdIsVisible, tdDataType, tdRename);
             
                 tbody.append(tr);
               });
@@ -209,10 +210,10 @@ function addNewRow() {
   var tr = $('<tr class="border border-bottom"></tr>');
   var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control"></div></td>');
   var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+  var tdDataType = createDataTypeDropdown('', {});
   var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
 
-  tr.append(tdName, tdIsVisible, tdRename);
-
+  tr.append(tdName, tdIsVisible, tdDataType, tdRename);
   tbody.append(tr);
 }
 
@@ -296,7 +297,6 @@ $(document).ready(function() {
 
   $('#nextBtn').on('click', function () {
     var activeButton = $('.btn-group .btn.active');
-
     // Perform actions based on the active button
     if (activeButton.hasClass('btn-json')) {
       // Actions for JSON
@@ -320,9 +320,10 @@ $(document).ready(function() {
               var tr = $('<tr class="border border-bottom"></tr>');
               var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control" value="' + key + '"></div></td>');
               var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+              var tdDataType = createDataTypeDropdown(key, columnJsonData);
               var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
 
-              tr.append(tdName, tdIsVisible, tdRename);
+              tr.append(tdName, tdIsVisible, tdDataType, tdRename);
 
               tbody.append(tr);
             });
@@ -360,9 +361,10 @@ $(document).ready(function() {
           var tr = $('<tr class="border border-bottom"></tr>');
           var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control" value="' + key + '"></div></td>');
           var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+          var tdDataType = createDataTypeDropdown(key, columnJsonData); 
           var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
       
-          tr.append(tdName, tdIsVisible, tdRename);
+          tr.append(tdName, tdIsVisible, tdDataType, tdRename);
       
           tbody.append(tr);
         });
@@ -403,9 +405,10 @@ $(document).ready(function() {
             var tr = $('<tr class="border border-bottom"></tr>');
             var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control" value="' + key + '"></div></td>');
             var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+            var tdDataType = createDataTypeDropdown(key, columnJsonData);
             var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
 
-            tr.append(tdName, tdIsVisible, tdRename);
+            tr.append(tdName, tdIsVisible, tdDataType, tdRename);
 
             tbody.append(tr);
           });
@@ -561,9 +564,10 @@ function headerTableCreate(data) {
       var tr = $('<tr class="border border-bottom"></tr>');
       var tdName = $('<td><div class="column-name"><input type="text" name="cname" id="cname" class="form-control" value="' + key + '"></div></td>');
       var tdIsVisible = $('<td><input type="checkbox" name="columnCheck" class="form-check-input" checked></td>');
+      var tdDataType = createDataTypeDropdown(key, columnJsonData);
       var tdRename = $('<td><div class="column-name"><input type="text" name="rename" class="form-control"></div></td>');
   
-      tr.append(tdName, tdIsVisible, tdRename);
+      tr.append(tdName, tdIsVisible, tdDataType, tdRename);
   
       tbody.append(tr);
     });
@@ -579,4 +583,39 @@ function headerTableCreate(data) {
   else {
     alert("no data selected")
   }
+}
+
+function createDataTypeDropdown(key, columnJsonData) {
+  const dataTypes = [
+    "String", "Image", "Number", "Date", "URL", "Boolean",
+    "BooleanImage", "Time", "Currency", "Table", "List"
+  ];
+
+  var tdDataType = $('<td></td>');
+  var selectDataType = $('<select class="form-control dataType-select"></select>');
+
+  dataTypes.forEach(type => {
+    selectDataType.append(`<option value="${type.toLowerCase()}">${type}</option>`);
+  });
+
+  let currentValue = "String";
+
+  if (columnJsonData && Object.keys(columnJsonData).length > 0) {
+    const firstObject = Object.values(columnJsonData)[0];
+    currentValue = firstObject[key] || "string";
+  }
+  else {
+    currentValue = "string";
+  }
+
+  selectDataType.val(currentValue);
+
+  selectDataType.on("change", function () {
+    if (columnJsonData && Object.keys(columnJsonData).length > 0) {
+      Object.values(columnJsonData)[0][key] = $(this).val();
+    }
+  });
+
+  tdDataType.append(selectDataType);
+  return tdDataType;
 }

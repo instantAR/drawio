@@ -1719,3 +1719,7 @@ padding: 8px 0;
     margin-top: -40px;
     width: 80%; 
 }
+
+.dataType-select {
+	background: white !important;
+}
