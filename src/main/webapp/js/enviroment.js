@@ -1,6 +1,6 @@
 var enviroment = {
-    'restClientService': window?.configs?.['restClientService'] || 'https://connect.instantar.io/restapi/',
-    'restBackendService': window?.configs?.['restBackendService'] || 'https://connect.instantar.io/restapi/',
+    'restClientService': window?.configs?.['restClientService'] || 'https://emachine.instantar.io/restclient',
+    'restBackendService': window?.configs?.['restBackendService'] || 'https://emachine.instantar.io/restbackend',
     'appBuilder': window?.configs?.['appBuilder'] || 'https://dev.emachine.ai/api/api/v2.0/'
 }
 
