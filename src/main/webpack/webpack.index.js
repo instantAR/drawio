@@ -536,7 +536,7 @@ export class GraphEditor {
             setTimeout(() => {
                 // console.log("entries", editorUi.sidebar.entries, editorUi.sidebar.palettes)
                 activateSiderBarAfterLoad.forEach((id, index) => {
-                    var config = editorUi.sidebar.palettes[id]; // comment me
+                    var config = editorUi.sidebar?.palettes[id]; // comment me
                     // var isChecked = config && config[0] && config[0].style.display != "none"; // comment me
                     // console.log("entry status", id, isChecked, config, config[1].children[0]); // comment me
                     config && config[0] && config[0].style.display == "none" && (config[0].style.display = "block");

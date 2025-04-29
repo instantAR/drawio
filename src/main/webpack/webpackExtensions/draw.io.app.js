@@ -5555,7 +5555,7 @@
                  (mxUtils.bind(this, function(id, index)
                  {
                      if (id != null && id.length > 0 && this.pendingLibraries[id] == null &&
-                         this.sidebar.palettes[id] == null)
+                         this.sidebar?.palettes[id] == null)
                      {
                          // Waits for all libraries to load
                          waiting++;

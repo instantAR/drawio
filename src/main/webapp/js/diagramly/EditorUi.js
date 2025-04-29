@@ -3354,7 +3354,7 @@
 	 */
 	EditorUi.prototype.removeLibrarySidebar = function(id)
 	{
-		var elts = this.sidebar.palettes[id];
+		var elts = this.sidebar?.palettes[id];
 		
 		if (elts != null)
 		{
@@ -3376,7 +3376,7 @@
 	    
 	    if (nextChild == null)
 	    {
-	    	var elts = this.sidebar.palettes['L.scratchpad'];
+	    	var elts = this.sidebar?.palettes['L.scratchpad'];
 	    	
 	    	if (elts == null)
 	    	{
@@ -3496,7 +3496,7 @@
 			this.scratchpad = file;
 		}
 		
-		var elts = this.sidebar.palettes[file.getHash()];
+		var elts = this.sidebar?.palettes[file.getHash()];
 		var nextSibling = (elts != null) ? elts[elts.length - 1].nextSibling : null;
 	
 		// Removes existing sidebar entry for this library
