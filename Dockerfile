@@ -7,7 +7,7 @@ RUN npm install -g tsc \
     && npm install -g concurrently \
     && npm install -g typescript --force
 COPY ./ /app
-RUN cd /app/src/main/webpack && npm run build
+RUN cd /app/src/main/webpack && npm run build:prod
 
 
 FROM nginx:1.21-alpine
