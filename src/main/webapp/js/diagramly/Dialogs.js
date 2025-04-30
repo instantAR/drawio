@@ -2172,6 +2172,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 					try {
 						importedCells.forEach(cell => {
 							if (graph.getModel().isVertex(cell)) {
+								graph.setCellStyles(mxConstants.STYLE_SHADOW, '1', [cell]);
 								const style = graph.getCellStyle(cell);
 								const shape = style.shape;
 								const isRounded = style.rounded == 1;
@@ -2190,6 +2191,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 								}
 
 								if (shape === 'mxgraph.flowchart.decision') {
+									graph.setCellStyles(mxConstants.STYLE_PERIMETER, 'rhombusPerimeter', [cell]);
 									graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, scheme[2].fill, [cell]);
 									graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, scheme[2].stroke, [cell]);
 									graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, scheme[2].font, [cell]);

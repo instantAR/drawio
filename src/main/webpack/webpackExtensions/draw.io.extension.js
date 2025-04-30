@@ -197,7 +197,6 @@ DrawIOOverridUpdateBody = function (editorUi, config) {
 DrawIOMakeMermaid = function (editorUi, config, mermaidString) {
 	return new Promise((resolve, reject) => {
 	const dialog = new ParseDialog(editorUi, 'abc', 'mermaid');
-	setTimeout(() => {
 		// DrawIOOverridExport(config, editorUi);
 		try {
 			const result = dialog.parseFunc(mermaidString, 'mermaid2drawio');
@@ -205,7 +204,6 @@ DrawIOMakeMermaid = function (editorUi, config, mermaidString) {
 		} catch (error) {
 			reject(error); // Reject with the error if it fails
 		}
-	}, 2000);
 });
 }
 
