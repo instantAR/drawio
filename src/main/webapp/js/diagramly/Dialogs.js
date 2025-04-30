@@ -2156,11 +2156,56 @@ var ParseDialog = function(editorUi, title, defaultType)
 						return;
 					}
 					editorUi.spinner.stop();
-					graph.setSelectionCells(editorUi.importXml(modelXml,
+					const importedCells = editorUi.importXml(
+						modelXml,
 						Math.max(insertPoint.x, 20),
 						Math.max(insertPoint.y, 20),
-						true, null, null, true));
+						true, null, null, true);
+				
+					graph.setSelectionCells(importedCells);
 					graph.scrollCellToVisible(graph.getSelectionCell());
+				
+					const colorSchemes = StyleFormatPanel.prototype.defaultColorSchemes;
+					const schemeIndex = 2;
+					const scheme = colorSchemes[schemeIndex];
+					graph.getModel().beginUpdate();
+					try {
+						importedCells.forEach(cell => {
+							if (graph.getModel().isVertex(cell)) {
+								const style = graph.getCellStyle(cell);
+								const shape = style.shape;
+								const isRounded = style.rounded == 1;
+
+								if (shape === 'rectangle') {
+									if (isRounded) {
+										graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, scheme[1].fill, [cell]);
+										graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, scheme[1].stroke, [cell]);
+										graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, scheme[1].font, [cell]);
+									}
+									else {
+										graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, scheme[7].fill, [cell]);
+										graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, scheme[7].stroke, [cell]);
+										graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, scheme[7].font, [cell]);
+									}
+								}
+
+								if (shape === 'mxgraph.flowchart.decision') {
+									graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, scheme[2].fill, [cell]);
+									graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, scheme[2].stroke, [cell]);
+									graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, scheme[2].font, [cell]);
+								}
+							} else if (graph.getModel().isEdge(cell)) {
+								graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, '#666666', [cell]);
+
+								graph.setCellStyles(mxConstants.STYLE_CURVED, '1', [cell]);
+
+								graph.setCellStyles(mxConstants.STYLE_STROKEWIDTH, '2', [cell]);
+								graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, '#000000', [cell]);
+							}
+						});
+					} finally {
+						graph.getModel().endUpdate();
+					}
 					resolve('mermiad successfully created');
 					window.parent.postMessage('Mermiad successfully created', "*");
 				});
