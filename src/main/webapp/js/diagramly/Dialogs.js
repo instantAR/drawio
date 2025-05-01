@@ -2171,11 +2171,47 @@ var ParseDialog = function(editorUi, title, defaultType)
 					graph.getModel().beginUpdate();
 					try {
 						importedCells.forEach(cell => {
-							if (graph.getModel().isVertex(cell)) {
 								graph.setCellStyles(mxConstants.STYLE_SHADOW, '1', [cell]);
 								const style = graph.getCellStyle(cell);
 								const shape = style.shape;
 								const isRounded = style.rounded == 1;
+
+								if (cell.children && cell.children.length > 0) {
+									graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, '#eeeeee', [cell]);
+									graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, '#36393d', [cell]);
+									graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, '#000000', [cell]);
+
+									cell.children.forEach(function (child) {
+										if (graph.getModel().isVertex(child)) {
+											const childStyle = graph.getCellStyle(child);
+											const childShape = childStyle.shape;
+											const childRounded = childStyle.rounded == 1;
+
+											if (childShape === 'rectangle') {
+												const s = childRounded ? scheme[1] : scheme[7];
+												graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, s.fill, [child]);
+												graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, s.stroke, [child]);
+												graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, s.font, [child]);
+											}
+
+											if (childShape === 'mxgraph.flowchart.decision') {
+												graph.setCellStyles(mxConstants.STYLE_PERIMETER, 'rhombusPerimeter', [child]);
+												graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, scheme[2].fill, [child]);
+												graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, scheme[2].stroke, [child]);
+												graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, scheme[2].font, [child]);
+											}
+
+											graph.setCellStyles(mxConstants.STYLE_SHADOW, '1', [child]);
+										} else if (graph.getModel().isEdge(child)) {
+											graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, '#666666', [child]);
+											graph.setCellStyles(mxConstants.STYLE_CURVED, '1', [child]);
+											graph.setCellStyles(mxConstants.STYLE_STROKEWIDTH, '2', [child]);
+											graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, '#000000', [child]);
+										}
+									});
+									return;
+								}
+								if (graph.getModel().isVertex(cell)) {
 
 								if (shape === 'rectangle') {
 									if (isRounded) {
