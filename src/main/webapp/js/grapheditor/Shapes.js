@@ -1412,6 +1412,37 @@
 
 	mxCellRenderer.registerShape('parallelogram', ParallelogramShape);
 
+	function CustomArrowShape() {
+		mxActor.call(this);
+	}
+	mxUtils.extend(CustomArrowShape, mxActor);
+
+	CustomArrowShape.prototype.dx = 20;
+	CustomArrowShape.prototype.dy = 10;
+	CustomArrowShape.prototype.notch = 20;
+
+	CustomArrowShape.prototype.isRoundable = function () {
+		return false;
+	};
+
+	CustomArrowShape.prototype.redrawPath = function (c, x, y, w, h) {
+		const dx = mxUtils.getNumber(this.style, 'dx', this.dx);
+		const dy = mxUtils.getNumber(this.style, 'dy', this.dy);
+		const notch = mxUtils.getNumber(this.style, 'notch', this.notch);
+
+		this.addPoints(c, [
+			new mxPoint(0, 0),
+			new mxPoint(w - dx, 0),
+			new mxPoint(w, h / 2),
+			new mxPoint(w - dx, h),
+			new mxPoint(0, h),
+			new mxPoint(notch, h / 2)
+		], false, null, true);
+		c.end();
+	};
+
+	mxCellRenderer.registerShape('mxgraph.arrows2.arrow', CustomArrowShape);
+
 	// Trapezoid shape
 	function TrapezoidShape()
 	{
