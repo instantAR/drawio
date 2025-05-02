@@ -2196,10 +2196,8 @@ var ParseDialog = function(editorUi, title, defaultType)
 							  graph.setCellStyles(mxConstants.STYLE_ASPECT, 'fixed', [cell]);
 							  graph.setCellStyles(mxConstants.STYLE_OVERFLOW, 'hidden', [cell]);
 						  
-							  const s = colorSchemes[5][1];
-							  graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, s.fill, [cell]);
-							  graph.setCellStyles(mxConstants.STYLE_STROKECOLOR, s.stroke, [cell]);
-							  graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, s.font, [cell]);
+							//   const s = colorSchemes[5][1];
+							  applyShapeStyle(graph, cell, scheme[7]);
 							  return;
 							}
 						  
@@ -2226,10 +2224,10 @@ var ParseDialog = function(editorUi, title, defaultType)
 								  } else if (childShape === 'parallelogram') {
 									applyShapeStyle(graph, child, scheme[3]);
 								  }
-						  
 								  graph.setCellStyles(mxConstants.STYLE_SHADOW, '1', [child]);
 								} else if (graph.getModel().isEdge(child)) {
 								  applyEdgeStyle(graph, child);
+								  graph.setCellStyles(mxConstants.STYLE_SHADOW, '0', [child]);
 								}
 							  });
 							  return;
@@ -2252,6 +2250,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 							  }
 							} else if (graph.getModel().isEdge(cell)) {
 							  applyEdgeStyle(graph, cell);
+							  graph.setCellStyles(mxConstants.STYLE_SHADOW, '0', [cell]);
 							}
 						  });
 						  
