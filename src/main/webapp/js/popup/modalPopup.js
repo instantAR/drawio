@@ -397,7 +397,10 @@ $(document).ready(function() {
           $('#btn-wrapper').show();
           columnJsonData = {};
           csvTextareadata.forEach(function (key) {
-            columnJsonData[key] = 'string';
+            const trimmedKey = key?.trim();
+            if(trimmedKey) {
+              columnJsonData[trimmedKey] = 'string';
+            }
           });
           columnJsonData = {'From Comma Separated' : columnJsonData};
 
