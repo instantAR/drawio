@@ -89,8 +89,10 @@ function openModal() {
         jsonTextArea.value = JSON.stringify(fromJsonData, null, 2);
       } else if (buttonData === '.btn-csv') {
         const fromCsvData = JSON.parse(tabData)['From Comma Separated'];
-        const updatedData = Object.keys(fromCsvData).join(',');
-        csvTextArea.value = updatedData;
+        if(Array.isArray(fromCsvData)) {
+          const updatedData = fromCsvData.map(x => x.id).join(',');
+          csvTextArea.value = updatedData;
+        }
       } else{
         if(JSON.parse(selectedcellData.selectedSourceData).parentNode){
           let parentNodes = JSON.parse(selectedcellData.selectedSourceData).parentNode;
@@ -434,6 +436,7 @@ $(document).ready(function() {
   $('#okBtn').on('click', async function () {
     var updatedData = getUpdatedJsonData();
     const collectionId = selectedcellData['collectionId'];
+    if(collectionId) {
       const response = await fetch(`${window.enviroment.restBackendService}api/get_api_by_id/${collectionId}`);
       const workspace = await response.json();
   
@@ -441,6 +444,7 @@ $(document).ready(function() {
         const workspaceData = workspace.api;
         window.selectedworkSpaceData = workspaceData;
       }
+    }
 
     setCellAttributeData(updatedData);
 
