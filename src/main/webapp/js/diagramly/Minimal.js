@@ -257,8 +257,21 @@ EditorUi.initMinimalTheme = function()
 	 */
 	Editor.styleElt = document.createElement('style')
 	Editor.styleElt.type = 'text/css';
-	Editor.styleElt.innerHTML = Editor.createMinimalCss();
-	document.getElementsByTagName('head')[0].appendChild(Editor.styleElt);
+	applyMinimalCssRetry();
+
+
+
+	function applyMinimalCssRetry(retries = 5) {
+		if (typeof Editor.createMinimalCss === 'function') {
+			Editor.styleElt.innerHTML = Editor.createMinimalCss();
+			document.getElementsByTagName('head')[0].appendChild(Editor.styleElt);
+		} else if (retries > 0) {
+			console.warn('Editor.createMinimalCss not ready. Retrying in 100ms...');
+			setTimeout(() => applyMinimalCssRetry(retries - 1), 100);
+		} else {
+			console.error('Editor.createMinimalCss is not available after retries. Skipping CSS injection.');
+		}
+	}
 
 	/**
      * Sets the XML node for the current diagram.
