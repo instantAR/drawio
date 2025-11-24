@@ -77,7 +77,7 @@ jobs:
     #       # Required mail subject:
     #       subject: Github Actions job result
     #       # Required recipients' addresses:
-    #       to: laxsharma79@gmail.com,jitenderh@gmail.com,subham.bubai92@gmail.com
+    #       to: jitenderh@gmail.com,subham.bubai92@gmail.com
     #       # Required sender full name (address can be skipped):
     #       from: Github # <user@example.com>
     #       # Optional whether this connection use TLS (default is true if server_port is 465)

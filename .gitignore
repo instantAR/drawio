@@ -57,3 +57,8 @@ src/main/webapp/WEB-INF/lib/protobuf-java-*.jar
 src/main/webapp/WEB-INF/lib/protobuf-java-util-*.jar
 src/main/webapp/WEB-INF/lib/re2j-*.jar
 src/main/webapp/WEB-INF/lib/threetenbp-*.jar
+.DS_Store
+.github/.DS_Store
+etc/.DS_Store
+src/.DS_Store
+src/main/.DS_Store
